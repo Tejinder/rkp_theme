@@ -1,0 +1,667 @@
+{namespace jive.search.result autoescape="contextual"}
+
+/**
+ * Content result
+ *
+ * @param type
+ * @param resources
+ * @param subject
+ * @param author
+ * @param? summary
+ * @param publishedDate
+ * @param updatedDate
+ * @param? publishedDateRelative
+ * @param? updatedDateRelative
+ * @param replyCount
+ * @param likeCount
+ * @param viewCount
+ * @param? parentPlace
+ * @param? highlightTags
+ * @param displayExternalAccess
+ * @param? outcomeCounts
+ * @param? socialScoreCategory
+ * @param? uuid
+ * @param? index
+ * @param? promotedResult
+ *
+ * @allowDependsWildcard
+ *
+ * @depends i18nKeys=search.result.content.creatd_modif_by_in.*
+ * @depends i18nKeys=search.result.content.social.*
+ */
+{template .contentResult}
+<li{if $resources.self} data-self="{$resources.self.ref}"{/if} class="j-search-result j-content {if $promotedResult}j-search-promoted-result-container{/if}">
+    {if $promotedResult}<span class="j-search-promoted-result-label">{i18nText('search.promoted_result')}</span>{/if}
+
+    <div class="j-result-icon">
+        {if $resources and $resources.html}
+        <a {sp}
+        {if $uuid and $index}
+            {if length(match($resources.html.ref, '#')) > 0}
+            {let $parts: split($resources.html.ref, '#') /}
+            href="{$parts.0}?sr=search&searchId={$uuid}&searchIndex={$index}{if length($parts) > 1}#{$parts.1}{/if}">
+            {else}
+            href="{$resources.html.ref}?sr=search&searchId={$uuid}&searchIndex={$index}">
+            {/if}
+        {else}
+            href="{$resources.html.ref}">
+        {/if}
+        {call jive.shared.displayutil.icon data="all"}
+            {param size: 'big'/}
+        {/call}
+        </a>
+        {else}
+            {call jive.shared.displayutil.icon data="all"}
+            {param size: 'big'/}
+            {/call}
+        {/if}
+    </div>
+    <div class="j-result-content">
+        {if $resources and $resources.html}
+        <a class="j-search-result-value"
+            {if $uuid and $index}
+                {if length(match($resources.html.ref, '#')) > 0}
+                    {let $parts: split($resources.html.ref, '#') /}
+                    href="{$parts.0}?sr=search&searchId={$uuid}&searchIndex={$index}{if length($parts) > 1}#{$parts.1}{/if}">
+                {else}
+                    href="{$resources.html.ref}?sr=search&searchId={$uuid}&searchIndex={$index}">
+                {/if}
+            {else}
+                href="{$resources.html.ref}">
+            {/if}
+            <span class="j-search-result-title">{$subject|noAutoescape}</span>
+        </a>
+        {else}
+        <span class="j-search-result-value">
+            <span class="j-search-result-title">{$subject|noAutoescape}</span>
+        </span>
+        {/if}
+
+        <p class="j-author-location">
+			{if $updatedDate and $publishedDate != $updatedDate and $author and $parentPlace and $parentPlace.html and $parentPlace.name and $parentPlace.type != 'person' and $type != 'update' and $type != 'dm'} /* Created {0} (modified {1}) by {2} in {3} */
+				{call jive.shared.soy.i18nHelper}
+					{param i18nKey}
+					    {i18nKey('search.result.content.creatd_modif_by_in.1111')}
+					{/param}
+					{param arg0}
+						<span class="j-search-created-timeago" title="{formatDate($publishedDate,'long','datetime')}">
+							{$publishedDateRelative ?: formatDate($publishedDate,'med','datetime')}
+						</span>
+					{/param}	
+					{param arg1}
+						<span class="j-search-modified-timeago" title="{formatDate($updatedDate,'long','datetime')}">
+							{$updatedDateRelative ?: formatDate($updatedDate,'med','datetime')}
+						</span>
+					{/param}
+					{param arg2}
+						{call jive.shared.displayutil.userDisplayNameLink data="$author"}
+							{param visible: ($author.resources and $author.resources.html) ? true : false/}
+							{param username: $author.jive? $author.jive.username : ''/}
+							{param displayNameOverride: ($author.id == -1 and $author.jive) ? $author.jive.username : false/}
+						{/call}
+					{/param}
+					{param arg3}<a href="{buildUrl($parentPlace.html)}">{$parentPlace.name}</a>{/param}
+					{param noAutoEscape}true{/param}
+				{/call}				
+			{elseif $updatedDate and $publishedDate != $updatedDate and $author} /* Created {0} (modified {1}) by {2} */
+				{call jive.shared.soy.i18nHelper}
+					{param i18nKey}
+					    {i18nKey('search.result.content.creatd_modif_by_in.1110')}
+					{/param}
+					{param arg0}
+						<span class="j-search-created-timeago" title="{formatDate($publishedDate,'long','datetime')}">
+							{$publishedDateRelative ?: formatDate($publishedDate,'med','datetime')}
+						</span>
+					{/param}	
+					{param arg1}
+						<span class="j-search-modified-timeago" title="{formatDate($updatedDate,'long','datetime')}">
+							{$updatedDateRelative ?: formatDate($updatedDate,'med','datetime')}
+						</span>
+					{/param}
+					{param arg2}
+						{call jive.shared.displayutil.userDisplayNameLink data="$author"}
+							{param visible: ($author.resources and $author.resources.html) ? true : false/}
+							{param username: $author.jive? $author.jive.username : ''/}
+							{param displayNameOverride: ($author.id == -1 and $author.jive) ? $author.jive.username : false/}
+						{/call}
+					{/param}
+					{param noAutoEscape}true{/param}
+				{/call}				
+			{elseif $updatedDate and $publishedDate != $updatedDate and $parentPlace and $parentPlace.html and $parentPlace.name and $parentPlace.type != 'person' and $type != 'update' and $type != 'dm'} /* Created {0} (modified {1}) in {2} */
+				{call jive.shared.soy.i18nHelper}
+					{param i18nKey}
+					    {i18nKey('search.result.content.creatd_modif_by_in.1101')}
+					{/param}
+					{param arg0}
+						<span class="j-search-created-timeago" title="{formatDate($publishedDate,'long','datetime')}">
+							{$publishedDateRelative ?: formatDate($publishedDate,'med','datetime')}
+						</span>
+					{/param}	
+					{param arg1}
+						<span class="j-search-modified-timeago" title="{formatDate($updatedDate,'long','datetime')}">
+							{$updatedDateRelative ?: formatDate($updatedDate,'med','datetime')}
+						</span>
+					{/param}
+					{param arg2}<a href="{buildUrl($parentPlace.html)}">{$parentPlace.name}</a>{/param}
+					{param noAutoEscape}true{/param}
+				{/call}				
+			{elseif $updatedDate and $publishedDate != $updatedDate} /* Created {0} (modified {1}) */
+				{call jive.shared.soy.i18nHelper}
+					{param i18nKey}
+					    {i18nKey('search.result.content.creatd_modif_by_in.1100')}
+					{/param}
+					{param arg0}
+						<span class="j-search-created-timeago" title="{formatDate($publishedDate,'long','datetime')}">
+							{$publishedDateRelative ?: formatDate($publishedDate,'med','datetime')}
+						</span>
+					{/param}	
+					{param arg1}
+						<span class="j-search-modified-timeago" title="{formatDate($updatedDate,'long','datetime')}">
+							{$updatedDateRelative ?: formatDate($updatedDate,'med','datetime')}
+						</span>
+					{/param}
+					{param noAutoEscape}true{/param}
+				{/call}
+			{elseif $author and $parentPlace and $parentPlace.html and $parentPlace.name and $parentPlace.type != 'person' and $type != 'update' and $type != 'dm'} /* Created {0} by {1} in {2} */
+				{call jive.shared.soy.i18nHelper}
+					{param i18nKey}
+					    {i18nKey('search.result.content.creatd_modif_by_in.1011')}
+					{/param}
+					{param arg0}
+						<span class="j-search-created-timeago" title="{formatDate($publishedDate,'long','datetime')}">
+							{$publishedDateRelative ?: formatDate($publishedDate,'med','datetime')}
+						</span>
+					{/param}	
+					{param arg1}
+						{call jive.shared.displayutil.userDisplayNameLink data="$author"}
+							{param visible: ($author.resources and $author.resources.html) ? true : false/}
+							{param username: $author.jive? $author.jive.username : ''/}
+							{param displayNameOverride: ($author.id == -1 and $author.jive) ? $author.jive.username : false/}
+						{/call}
+					{/param}
+					{param arg2}<a href="{buildUrl($parentPlace.html)}">{$parentPlace.name}</a>{/param}
+					{param noAutoEscape}true{/param}
+				{/call}
+			{elseif $author} /* Created {0} by {1} */
+				{call jive.shared.soy.i18nHelper}
+					{param i18nKey}
+					    {i18nKey('search.result.content.creatd_modif_by_in.1010')}
+					{/param}
+					{param arg0}
+						<span class="j-search-created-timeago" title="{formatDate($publishedDate,'long','datetime')}">
+							{$publishedDateRelative ?: formatDate($publishedDate,'med','datetime')}
+						</span>
+					{/param}	
+					{param arg1}
+						{call jive.shared.displayutil.userDisplayNameLink data="$author"}
+							{param visible: ($author.resources and $author.resources.html) ? true : false/}
+							{param username: $author.jive? $author.jive.username : ''/}
+							{param displayNameOverride: ($author.id == -1 and $author.jive) ? $author.jive.username : false/}
+						{/call}
+					{/param}
+					{param noAutoEscape}true{/param}
+				{/call}
+			{elseif $parentPlace and $parentPlace.html and $parentPlace.name and $parentPlace.type != 'person' and $type != 'update' and $type != 'dm'} /* Created {0} in {1} */
+				{call jive.shared.soy.i18nHelper}
+					{param i18nKey}
+					    {i18nKey('search.result.content.creatd_modif_by_in.1001')}
+					{/param}
+					{param arg0}
+						<span class="j-search-created-timeago" title="{formatDate($publishedDate,'long','datetime')}">
+							{$publishedDateRelative ?: formatDate($publishedDate,'med','datetime')}
+						</span>
+					{/param}
+					{param arg1}<a href="{buildUrl($parentPlace.html)}">{$parentPlace.name}</a>{/param}
+					{param noAutoEscape}true{/param}
+				{/call}
+			{else} /* Created {0} */
+				{call jive.shared.soy.i18nHelper}
+					{param i18nKey}
+					    {i18nKey('search.result.content.creatd_modif_by_in.1000')}
+					{/param}
+					{param arg0}
+						<span class="j-search-created-timeago" title="{formatDate($publishedDate,'long','datetime')}">
+							{$publishedDateRelative ?: formatDate($publishedDate,'med','datetime')}
+						</span>
+					{/param}
+					{param noAutoEscape}true{/param}
+				{/call}
+			{/if}
+			
+			
+        </p>
+
+        {if $displayExternalAccess}
+            <span class="font-color-meta-light j-browse-external-access"><em>{i18nText('partner.browse.ext_access')}</em></span>
+        {/if}
+
+        {if $summary}<p class="j-search-result-summary"> {$summary|noAutoescape}</p>{/if}
+
+        <aside class="j-meta-wrapper">
+            <p class="j-search-result-meta">
+                {if $type == 'dm' or $type == 'collaboration'}
+
+                {else}
+                    {if $replyCount != null}
+                        <span class="j-search-result-comments">
+                            {if $type != 'discussion' and $type != 'message'}
+                                <span class="icon-bubble2" title="{i18nText('search.result.content.comments')}"></span>
+                            {else}
+                                <span class="icon-bubble2" title="{i18nText('search.result.content.replies')}"></span>
+                            {/if}
+                            {sp}{$replyCount}
+                        </span>
+                    {/if}
+                    {if $likeCount != null}
+                        <span class="j-search-result-likes"><span class="icon-thumbs-up2" title="{i18nText('search.result.content.likes')}"></span>{sp}{$likeCount}</span>
+                    {/if}
+                    {if $viewCount != null}
+                        <span class="j-search-result-views"><span class="icon-eye" title="{i18nText('search.result.content.views')}"></span>{sp}{$viewCount}</span>
+                    {/if}
+
+                    {if $socialScoreCategory}
+                        <span class="j-search-result-social-rank"
+                              title="{i18nText(i18nKey('search.result.content.social.rank'+$socialScoreCategory+'.title', true))}">
+                            <span class="icon-social-rank{$socialScoreCategory}"></span>
+                        </span>
+                    {/if}
+                {/if}
+                {if $highlightTags}
+                    <span class="j-search-result-tags">
+                        <span class="icon-tags" title="{i18nText('search.tags.label')}"></span>{sp}
+                        {$highlightTags|noAutoescape}
+                    </span>
+                {/if}
+            </p>
+            {if $outcomeCounts}
+                <div class='j-search-result-outcomes'>
+                    {foreach $outcomeType in keys($outcomeCounts)}
+                        {call jive.outcomes.summary.textCountBadge}
+                            {param outcomeType : $outcomeType /}
+                            {param count       : $outcomeCounts[$outcomeType] /}
+                            {param isLast      : isLast($outcomeType) /}
+                        {/call}
+                    {/foreach}
+                </div>
+            {/if}
+        </aside>
+    </div>
+</li>
+{/template}
+
+/**
+ * People result
+ *
+ * @param? jive
+ * @param id
+ * @param resources
+ * @param displayName
+ * @param? title
+ * @param? department
+ * @param? email
+ * @param displayExternalContributor
+ * @param displayOrgChart
+ *
+ * @depends i18nKeys=global.colon
+ * @depends i18nKeys=profile.org.view-orgchart.link
+ */
+{template .peopleResult}
+<li{if $resources.self} data-self="{$resources.self.ref}"{/if} class="j-search-result j-person" style="display: list-item;">
+    <div class="j-result-icon">
+        {call jive.shared.displayutil.icon data="all"}
+            {param size: 'big'/}
+        {/call}
+    </div>
+    <div class="j-result-content">
+        <a class="j-search-result-value jiveTT-hover-user" data-userid="{$id}" href="{if $jive}{buildUrl('/people/'+ UrlEncode($jive.username))}{else}#{/if}">
+            <span class="j-search-result-title">{$displayName}</span>
+        </a>
+        <p class="j-title-location">
+            {if $title and $department}
+                {i18nText('search.result.people.in', $title, $department)}
+            {elseif $title}
+                {$title}
+            {elseif $department}
+                {$department}
+            {/if}
+        </p>
+        {if $displayExternalContributor}
+            <span class="font-color-meta-light j-browse-external-access"><em>{i18nText('partner.browse.external.contributor')}</em></span>
+        {/if}
+        <p class="j-contact">
+            {if $email}<a class="j-email" href="mailto:{$email}">{$email}</a>{/if}
+        </p>
+        {if $displayOrgChart}
+            <a class="j-org-chart" href="{buildUrl('/people/'+ UrlEncode($jive.username) + '/orgchart')}">
+                <span class="jive-icon-sml jive-glyph-orgchart"></span>
+                {i18nText('profile.org.view-orgchart.link')}
+            </a>
+        {/if}
+    </div>
+</li>
+{/template}
+
+/**
+ * Place result
+ *
+ * @param type
+ * @param typeid
+ * @param id
+ * @param resources
+ * @param name
+ * @param? description
+ * @param memberCount
+ * @param? highlightTags
+ * @param? socialScoreCategory
+ * @param displayExternalAccess
+ * @param? parentPlace
+ * @param? uuid
+ * @param? index
+ *
+ * @depends i18nKeys=global.colon
+ *
+ * @allowDependsWildcard
+ * @depends i18nKeys=search.result.content.social.*
+ */
+{template .placeResult}
+<li{if $resources.self} data-self="{$resources.self.ref}"{/if} class="j-search-result" style="display: list-item;">
+    <div class="j-result-icon">
+        {if $type == 'page' and $parentPlace}
+            {call jive.shared.displayutil.icon}
+                {param type: $parentPlace.type/}
+                {param size: 'big'/}
+            {/call}
+        {else}
+            {call jive.shared.displayutil.icon data="all"}
+                {param size: 'big'/}
+            {/call}
+        {/if}
+    </div>
+    <div class="j-result-content">
+        <a class="j-search-result-value jivecontainerTT-hover-container" data-objecttype="{$typeid}" data-objectid="{$id}"
+            {if $resources and $resources.html}
+                {if $uuid and $index}
+                    {if length(match($resources.html.ref, '#')) > 0}
+                        {let $parts: split($resources.html.ref, '#') /}
+                        href="{$parts.0}?sr=search&searchId={$uuid}&searchIndex={$index}{if length($parts) > 1}#{$parts.1}{/if}">
+                    {else}
+                        href="{$resources.html.ref}?sr=search&searchId={$uuid}&searchIndex={$index}">
+                    {/if}
+                {else}
+                    href="{$resources.html.ref}">
+                {/if}
+            {else}
+                href="#">
+            {/if}
+            {if $type == 'page' and $parentPlace}
+                <span class="j-search-result-title">
+                {$parentPlace.name|noAutoescape}&nbsp;-&nbsp;<span class="j-search-tilepage-name">{$name|noAutoescape}</span>
+                </span>
+            {else}
+                <span class="j-search-result-title">{$name|noAutoescape}</span>
+            {/if}
+        </a>
+            {if $displayExternalAccess}
+                <span class="font-color-meta-light j-browse-external-access">&nbsp;<em>{i18nText('partner.browse.ext_access')}</em></span>
+            {/if}
+        {if $description}<p class="j-search-result-summary">{$description|noAutoescape}</p>{/if}
+        <p class="j-search-result-meta">
+            {if $type=='group'}
+                <span>{i18nText('search.result.place.members')}{i18nText('global.colon')}{sp}{$memberCount}</span>
+            {/if}
+            {if $highlightTags}
+            <span class="j-search-result-tags">
+                {i18nText('search.tags.label')}{sp}
+                {$highlightTags|noAutoescape}
+            </span>
+            {/if}
+            {if $socialScoreCategory}
+                <span class="j-search-result-social-rank"
+                      title="{i18nText(i18nKey('search.result.content.social.rank'+$socialScoreCategory+'.title', true))}">
+                    <span class="icon-social-rank{$socialScoreCategory}"></span>
+                </span>
+            {/if}
+        </p>
+    </div>
+</li>
+{/template}
+
+
+/**
+ * OpenSearch result
+ *
+ * @param resourceIconCss
+ * @param resourceURL
+ * @param title
+ * @param author
+ * @param description
+ * @param publishedDate
+ * @param lastUpdatedDate
+ *
+ * @depends i18nKeys=search.result.content.created_date_modif_date
+ * @depends i18nKeys=search.result.content.created_date
+ * @depends i18nKeys=global.colon
+ */
+{template .openSearchResult}
+<li data-self="{$resourceURL}" class="j-search-result j-content">
+    <div class="j-result-icon">
+        <span class="jive-icon-big {$resourceIconCss}"></span>
+    </div>
+    <div class="j-result-content">
+        <a href="{$resourceURL}" class="j-search-result-value">
+            <span class="j-search-result-title">{$title}</span>
+        </a>
+        <p class="j-author-location">
+            {if $author}
+				{i18nText('search.result.content.createdBy', $author)}
+            {/if}
+        </p>
+        <p class="j-search-result-summary">{$description|noAutoescape}</p>
+        <p class="j-search-result-meta">
+            {if $publishedDate != null and $lastUpdatedDate != null}
+                <span class="j-search-result-create">
+					{call jive.shared.soy.i18nHelper}
+						{param i18nKey}
+						    {i18nKey('search.result.content.created_date_modif_date')}
+						{/param}
+						{param arg0}{formatDate($publishedDate,'med','date')}{/param}
+						{param arg1}{formatDate($lastUpdatedDate,'med','date')}{/param}
+						{param noAutoEscape}true{/param}
+					{/call}
+				</span>
+			{elseif $publishedDate != null}
+                <span class="j-search-result-create">
+					{call jive.shared.soy.i18nHelper}
+						{param i18nKey}
+						    {i18nKey('search.result.content.created_date')}
+						{/param}
+						{param arg0}{formatDate($publishedDate,'med','date')}{/param}
+						{param noAutoEscape}true{/param}
+					{/call}
+				</span>				
+            {/if}
+        </p>
+    </div>
+</li>
+{/template}
+
+
+/**
+ * Alternate content result
+ *
+ * @param type
+ * @param resources
+ * @param subject
+ * @param? author
+ * @param parentPlace
+ * @param displayExternalAccess
+ * @param? uuid
+ * @param? index
+ * @param? promotedResult
+ *
+ * @depends i18nKeys=search.result.content.createdBy_inPlace
+ * @depends i18nKeys=search.result.content.createdBy
+ */
+{template .altContentResult}
+<li{if $resources.self} data-self="{$resources.self.ref}"{/if} class="j-search-result j-content {if $promotedResult}j-search-promoted-result-container{/if}">
+    {if $promotedResult}<span class="j-search-promoted-result-label">{i18nText('search.promoted_result')}</span>{/if}
+
+    <div class="j-result-icon">
+        {call jive.shared.displayutil.icon data="all"}
+            {param size: 'big'/}
+        {/call}
+    </div>
+    <div class="j-result-content">
+        <a class="j-search-result-value"
+        {if $resources and $resources.html}
+            {if $uuid and $index}
+                {if length(match($resources.html.ref, '#')) > 0}
+                    {let $parts: split($resources.html.ref, '#') /}
+                    href="{$parts.0}?sr=search&searchId={$uuid}&searchIndex={$index}{if length($parts) > 1}#{$parts.1}{/if}">
+                {else}
+                    href="{$resources.html.ref}?sr=search&searchId={$uuid}&searchIndex={$index}">
+                {/if}
+            {else}
+                href="{$resources.html.ref}">
+            {/if}
+        {else}
+            href="#">
+        {/if}
+            <span class="j-search-result-title">{$subject|noAutoescape}</span>
+        </a>
+        <p class="j-author-location">
+			{if $author and $parentPlace and $parentPlace.type != 'person' and $type != 'update' and $type != 'dm'}
+                {call jive.shared.soy.i18nHelper}
+					{param i18nKey}
+					    {i18nKey('search.result.content.createdBy_inPlace')}
+					{/param}
+					{param arg0}
+						{call jive.shared.displayutil.userDisplayNameLink data="$author"}
+							{param visible: ($author.resources and $author.resources.html) ? true : false/}
+							{param username: $author.jive? $author.jive.username : ''/}
+							{param displayNameOverride: ($author.id == -1 and $author.jive) ? $author.jive.username : false/}
+						{/call}
+					{/param}
+					{param arg1}<a href="{buildUrl($parentPlace.html)}">{$parentPlace.name}</a>{/param}
+					{param noAutoEscape}true{/param}
+				{/call}
+            {elseif $author}
+                {call jive.shared.soy.i18nHelper}
+					{param i18nKey}
+					    {i18nKey('search.result.content.createdBy')}
+					{/param}
+					{param arg0}
+						{call jive.shared.displayutil.userDisplayNameLink data="$author"}
+							{param visible: ($author.resources and $author.resources.html) ? true : false/}
+							{param username: $author.jive? $author.jive.username : ''/}
+							{param displayNameOverride: ($author.id == -1 and $author.jive) ? $author.jive.username : false/}
+						{/call}
+					{/param}
+					{param noAutoEscape}true{/param}
+				{/call}
+            {/if}
+        </p>
+        {if $displayExternalAccess}
+            <span class="font-color-meta-light j-browse-external-access"><em>{i18nText('partner.browse.ext_access')}</em></span>
+        {/if}
+    </div>
+</li>
+{/template}
+
+/**
+ * Alternate people result
+ *
+ * @param id
+ * @param? jive
+ * @param resources
+ * @param displayName
+ * @param? title
+ * @param? department
+ * @param? email
+ * @param displayExternalContributor
+ */
+{template .altPeopleResult}
+<li{if $resources.self} data-self="{$resources.self.ref}"{/if} class="j-search-result j-person">
+    <div class="j-result-icon">
+        {call jive.shared.displayutil.icon data="all"}
+            {param size: 'big'/}
+        {/call}
+    </div>
+    <div class="j-result-content">
+        <a class="j-search-result-value jiveTT-hover-user" data-userid="{$id}" href="{if $jive}{buildUrl('/people/'+ UrlEncode($jive.username))}{else}#{/if}">
+            <span class="j-search-result-title">{$displayName}</span>
+        </a>
+        <p class="j-title-location">
+            {if $title and $department}
+                {i18nText('search.result.people.in', $title, $department)}
+            {elseif $title}
+                {$title}
+            {elseif $department}
+                {$department}
+            {/if}
+        </p>
+        {if $displayExternalContributor}
+            <span class="font-color-meta-light j-browse-external-access"><em>{i18nText('partner.browse.external.contributor')}</em></span>
+        {/if}
+        <p class="j-contact">
+            {if $email}<a class="j-email" href="mailto:{$email}">{$email}</a>{/if}
+        </p>
+    </div>
+</li>
+{/template}
+
+/**
+ * Alternate place result
+ *
+ * @param type
+ * @param name
+ * @param resources
+ * @param displayExternalAccess
+ * @param? parentPlace
+ * @param? uuid
+ * @param? index
+ */
+{template .altPlaceResult}
+<li{if $resources.self} data-self="{$resources.self.ref}"{/if} class="j-search-result">
+    <div class="j-result-icon">
+        {if $type == 'page' and $parentPlace}
+            {call jive.shared.displayutil.icon}
+                {param type: $parentPlace.type/}
+                {param size: 'big'/}
+            {/call}
+        {else}
+            {call jive.shared.displayutil.icon data="all"}
+                {param size: 'big'/}
+            {/call}
+        {/if}
+    </div>
+    <div class="j-result-content">
+        <a class="j-search-result-value"
+            {if $resources and $resources.html}
+                {if $uuid and $index}
+                    {if length(match($resources.html.ref, '#')) > 0}
+                        {let $parts: split($resources.html.ref, '#') /}
+                        href="{$parts.0}?sr=search&searchId={$uuid}&searchIndex={$index}{if length($parts) > 1}#{$parts.1}{/if}">
+                    {else}
+                        href="{$resources.html.ref}?sr=search&searchId={$uuid}&searchIndex={$index}">
+                    {/if}
+                {else}
+                    href="{$resources.html.ref}">
+                {/if}
+            {else}
+                href="#">
+            {/if}
+            {if $type == 'page' and $parentPlace}
+                <span class="j-search-result-title">
+                {$parentPlace.name|noAutoescape}&nbsp;-&nbsp;<span class="j-search-tilepage-name">{$name|noAutoescape}</span>
+                </span>
+            {else}
+                <span class="j-search-result-title">{$name|noAutoescape}</span>
+            {/if}
+        </a>
+        {if $displayExternalAccess}
+            <span class="font-color-meta-light j-browse-external-access">&nbsp;<em>{i18nText('partner.browse.ext_access')}</em></span>
+        {/if}
+    </div>
+</li>
+{/template}

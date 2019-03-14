@@ -1,0 +1,132 @@
+{namespace jive.documents}
+
+/**
+ * Create a new document.
+ *
+ * @depends path=/resources/scripts/apps/content/documents/main.js
+ * @depends path=/resources/scripts/apps/trial/views/trial_tip_helper.js
+ *
+ * @param bean com.jivesoftware.community.content.document.bean.CreateDocumentDataBean
+ * @param templateView The model to render the page template.
+ */
+{template .create}
+    {call jive.skin.template.main data="$templateView"}
+        {param title: i18nText('create.containable.document') /}
+        {param asyncLoadRTE: false/}
+        {param headContent}
+		<link rel="stylesheet" href="/themes/rkp_theme/style/rkp.css" type="text/css" media="all" />
+            {call jive.content.head/}
+            {call jive.shared.soy.resourceInlineJs}
+                {param code}
+                    $j(function() {lb}
+                        var data = {buildJson($bean)|noAutoescape};
+                        var main = new jive.content.documents.Main({lb}
+                            actionBean: data,
+                            selector: '#create-document'
+                        {rb});
+                        require(['appContainer'], function(appContainer) {lb}
+                            appContainer.initEditContext(data);
+                        {rb});
+                    {rb});
+                {/param}
+            {/call}
+        {/param}
+		{param showNav: 'true'/}
+        {param bodyClass: 'jive-body-formpage jive-body-formpage-document j-doc'/}
+        {param bodyContent}
+        <form class="j-form" method="post" name="create-document" id="create-document">
+
+            <!-- BEGIN main body -->
+            <div class="jive-create-doc jive-create-large jive-content doc-page clearfix">
+
+                {call jive.content.moderationWarning/}
+
+                {call jive.content.header}
+                    {param header: i18nText('create.containable.document') /}
+                    {param headerIcon: 'jive-icon-document' /}
+                {/call}
+
+
+                    {call jive.documents.dataPassthrough}
+                        {param bean: $bean /}
+                    {/call}
+
+                    {if $bean.guest}
+                        {call jive.content.guestinfo data="$bean.userContextBean" /}
+                    {/if}
+
+                    {call jive.content.subject}
+                        {param subject: $bean.subject /}
+                        {param required: i18nText('doc.create.error_title.text') /}
+                        {param placeHolder: i18nText('doc.create.title.text') /}
+                    {/call}
+
+                    {call jive.content.editor}
+                        {param body: $bean.body /}
+                        {param required: i18nText('doc.create.error_text.text') /}
+                    {/call}
+
+
+            </div>
+
+            {call jive.publishbar.main data="$bean.publishBarViewBean" /}
+
+          
+		
+		<!-- Start Grail changes -->
+		
+			<label style="float:left; padding-right:10px; font-weight:bold;">Country:</label>
+			<select style="float:left; height:100px;" name="country" multiple="true">
+				<option value="NA" >NA</option>
+				{foreach $n in $bean.countryList}  
+				
+				<option value="{$n}">{$n}</option>				
+			{/foreach}
+			</select>
+			
+			<label style="float:left; padding-right:10px; font-weight:bold;">Brand:</label>
+			<select style="float:left; height:100px;" name="brand" multiple="true">
+				<option value="NA" >NA</option>
+				{foreach $n in $bean.brandList}  
+				
+				<option value="{$n}">{$n}</option>				
+			{/foreach}
+			</select>
+			
+			<label style="float:left; padding-right:10px; font-weight:bold;">Methodology:</label>
+			<select style="float:left; height:100px;" name="methodology" multiple="true">
+				<option value="NA" >NA</option>
+				{foreach $n in $bean.methodologyList}  
+				
+				<option value="{$n}">{$n}</option>				
+			{/foreach}
+			</select>
+			
+			<label style="float:left; padding-right:10px; font-weight:bold;">Period:</label>
+			<select style="float:left;margin-right:5px;" name="periodMonth" >
+				<option value="NA" >NA</option>
+				{foreach $n in $bean.periodMonth}  
+				
+				<option value="{$n}">{$n}</option>				
+			{/foreach}
+			</select>
+			
+			<select style="float:left;;" name="periodYear" >
+				<option value="NA" >NA</option>
+				{foreach $n in $bean.periodYear}  
+				
+				<option value="{$n}">{$n}</option>				
+			{/foreach}
+			</select>
+			
+			  {call jive.content.composebuttons}
+                {param submitButton: i18nText('doc.create.publish.button') /}
+                {param showDraftButton: true /}
+            {/call}
+			 
+		</div>
+        </form>
+
+        {/param}
+    {/call}
+{/template}

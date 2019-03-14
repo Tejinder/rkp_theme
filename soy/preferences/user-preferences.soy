@@ -1,0 +1,144 @@
+{namespace jive.preferences}
+
+/**
+* Renders the user preferences settings view
+*
+* @param activeTab - The last active preferences tab
+* @param preferencesLinks ActionLink representation of tab items
+* @param preferencesTemplate - template with form elements for setting preferences
+* @param templateData - data to pass to preferences template
+* @param pageTitleKey - i18n key for page title
+* @param showNav - default true
+*
+* @depends path=/resources/scripts/apps/filters/view/secondary_nav_view.js
+* @depends template=jive.preferences.mobile.*
+* @depends template=jive.shared.soy.render
+*/
+{template .main}
+
+    {call jive.shared.soy.resourceInlineJs}
+        {param code}
+        $j(function() {lb}
+            var filterApp = new jive.Filters.SecondaryNavView();
+        {rb});
+       {/param}
+    {/call}
+
+    <head>
+        <title>{i18nText($pageTitleKey)}</title>
+
+        {if match($preferencesTemplate, 'bridgePreferences')}
+            <link rel="stylesheet" type="text/css" href="{resourceUrl('/styles/jive-bridges.css')}" media="all">
+        {/if}
+        {if match($preferencesTemplate, 'preferences.mobile.body')}
+            <link rel="stylesheet" type="text/css" href="{resourceUrl('/styles/mobile-pref.css')}" media="all">
+        {/if}
+    </head>
+
+    <body class="j-body-preferences">
+        <content tag="breadcrumb">
+              {if $templateData.rootCommunityName}
+              <a href="{buildUrl('/')}">{$templateData.rootCommunityName}</a>
+              <a href="{buildUrl('/people')}">{i18nText('profile.people.brdcrmb.link')}</a>
+              <a href="{buildUrl('/people/')}{$templateData.username}">{$templateData.username}</a>
+              {/if}
+          </content>
+    {if $showNav}
+        {call .nav }
+            {param activeTab:$activeTab /}
+            {param preferencesLinks:$preferencesLinks /}
+        {/call}
+    {/if}
+
+    <div class="j-layout j-layout-l clearfix j-contained j-contained-tabs j-contained-tabs-preferences j-rc-none-top j-rc4">
+        <!-- BEGIN large column -->
+        <div class="j-column-wrap-l">
+            <div class="j-column j-column-l">
+
+                {if $preferencesTemplate}
+                    {call jive.shared.soy.render}
+                        {param templateName: $preferencesTemplate /}
+                        {param data: Map(p('data', $templateData)) /}
+                        {param failGracefully: false /}
+                    {/call}
+                {/if}
+                
+            </div>                                                                        
+        </div>
+        <!-- END large column -->
+    <!-- END main section -->
+    </div>
+
+    </body>
+
+<!-- END main body -->
+{/template}
+
+/**
+ * Renders nav tab container
+ *
+ * @param activeTab - ID of currently active tab
+ * @param preferencesLinks ActionLink representation of tab items
+ */
+{template .nav}
+    <nav class="j-bigtab-nav j-rc5 j-rc-none-bottom">
+        <ul class="j-tabbar j-rc5 j-rc-none-bottom">
+            {foreach $preferencesLink in $preferencesLinks}
+                {call .preferencesTab}
+                    {param activeTab: $activeTab /}
+                    {param actionLink: $preferencesLink /}
+                {/call}
+            {/foreach}
+        </ul>
+    </nav>
+{/template}
+
+/**
+ * Renders the general user preferences tab
+ *
+ * @param activeTab
+ * @param actionLink
+ */
+{template .preferencesTab}
+    {if $actionLink and $actionLink.visible}
+        <li id="{call .actionLinkID}{param actionLink:$actionLink /}{/call}" {if $activeTab == $actionLink.id} class="active j-ui-elem"{/if} >
+            <a href="{buildUrl($actionLink.url)}" {if $activeTab == $actionLink.id} class="j-ui-elem"{/if} title="{call .actionLinkTitle}{param actionLink:$actionLink /}{/call}">
+                {call .actionLinkText}{param actionLink:$actionLink /}{/call}
+            </a>
+        </li>
+    {/if}
+{/template}
+
+/**
+ * Safely renders the id of an action link
+ *
+ * @param actionLink
+ */
+{template .actionLinkID}
+    {if $actionLink and $actionLink.id}
+        {$actionLink.id}
+    {/if}
+{/template}
+
+
+/**
+ * Safely renders the title of an action link
+ *
+ * @param actionLink
+ */
+{template .actionLinkTitle}
+    {if $actionLink and $actionLink.titleKey    }
+        {i18nText($actionLink.titleKey)}
+    {/if}
+{/template}
+
+/**
+ * Safely renders the text of an action link
+ *
+ * @param actionLink
+ */
+{template .actionLinkText}
+    {if $actionLink and $actionLink.nameKey}
+        {i18nText($actionLink.nameKey)}
+    {/if}
+{/template}

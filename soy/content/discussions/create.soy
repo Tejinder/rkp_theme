@@ -1,0 +1,90 @@
+{namespace jive.discussions}
+
+/**
+ * Create a new discussion
+ *
+ * @depends path=/resources/scripts/apps/content/discussions/main.js
+ *
+ * @param bean com.jivesoftware.community.content.action.beans.BaseContentActionBean
+ * @param templateView The model to render the page template.
+ */
+{template .create}
+    {call jive.skin.template.main data="$templateView"}
+        {param title: i18nText('create.containable.thread') /}
+        {param asyncLoadRTE: false/}
+        {param headContent}
+            {call jive.content.head/}
+            {call jive.shared.soy.resourceInlineJs}
+                {param code}
+                    $j(function() {lb}
+                        var main = new jive.discussions.Main({lb}
+                            {if not $bean.guest}beforeRteSelector: '#mq01',{/if}
+                            actionBean: {buildJson($bean)|noAutoescape},
+                            selector: '#create-discussion'
+                        {rb});
+                        require(['appContainer'], function(appContainer) {lb}
+                            appContainer.initEditContext({buildJson($bean)|noAutoescape});
+                        {rb});
+                    {rb});
+                {/param}
+            {/call}
+        {/param}
+		{param showNav: 'true'/}
+        {param bodyClass: 'jive-body-formpage jive-body-formpage-discussion j-thread'/}
+        {param bodyContent}
+		<link rel="stylesheet" href="/themes/rkp_theme/style/rkp.css" type="text/css" media="all" />
+            <form class="j-form" method="post" name="create-discussion" id="create-discussion">
+
+                <!-- BEGIN main body -->
+                <div class="jive-create-thread jive-create-large  jive-content thread-page">
+
+
+                    {call jive.content.moderationWarning/}
+                    
+                    {call jive.content.header}
+                        {param header: i18nText('post.post_new_thread.gtitle') /}
+                        {param headerIcon: 'jive-icon-discussion' /}
+                    {/call}
+
+                    {call jive.content.dataPassthrough}
+                        {param bean: $bean /}
+                    {/call}
+
+                    {if $bean.guest}
+                        {call jive.content.guestinfo data="$bean.userContextBean" /}
+                    {/if}
+
+                    {call jive.content.subject}
+                        {param subject: $bean.subject /}
+                        {param required: i18nText('post.err.pls_enter_subject.text') /}
+                        {param placeHolder: i18nText('post.post_new_question.title') /}
+                    {/call}
+
+                    {if not $bean.guest and not $bean.fromQuest}
+                        {call .question}
+                            {param checked: $bean.question /}
+                        {/call}
+                    {/if}
+
+                    {call jive.content.editor}
+                        {param body: $bean.body /}
+                        {param required: i18nText('post.err.pls_enter_a_msg.text') /}
+                    {/call}
+                </div>
+
+                {call jive.publishbar.main data="$bean.publishBarViewBean" /}
+
+                {call jive.content.composebuttons}
+                    {param submitButton: i18nText('global.post_message') /}
+                    {param showDraftButton: false /}
+                {/call}
+            </form>
+
+            <!-- END main body -->
+
+        {/param}
+    {/call}
+{/template}
+
+
+

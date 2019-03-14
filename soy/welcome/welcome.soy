@@ -1,0 +1,870 @@
+{namespace jive.welcome autoescape="contextual"}
+
+/**
+* Renders the welcome page.
+*
+* @param homeNavHelper properties for home nav
+* @param jiveURL the canonical url of the jive instance
+* @param templateView The model to render the page template.
+* @param communityMetaDescription Description for meta information
+*/
+{template .main}
+
+    {call jive.skin.template.main data="$templateView"}
+       {param title}
+            {i18nText('userbar.welcome.gtitle')}
+        {/param}
+        {param canonicalUrl: $jiveURL/}
+        {param selectedLinkID: 'jive-nav-link-home'/}
+        {param bodyClass: 'j-body-welcome j-body-home'/}
+        {param bodyContent}
+            
+			<div class="j-layout j-layout-sl clearfix">
+                <div class="j-column-wrap-s">
+                    <nav class="j-column j-column-s" role="navigation" aria-label="{i18nText('eae.stream.nav')}">
+                        {call .homeSideNav}
+                            {param homeNavHelper: $homeNavHelper/}
+                            {param selectedLinkID: 'jive-nav-link-dashboard'/}
+                        {/call}
+                    </nav>
+                </div>
+                <!-- BEGIN large column -->
+                <div class="j-column-wrap-l">
+                <div id="j-dynamic-pane" class="j-column j-column-l">
+                        {call .welcomeDynamicPane data="all"/}
+                    </div>
+                </div>
+            </div>
+            <!-- END main body -->
+        {/param}
+        {param headContent}
+			<link rel="shortcut icon" type="image/x-icon" href="/themes/rkp_theme/images/favicon.ico" />
+			<link rel="icon" type="image/png" href="/themes/rkp_theme/images/favicon.png" />           
+		   <link rel="stylesheet" href="{resourceUrl('/styles/jive-widgets.css')}" type="text/css" media="all" />
+			<link rel="stylesheet" href="/themes/rkp_theme/style/rkp.css" type="text/css" media="all" />
+            <meta name="description" content="{$communityMetaDescription}">
+        {/param}
+		{param showNav: 'false'/}
+		
+    {/call}
+{/template}
+
+/**
+* Renders the welcome page as just the overview page with no controls.
+*
+* @param homeNavHelper properties for home nav
+* @param jiveURL the canonical url of the jive instance
+* @param templateView The model to render the page template.
+* @param communityMetaDescription Description for meta information
+*
+* @depends path=/resources/scripts/apps/home/home_nav_controller.js
+*/
+{template .simplifiedMain}
+    {call jive.skin.template.main data="$templateView"}
+        {param title}
+            {i18nText('userbar.welcome.gtitle')}
+        {/param}
+        {param canonicalUrl: $jiveURL/}
+        {param selectedLinkID: 'jive-nav-link-home'/}
+        {param bodyClass: 'j-body-welcome j-body-home j-simple-homepage'/}
+        {param bodyContent}
+            {call .welcomeDynamicPane data="all"}
+                {param selectedLinkID: 'jive-nav-link-activity'/}
+            {/call}
+            {call jive.shared.soy.resourceInlineJs}
+                {param code}
+                    $j(function() {lb}
+                        {if $homeNavHelper.showOnbIntroModal}
+                            require(['apps/home/home_nav_controller'], function(HomeNavController) {lb}
+                                jive.HomeNav.GlobalController = new HomeNavController({lb}
+                                    showOnbIntroModal: true
+                                {rb});
+                            {rb});
+                         {/if}
+                    {rb});
+                {/param}
+            {/call}
+        {/param}
+        {param headContent}
+			<link rel="shortcut icon" type="image/x-icon" href="/themes/rkp_theme/images/favicon.ico" />
+			<link rel="icon" type="image/png" href="/themes/rkp_theme/images/favicon.png" />
+            <link rel="stylesheet" href="{resourceUrl('/styles/jive-widgets.css')}" type="text/css" media="all" />
+			<link rel="stylesheet" href="/themes/rkp_theme/style/rkp.css" type="text/css" media="all" />
+            <meta name="description" content={$communityMetaDescription}>
+        {/param}
+		{param showNav: 'false'/}
+    {/call}
+{/template}
+
+/**
+* Displays the widget container section of the homepage
+*
+* @param place the {@link Place} that we are displaying.
+* @param widgetMarkup the html markup from the widget layout
+* @param widgetTypeKey the key for the specified widget type
+* @param canManageContainer true if the user can manage the container
+* @param customizeMessageSeen true if the place customize message has been seen
+* @param canManageAnnouncements true if the current user can manage announcements
+* @param announcements the system announcements
+* @param customizeNow true if we need to open the customization panel automatically, false otherwise. This is triggered from the manage link
+* @param showLayoutUpgradeMessage true if we should display the layout upgraded message, false otherwise
+* @param? invitationVisible
+* @param? showInviter showInviter
+* @param welcomeMessage the mobile homepage welcome message
+* @param defaultMobileHomePage the default mobile homepage
+*
+* @depends template=jive.announcements.list
+* @depends path=/resources/scripts/apps/browse/user/model/user_source.js
+* @depends path=/resources/scripts/apps/browse/container/model/container_source.js
+* @depends path=/resources/scripts/jquery/ui/jquery.ui.sortable.js
+* @depends path=/resources/scripts/jquery/ui/jquery.ui.draggable.js
+* @depends path=/resources/scripts/jquery/jquery.ui.touch-punch.js
+* @depends path=/resources/scripts/jivewidgets.js
+* @depends path=/resources/scripts/apps/shared/views/loader_view.js
+* @depends path=/resources/scripts/apps/navbar/menu/create/create_quick.js
+* @depends path=/resources/scripts/jive/widget/widget-container.js
+* @depends path=/resources/scripts/jquery/jquery.safelyLoad.js
+* @depends i18nKeys=community.startFollow.desc
+* @depends i18nKeys=community.stopFollow.desc
+* @depends i18nKeys=project.startFollow.desc
+* @depends i18nKeys=project.stopFollow.desc
+* @depends i18nKeys=socialgroup.startFollow.desc
+* @depends i18nKeys=socialgroup.stopFollow.desc
+*/
+{template .welcomeDynamicPane autoescape="contextual"}
+    <div class="j-contained j-home-welcome j-rc511">
+        {call jive.shared.soy.resourceInlineJs}
+            {param code}
+            function toggleWidgetPanel() {lb}
+                var spinner = new jive.loader.LoaderView();
+                $j(document.body).addClass('jive-widget-progresscursor').addClass('jive-body-widget-customizing');
+                $j("#jive-widgets-panel-loading").show();
+                spinner.appendTo($j("#jive-widgets-panel-loading"));
+                $j("#jive-widget-container").safelyLoad('{buildUrl('customize-container.jspa', 'containerType', $place.objectType, 'containerID', $place.id)|noAutoescape}', {lb} cache: false {rb}, function() {lb}
+                    $j("#jive-widgets-panel-loading").hide();
+                    spinner.destroy();
+                    $j("#jive-widgets-panel").fadeIn(500);
+                    $j("#jive-widgets-warning").fadeIn(500);
+                    $j(document.body).removeClass('jive-widget-progresscursor');
+                    {if not $customizeMessageSeen}
+                        $j('#customize-message').slideDown();
+                    {/if}
+                {rb});
+            {rb}
+			
+			$j(document).ready(function() {lb}
+               
+
+                if($j("#jive-widget-content #world") != undefined) {lb}
+                    updateCoordinates();
+				   /*$j("#jive-widget-content #world").load(function() {lb}
+                      updateCoordinates();
+                   {rb})*/
+                {rb}
+
+            {rb});
+			
+			function updateCoordinates() {lb}
+
+               if($j("#world") != undefined) {lb}
+
+                  var width = $j("#world").width();
+                  var height = $j("#world").height();
+
+                  var americas = document.getElementById("americas");
+                  if(americas != undefined) {lb}
+                     americas.coords = (157/819*width)+", "+(20/319*height)+", "+(274/819*width)+", "+(148/319*height);
+                  {rb}
+
+                 var americas_2 = document.getElementById("americas_2");
+                 if(americas_2) {lb}
+                    americas_2.coords = (237/819*width)+", "+(152/319*height)+", "+(329/819*width)+", "+(313/319*height);
+                 {rb}
+
+                 var americas_3 = document.getElementById("americas_3");
+                 if(americas_3) {lb}
+                    americas_3.coords = (279/819*width)+", "+(5/319*height)+", "+(376/819*width)+", "+(47/319*height);
+                 {rb}
+
+                 var western_europe = document.getElementById("western_europe");
+                 if(western_europe) {lb}
+                    western_europe.coords = (381/819*width)+", "+(25/319*height)+", "+(438/819*width)+", "+(101/319*height);
+                 {rb}
+
+                 var eemea = document.getElementById("eemea");
+                 if(eemea) {lb}
+                    eemea.coords = (365/819*width)+", "+(107/319*height)+", "+(515/819*width)+", "+(169/319*height);
+                 {rb}
+
+                 var eemea_2 = document.getElementById("eemea_2");
+                 if(eemea_2) {lb}
+                    eemea_2.coords = (417/819*width)+", "+(169/319*height)+", "+(495/819*width)+", "+(267/319*height);
+                 {rb}
+
+                  var eemea_3 = document.getElementById("eemea_3");
+                  if(eemea_3) {lb}
+                     eemea_3.coords = (443/819*width)+", "+(12/319*height)+", "+(534/819*width)+", "+(104/319*height);
+                  {rb}
+
+                  var eemea_4 = document.getElementById("eemea_4");
+                  if(eemea_4) {lb}
+                     eemea_4.coords = (535/819*width)+", "+(15/319*height)+", "+(658/819*width)+", "+(67/319*height);
+                  {rb}
+
+                  var asia_pacific = document.getElementById("asia_pacific");
+                  if(asia_pacific) {lb}
+                     asia_pacific.coords = (528/819*width)+", "+(69/319*height)+", "+(627/819*width)+", "+(165/319*height);
+                  {rb}
+
+                  var asia_pacific_2 = document.getElementById("asia_pacific_2");
+                  if(asia_pacific_2) {lb}
+                     asia_pacific_2.coords = (602/819*width)+", "+(191/319*height)+", "+(685/819*width)+", "+(275/319*height);
+                  {rb}
+
+               {rb}
+
+            {rb}
+			 function combineFields(){lb}
+			 var combinedSearch = "";
+        var allwords = document.getElementById('all_fields').value;
+        var anywords = document.getElementById('any_fields').value;
+        var exactwords = document.getElementById('exact_fields').value;
+        var nonewords = document.getElementById('none_fields').value;
+        var tagwords = document.getElementById('tag_fields').value;
+        var mrts = document.getElementById('mrts').value;
+
+       
+
+
+
+
+        combinedSearch = allwords + anywords + exactwords + nonewords + tagwords + mrts;
+		
+        if(combinedSearch == "") {lb}
+            var errorel = document.getElementById('modal_error');
+            errorel.style.display = '';
+            errorel.innerHTML = '<div><span class="jive-icon-med jive-icon-redalert"></span>Please enter at least one search term</div>';
+            return false;
+        {rb}
+		
+	 {rb}
+        
+		require(['apps/places/actions/main', 'apps/places/manage/main', 'jive/widget/widget-container', 'apps/browse/container/model/container_source', 'documentReady'], function(Actions, ManageMain, WidgetContainer, ItemSource) {lb}
+                if (!window.widgetContainer) {lb}
+                    window.widgetContainer = new WidgetContainer({lb}
+                        'widgetType': '{$widgetTypeKey}',
+                        'renderWidgetAction': '{buildUrl('/render-widget.jspa')}',
+                        'containerID': '{$place.id}',
+                        'containerType': '{$place.objectType}'
+                    {rb});
+                    define('widgetContainer', window.widgetContainer);
+                {rb};
+                new Actions({buildJson($place) |noAutoescape});
+
+                new ManageMain({buildJson($place) |noAutoescape}, {lb}
+                    canManageAnnouncements: {if $canManageAnnouncements}true{else}false{/if},
+                    i18n: {buildJson(Map(
+                        p('startFollowing', i18nText(i18nKey($place.placeI18nKeyPrefix +'.startFollow.desc', true))),
+                        p('stopFollowing', i18nText(i18nKey($place.placeI18nKeyPrefix +'.stopFollow.desc', true))),
+                        p('followError', i18nText('global.follow.error'))
+                    )) |noAutoescape}
+                {rb});
+
+                window.widgetContainer.renderAll();
+                $j('#customize-message #dismiss-link').click(dismissCustomizeMessage);
+                $j('#js-layout-upgrade-link').click(function() {lb} dismissLayoutUpgradeMessage(); return false; {rb});
+                $j('#js-layout-upgrade-change-link').click(function() {lb} dismissLayoutUpgradeMessage(); toggleWidgetPanel(); return false; {rb});
+                $j('body').on('click','.widget-remove-link', function() {lb} removeWidgetFrame(this); return false; {rb});
+                $j('body').on('click','.widget-edit-link', function() {lb} editWidgetFrame(this); return false; {rb});
+                $j('body').on('click','.widget-dismiss-link', function() {lb} dismissWidgetMessage(this); return false; {rb});
+
+                // bind to create links on the page
+                var createQuick = new jive.Navbar.Menu.CreateQuick.Main('a.js-create-quick-link, a:has(.js-create-quick-link)');
+
+                {if $customizeNow}
+                    toggleWidgetPanel();
+                {/if}
+
+            {rb});
+
+            function dismissCustomizeMessage() {lb}
+                $j('#customize-message').slideUp();
+                if ($j('#customize-message').find('#dont-display-message').prop('checked')) {lb}
+                    var userSource = new jive.Browse.User.ItemSource();
+                    userSource.setUserProperty({lb} userID: 'current', propName: 'jive.customizeWidgetMsg.closed', propValue: 'true' {rb});
+                {rb}
+                return false;
+            {rb}
+
+            function dismissLayoutUpgradeMessage() {lb}
+                 $j('#js-layout-upgrade').slideUp();
+                 var containerSource = new ItemSource();
+                 containerSource.removeContainerProperty({lb} containerType: {$place.objectType}, containerID: {$place.id}, propName: 'jive.upgrade.widgetLayoutInvalid'{rb});
+            {rb}
+
+            function dismissWidgetMessage(link) {lb}
+                $j(link).closest('.widget-message').slideUp();
+                var prop = $j(link).attr('data-property');
+                if (prop) {lb}
+                    var userSource = new jive.Browse.User.ItemSource();
+                    userSource.setUserProperty({lb} userID: 'current', propName: prop, propValue: 'true' {rb});
+                {rb}
+            {rb}
+
+            function removeWidgetFrame(button) {lb}
+                var frameID = widgets.getWidgetFrameID(button);
+                if (frameID) {lb}
+                    widgets.removeWidgetFrame(frameID);
+                {rb}
+            {rb}
+
+            function editWidgetFrame(button) {lb}
+                var frameID = widgets.getWidgetFrameID(button);
+                if (frameID) {lb}
+                    widgets.editWidgetFrame(frameID);
+                {rb}
+            {rb}
+            {/param}
+        {/call}
+
+        {if $invitationVisible}
+            {call jive.invite.jsInit}
+                {param container_id:$place.id/}
+                {param container_type:$place.objectType/}
+                {param showNow:$showInviter/}
+                {param trigger:'#jive-place-link-actions-invite'/}
+                {param trackingID:''/}
+            {/call}
+        {/if}
+
+        {call jive.announcements.list}
+            {param announcements: $announcements /}
+            {param showDismiss: false /}
+        {/call}
+
+        {if $canManageContainer}
+            {if $showLayoutUpgradeMessage}
+                {call .layoutUpgradeMessage /}
+            {/if}
+            {if not $customizeMessageSeen}
+                {call .editPageMessage /}
+            {/if}
+        {/if}
+
+        <div id="jive-widgets-panel-loading" style="display: none"></div>
+		
+		<div id="community" class="clearfix">
+                {$place.name}
+        </div>
+
+        <div id="jive-widget-container" role="main" aria-label="{i18nText('eae.header.text.overview')}">
+            <div id="jive-widget-content" class="clearfix">
+                {$widgetMarkup |noAutoescape}
+            </div>
+			
+        </div>
+		
+		<!-- Changes for NEW IRIS Summary Coming Soon Start -->
+		<div class="outerImgBlock">
+			<div class="innerImgBlock">
+			</div>
+			<div class="innerImgBlockText">
+			<p>COMING SOON !</p>
+			<div>
+			<span>IRIS page is under construction</span><span class="textSpanBorderRght"></span><span>Still feel free to use 'IRIS Search' feature</span>
+			</div>
+			</div>
+        </div>
+		<!-- Changes for NEW IRIS Summary Coming Soon End -->
+		
+		
+        // Announcement Modal
+        {if $canManageAnnouncements}
+            <div class="jive-modal" id="jive-modal-announcements">
+                <header>
+                    <h2 class="jive-modal-title jive-modal-title-manage-announcements">{i18nText('announcement.manage.system.title')}</h2>
+                    <h2 class="jive-modal-title jive-modal-title-add-announcement" style="display: none">{i18nText('announcement.manage.add.title')}</h2>
+                    <h2 class="jive-modal-title jive-modal-title-edit-announcement" style="display: none">{i18nText('announcement.manage.edit.title')}</h2>
+                </header>
+                <a href="#" class="j-modal-close-top close">{i18nText('global.close')}  <span class="j-close-icon j-ui-elem" role="img"></span></a>
+
+                <div id="announcements-modal"></div>
+				
+				
+				
+				
+				
+				
+				
+            </div>
+        {/if}
+        // End Announcement Modal
+
+        // Without this directive inline scripts are not emitted when
+        // loading Welcome view dynamically (via ajax).
+        {outputResources('script', '', false, true)|noAutoescape}
+    </div>
+    <div class="j-home-welcome-responsive visible-xs" data-welcome-message="{if $welcomeMessage}{$welcomeMessage}{/if}"
+        data-browse-id="{$place.browseID}" data-default-mobile-home-page="{buildJson($defaultMobileHomePage)}">
+    </div>
+{/template}
+
+/**
+ * A message telling admins that their layout has been changed
+ */
+{template .layoutUpgradeMessage}
+  <!--  <div class="customize-message jive-info-box clearfix" id="js-layout-upgrade" aria-live="polite" aria-atomic="true">
+        <a href="#" id="js-layout-upgrade-link" style="float: right">{i18nText('welcome.dismiss.link')}</a>
+        <h5>{i18nText('welcome.layout.upgrade.header')}</h5>
+        <p class="welcome-message">
+            {i18nText('welcome.layout.upgrade.text')}
+            &nbsp;<a href="#" id="js-layout-upgrade-change-link">{i18nText('welcome.layout.upgrade.change.link')}</a>
+        </p>
+    </div>-->
+{/template}
+
+/**
+ * A message telling admins how to customize the page with widgets.
+ */
+{template .editPageMessage}
+    <div class="customize-message clearfix" id="customize-message" style="display: none">
+        <h5>{i18nText('welcome.editpagetitle')}</h5>
+        <p class="welcome-message">
+            {i18nText('welcome.editinfo')}
+        </p>
+        <div class="customize-display clearfix">
+            <a href="#" id="dismiss-link" class="j-btn-global">{i18nText('welcome.dismiss.link')}</a>
+            <label for="dont-display-message">
+                <input type="checkbox" id="dont-display-message">
+                {i18nText('welcome.dontshowmsg')}
+            </label>
+        </div>
+
+        <div style="float:right"></div>
+    </div>
+{/template}
+
+
+
+/**
+* Renders a subnav bar for the browse sections.
+* @depends path=/resources/scripts/apps/home/home_nav_controller.js
+* @depends template=jive.try_jive.tryJiveLink
+* @param homeNavHelper properties for home nav
+* @param selectedLinkID The ID of the selected link.
+*/
+{template .homeSideNav}
+    <a href="#" id="mobile-sidenav-btn"></a>
+    
+    <ul id="j-home-side-nav" class="j-homenav">
+        {if not $homeNavHelper.anonymous}
+                {call .homeSideNavLink data="$homeNavHelper.inboxLink"}
+                    {param selected}{if $selectedLinkID == $homeNavHelper.inboxLink.id}true{/if}{/param}
+                    {param pollingEnabled: $homeNavHelper.pollingEnabled /}
+                    {param canPin: $homeNavHelper.canPin /}
+                    {param pinned: ($homeNavHelper.canPin and $homeNavHelper.pinnedLinkID == $homeNavHelper.inboxLink.id) /}
+                {/call}
+                {call .homeSideNavLink data="$homeNavHelper.yourViewLink"}
+                    {param selected}{if $selectedLinkID == $homeNavHelper.yourViewLink.id}true{/if}{/param}
+                    {param pollingEnabled: $homeNavHelper.pollingEnabled /}
+                    {param canPin: $homeNavHelper.canPin  /}
+                    {param pinned: ($homeNavHelper.canPin and $homeNavHelper.pinnedLinkID == $homeNavHelper.yourViewLink.id) /}
+                {/call}
+                {call .homeSideNavLink data="$homeNavHelper.moderationLink"}
+                    {param selected}{if $selectedLinkID == $homeNavHelper.moderationLink.id}true{/if}{/param}
+                    {param pollingEnabled: $homeNavHelper.pollingEnabled /}
+                    {param canPin: false /}
+                    {param pinned: false /}
+                {/call}
+            {/if}
+            {call .homeSideNavLink data="$homeNavHelper.actionsLink"}
+                {param selected}{if $selectedLinkID == $homeNavHelper.actionsLink.id}true{/if}{/param}
+                {param pollingEnabled: $homeNavHelper.pollingEnabled /}
+                {param canPin: $homeNavHelper.canPin  /}
+                {param pinned: ($homeNavHelper.canPin and $homeNavHelper.pinnedLinkID == $homeNavHelper.actionsLink.id) /}
+            {/call}
+            {foreach $link in $homeNavHelper.customLinks}
+                {call .homeSideNavLink data="$link"}
+                    {param selected}{if $selectedLinkID == $link.id}true{/if}{/param}
+                    {param pollingEnabled: $homeNavHelper.pollingEnabled /}
+                    {param canPin: false /}
+                    {param pinned: false /}
+                {/call}
+            {/foreach}
+        {call .getStartedNavLink data="$homeNavHelper.onboardingLink"}
+            {param selected}{if $selectedLinkID == $homeNavHelper.onboardingLink.id}true{/if}{/param}
+            {param canPin: $homeNavHelper.canPin /}
+            {param pinned: ($homeNavHelper.canPin and $homeNavHelper.pinnedLinkID == $homeNavHelper.onboardingLink.id) /}
+            {param visible: $homeNavHelper.onboardingLink.visible /}
+        {/call}
+    </ul>
+
+    {call jive.shared.soy.resourceInlineJs}
+        {param code}
+            $j(function() {lb}
+                jive.namespace('HomeNav');
+
+                require(['apps/home/home_nav_controller'], function(HomeNavController) {lb}
+                    jive.HomeNav.GlobalController =
+                        new HomeNavController({lb}
+                            selectedLinkID: '{$selectedLinkID}',
+                            pollingEnabled: {$homeNavHelper.pollingEnabled},
+                            canPin: {$homeNavHelper.canPin},
+                            maxCustomStreams: {$homeNavHelper.maxCustomStreams},
+                            showOnbIntroModal: {$homeNavHelper.showOnbIntroModal},
+                            sysDefaultHomeNavView: '{$homeNavHelper.systemDefaultHomeNavView}',
+                            instanceName: '{$homeNavHelper.instanceName}',
+                            userOriginType: '{$homeNavHelper.userOriginType}',
+                            displayData: {buildJson($homeNavHelper.displayData)|noAutoescape},
+                        {rb});
+                {rb});
+            {rb});
+        {/param}
+    {/call}
+{/template}
+
+/**
+ * @param streamName
+ */
+{template .streamNameEditForm}
+    <form class="j-js-display-name-edit-controls j-edit-name j-form">
+        <label for="{$streamName}-input-id" class="j-508-label">{i18nText('eae.stream.name')}</label>
+        <input type="text" maxlength="36" class="j-stream-name-input j-js-stream-name-input j-rc3" value="{$streamName}" id="{$streamName}-input-id"/>
+    </form>
+{/template}
+
+/**
+* Renders a link for the subnav nav.
+*
+* @param id The nav item ID.
+* @param url The link url.
+* @param nameKey The text key for getting the link name.
+* @param titleKey The text key for getting the link title.
+* @param linkCss The class attributes for the link.
+* @param visible true if the link is visible
+* @param? hidden true if the link is visible but hidden
+* @param? pinned true if this nav item is the user's pinned nav item
+* @param? canPin true if pinning is a possible action for the user
+* @param? pollingEnabled whether or not stream update counts polling is enabled
+* @param? selected Whether or not this is a selected link.
+* @param? countType - identifier of the type of update indicator to use, if applicable
+* @param source - identifier of the nav item "source" type, used for pinning
+* @param? channel - identifier of the nav item "channel" type
+* @param? canEditNews - Whether viewing user can edit news pages
+*/
+{template .homeSideNavLink}
+    {if $visible}
+        <li id="{$id}"
+            class="j-js-side-nav-item j-homenav-item {if $selected}selected{/if} {if $pinned}pinned{/if}"
+            data-source="{$source}"
+            {if $channel}data-channel="{$channel}"{/if}
+            {if $hidden}style="display:none;"{/if}>
+            <a href="{buildUrl($url)|noAutoescape}" {if $titleKey}title="{i18nText($titleKey)}"{/if} class="j-homenav-link j-js-side-nav-link {$linkCss}">
+                <span class="nav-link lnk">{i18nText($nameKey)}</span>
+                {if $canPin}
+                    <span class="j-js-pin-stream jive-icon-glyph j-stream-pin icon-pin font-color-meta-light" title="{i18nText('nav.bar.home.set.default')}"></span>
+                {/if}
+                {if $countType and $pollingEnabled}
+                    {call .updateIndicator}
+                        {param type: $countType /}
+                        {param count: 0 /}
+                        {param extraCssClasses: 'j-sidenav-count' /}
+                    {/call}
+                {/if}
+                {if $channel == 'news' and $canEditNews}
+                    <a href="{buildUrl('edit-news.jspa')}" class="j-editPage" title="{i18nText('nav.bar.home.edit.news')}">
+                       <span class="jive-icon-glyph icon-edit"></span>
+                    </a>
+               {/if}
+            </a>
+        </li>
+    {/if}
+{/template}
+
+/**
+* Renders a link for the subnav nav.
+*
+* @param id The nav item ID.
+* @param url The link url.
+* @param nameKey The text key for getting the link name.
+* @param titleKey The text key for getting the link title.
+* @param linkCss The class attributes for the link.
+* @param visible true if the link is visible
+* @param pinned true if this nav item is the user's pinned nav item
+* @param? selected Whether or not this is a selected link.
+* @param? source - identifier of the nav item "source" type, used for pinning
+* @param viewData
+*/
+{template .getStartedNavLink}
+    {if $visible}
+        <li id="{$id}" class="j-js-side-nav-item j-homenav-item j-rc5 {if $selected}selected{/if} {if $pinned}pinned{/if}" data-source="{$source}" role="tab">
+            <a href="{buildUrl($url)|noAutoescape}" {if $titleKey}title="{i18nText($titleKey)}"{/if} class="j-homenav-link j-js-side-nav-link {$linkCss}">
+                <span class="nav-link lnk">{i18nText($nameKey)}</span>
+                {call .onboardingNavProgress}
+                    {param percentComplete: $viewData.percentComplete /}
+                    {param totalSteps: $viewData.totalSteps /}
+                    {param totalStepsComplete: $viewData.totalStepsComplete /}
+                {/call}
+            </a>
+        </li>
+    {/if}
+{/template}
+
+/**
+ * @param percentComplete
+ * @param totalSteps
+ * @param totalStepsComplete
+ */
+{template .onboardingNavProgress}
+    <div id="j-onb-nav-progress" title="">
+        <span class="j-complete {if $percentComplete == 0} font-color-meta j-notstarted{else}font-color-meta j-started{/if}">
+            {$totalStepsComplete}/{$totalSteps}
+        </span>
+        <div class="j-onb-progress j-rc5" {if $percentComplete == 0} style="display:none"{else}style="display:block"{/if}>
+            <div class="j-progress-bar">
+                <span class="j-index-holder">
+                    <span style="width: {$percentComplete}%;" class="j-index">{sp}</span>
+                </span>
+            </div>
+        </div>
+    </div>
+{/template}
+/**
+* Renders an activity stream link for the subnav nav.
+*
+* @param id The stream ID.
+* @param name The text key for getting the link name.
+* @param source The StreamSource
+* @param endPoint Where the source of our stream is (News or Activity)
+* @param pollingEnabled whether or not stream update counts polling is enabled
+* @param? pinnedLinkID
+* @param? selectedLinkID Whether or not this is a selected link.
+* @param? anonymous
+* @depends i18nKeys=eae.activitystream.builder.done
+*
+*/
+{template .activityStreamNavItem}
+    {let $linkId}jive-nav-link-{$source}{if $source != 'connections' and $source != 'watches'}-{$id}{/if}{/let}
+    {let $pinned:
+        $pinnedLinkID
+         and (($source == 'connections' and $pinnedLinkID == 'jive-nav-link-connections')
+         or  ($source == 'watches' and $pinnedLinkID == 'jive-nav-link-watches')
+         or  ($source == 'custom' and $pinnedLinkID == 'jive-nav-link-custom-'+$id)
+         or  ($linkId == $pinnedLinkID))/}
+    <li id="{$linkId}" data-streamid="{$id}" data-source="{$source}"
+        class="j-js-side-nav-item j-js-as-nav-item j-homenav-item j-rc5 j-rc-none-right j-custom-stream-item{sp}
+            {if $selectedLinkID and
+                (($source == 'connections' and $selectedLinkID == 'jive-nav-link-connections') or
+                 ($source == 'watches' and $selectedLinkID == 'jive-nav-link-watches') or
+                 ($source == 'custom' and $selectedLinkID == 'jive-nav-link-custom-'+$id) or
+                 ($linkId == $selectedLinkID))
+            }
+                selected
+            {/if}{sp}
+            {if $pinned}
+                pinned
+            {/if}"
+    >
+
+        <a href="
+            {if $source == 'connections' or $source == 'watches'}
+                {buildUrl('/'+ $endPoint +'?streamSource='+$source)|noAutoescape}
+            {else}
+                {buildUrl('/'+ $endPoint+ '?streamSource='+$source+'&streamID='+$id)|noAutoescape}
+            {/if}
+            "{sp}
+            class="j-homenav-link j-custom-stream-link j-js-side-nav-link j-js-as-nav-link j-stream-link">
+            <span class="nav-link lnk j-js-nav-stream-name">{$name}</span>
+            {if $pollingEnabled}
+                {call .updateIndicator}
+                    {param type: 'gauge' /}
+                    {param count: 0 /}
+                {/call}
+            {/if}
+            {if not $anonymous and $source == 'publication'}
+                <span class="j-js-pin-stream jive-icon-glyph j-stream-pin icon-pin font-color-meta-light" title="{i18nText('nav.bar.home.set.default')}"></span>
+            {/if}
+        </a>
+        {if $source == 'connections'}
+            <span class="j-homenav-link j-custom-stream-link js-conns-display-name j-stream-link" style="display:none;">
+                <span class="nav-link lnk">{$name}</span>
+            </span>
+        {/if}
+        <a href="#" class="j-done-building j-js-done-building">{i18nText('eae.activitystream.builder.done')}</a>
+        {if not $anonymous and $source != 'publication'}
+            <a href="#" class="j-js-stream-options j-homenav-options font-color-normal" title="{i18nText('eae.activitystream.builder.stream_options')}"><span class="jive-icon-glyph icon-arrow-down2" role="img"></span></a>
+        {/if}
+    </li>
+{/template}
+
+/**
+ * Custom stream config menu
+ * @param canPin
+ * @param canDelete
+ * @param canEdit
+ */
+{template .navConfigMenuPopover}
+    <div class="j-homenav-options-menu j-nav-menu j-menu j-quick-menu j-pop-main">
+        <ul class="j-icon-list">
+            {if $canEdit}
+            <li>
+                <a href='#' class="j-js-edit-stream"><span class="jive-icon-glyph icon-edit"></span>
+                    <span class="lnk">{i18nText('home.nav.config.menu.edit')}</span>
+                </a>
+            </li>
+            {/if}
+            {if $canPin}
+                <li>
+                    <a href='#' class="j-js-pin-stream"><span class="jive-icon-glyph icon-pin"></span>
+                        <span class="lnk">{i18nText('home.nav.config.menu.pin')}</span>
+                    </a>
+                </li>
+            {/if}
+            {if $canDelete}
+                <li>
+                    <a href='#' class="j-js-delete-stream"><span class="jive-icon-glyph icon-cancel-circle2"></span>
+                        <span class="lnk">{i18nText('home.nav.config.menu.delete')}</span>
+                    </a>
+                </li>
+            {/if}
+        </ul>
+    </div>
+{/template}
+
+/**
+* Renders an activity stream link for creating a new one
+*
+* @param disabled
+*
+* @depends i18nKeys=eae.streams.new_stream
+* @depends i18nKeys=eae.streams.max_reached
+*/
+{template .newActivityStreamItem}
+    <li id="jive-nav-link-new" data-streamid="new"
+        class="j-js-side-nav-item j-js-as-nav-item j-homenav-item j-custom-stream-item{if $disabled} j-max-streams-reached font-color-meta-light{/if}">
+        <span class="j-enabled">
+            <label id="jive-nav-link-new-label" class="j-508-label">{i18nText('eae.streams.new_stream_label')}</label>
+            <a href="#" class="j-homenav-link j-custom-stream-link j-js-edit-stream j-new-stream"
+                aria-labelledby="jive-nav-link-new-label"
+                title="{i18nText('eae.streams.new_stream_label')}">
+                <span class="nav-link lnk j-js-nav-stream-name font-color-meta" aria-hidden="true">{i18nText('eae.streams.new_stream')}</span>
+            </a>
+        </span>
+        <span class="j-disabled">
+            {i18nText('eae.streams.max_reached')}
+        </span>
+    </li>
+{/template}
+
+/**
+ * @depends i18nKeys=nav.bar.home.pinned.message
+ * @param streamName
+ */
+{template .pinnedMessage}
+    <div>{i18nText('nav.bar.home.pinned.message', $streamName)}</div>
+{/template}
+
+/**
+ * renders the appropriate update indicator depending on stream source
+ * @param type
+ * @param count
+ * @param? extraCssClasses
+ * @param? showZero
+ * @param? initial
+ */
+{template .updateIndicator}
+    {if $type == 'count'}
+        <span data-count="{$count}" tabindex="-1"
+            aria-label="{i18nText('nav.bar.inbox.count.label')}"
+            class="j-js-update-indicator j-update-count
+        {if $count == 0} zero{/if}{if $count > 50} fiftyplus{/if}
+        {if $extraCssClasses}{sp}{$extraCssClasses}{/if}"
+        {if $count == 0 and not $showZero}style="display:none;"{/if}>
+            {if $count > 50}
+                50+
+            {elseif $count == 0 and $initial}
+                &ndash;
+            {else}
+                {$count}
+            {/if}
+        </span>
+    {elseif $type == 'gauge'}
+        <span role="img" data-count="{$count}" class="j-js-update-indicator j-update-gauge jive-icon-glyph{sp}
+            {if $count < 10}
+                icon-activity-gauge-low
+            {elseif $count < 40}
+                icon-activity-gauge-med
+            {else}
+                icon-activity-gauge-high
+            {/if}
+        " {if $count == 0}style="display:none;"{/if}{sp}
+        title="
+        {if $count < 10}
+            {i18nText('nav.bar.gauge.lessthanten')}
+        {elseif $count < 40}
+            {i18nText('nav.bar.gauge.tenplus')}
+        {else}
+            {i18nText('nav.bar.gauge.fiftyplus')}
+        {/if}"
+        aria-label="
+        {if $count < 10}
+            {i18nText('nav.bar.gauge.lessthanten')}
+        {elseif $count < 40}
+            {i18nText('nav.bar.gauge.tenplus')}
+        {else}
+            {i18nText('nav.bar.gauge.fiftyplus')}
+        {/if}"{sp}
+        tabindex="0"
+        >
+        </span>
+    {/if}
+{/template}
+
+/**
+* Renders the welcome image
+*
+*/
+{template .mobileWelcomeImage}
+    <img src="/api/core/mobile/theming/v1/mobileHomeImage" class="j-home-image" alt="Welcome">
+{/template}
+
+
+/**
+* Renders the welcome image
+*
+* @param message
+*/
+{template .mobileWelcomeMessage}
+    <div class="j-home-welcome-message">
+        <p>{$message}</p>
+    </div>
+{/template}
+
+/**
+* Renders a featured place
+*
+* @param featuredPlace
+*/
+{template .mobileFeaturedPlace}
+    <li>
+        <a href="{$featuredPlace.resources.html.ref}"><span class="jive-icon-{$featuredPlace.type} jive-icon-big"></span>{$featuredPlace.name}</a>
+    </li>
+{/template}
+
+/**
+* Renders featured places for mobile
+*
+* @param featuredPlaces
+*/
+{template .mobileFeaturedPlaces}
+    <div class="j-home-featured-places">
+        <h4>{i18nText('responsive.featuredPlaces')}</h4>
+        <ul>
+            {foreach $featuredPlace in $featuredPlaces}
+                {call .mobileFeaturedPlace}
+                    {param featuredPlace: $featuredPlace /}
+                {/call}
+            {/foreach}
+        </ul>
+    </div>
+{/template}

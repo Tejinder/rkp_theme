@@ -1,0 +1,227 @@
+{namespace jive.nav}
+
+
+/**
+ * @param  mode
+ * @param  registrationLink A link to the registration page
+ * @param  user The authenticated user.
+ * @param? customizeSite
+ * @param? showSatelliteMenu Whether or not to show the satellite navigation (display name, prefs, logout link)
+ * @param? useJiveViews
+ *
+ * @depends i18nKeys=trial.header.jive_help.link
+ * @depends i18nKeys=userbar.logout.link
+ * @depends i18nKeys=userbar.admin.skin.basic
+ * @depends i18nKeys=userbar.admin.link
+ * @depends i18nKeys=userbar.admin.cmr.link
+ * @depends i18nKeys=profile.edit_profile.link
+ * @depends i18nKeys=profile.change_password.link
+ *
+ * @allowDependsWildcard
+ *
+ * @depends i18nKeys=userbar.admin.*
+ * @depends i18nKeys=profile.tab.*
+ * @depends i18nKeys=nav.bar.nitro.admin
+ */
+{template .satelliteNav}
+    {if $showSatelliteMenu}
+        <span id="j-satNav-indicator"
+        {if $customizeSite}{sp}data-user="{buildJson($user)|escapeHtml}"{/if}></span>
+        {if $customizeSite and $mode == 'basic'}
+            {call jive.theme.controls.userMenuControl /}
+        {/if}
+        {call .satNavIcon data="all" /}
+
+        {if not $customizeSite}
+            {call jive.shared.soy.resourceInlineJs}{param code}
+                require(['jquery', 'apps/navbar/menu/satellite/main', 'documentReady'], function($, SatellteNavMenu){lb}
+                    new SatellteNavMenu('#j-satNav','#j-satNav-menu',{lb}darkPopover:true,user:{buildJson($user)|noAutoescape}{rb});
+                {rb});
+            {/param}{/call}
+        {/if}
+    {else}
+        {if $customizeSite and $mode == 'basic'}
+            {call jive.theme.controls.userMenuControl /}
+        {/if}
+
+        <ul id="j-satNav">
+            <li class="login">
+                <a href="#" class="login" id="navLogin" title="{i18nText('userbar.login.link')}">{i18nText('userbar.login.link')}</a>
+                {call jive.shared.soy.resourceInlineJs}
+                    {param code}
+                        {literal}
+                        require(['jquery'], function($) {
+                            $('#navLogin').on('click', function(e) {
+                                var fragment = '';
+                                if (window.location.hash.length > 1){
+                                    fragment = "?fragment=" + window.location.hash.substring(1);
+                                }
+                                $('#navLogin').attr("href", jive.app.url({ path: '/login.jspa' }) + fragment);
+                           });
+                        });
+                        {/literal}
+                    {/param}
+                {/call}
+            </li>
+
+            {if $registrationLink.visible}
+                <li class="register">
+                    <a href="{buildUrl($registrationLink.url)|noAutoescape}" class="register" title="{i18nText($registrationLink.nameKey)}" id="{$registrationLink.id}">{i18nText($registrationLink.nameKey)}</a>
+                </li>
+            {/if}
+        </ul>
+    {/if}
+
+    {if not $useJiveViews}
+        <div id="j-satNav-menu" class="clearfix" style="display:none;"></div>
+    {/if}
+{/template}
+
+/**
+ * param user
+ * @param useJiveViews
+ */
+{template .satNavIcon}
+    <a id="j-satNav-inbox" class="j-globalNavLink j-ui-elem j-satNav-inbox"
+        href="{buildUrl('/inbox.jspa')|noAutoescape}" aria-label="{i18nText('global.inbox')}"{if $useJiveViews} data-jive-view="minimal/nav/user_menu"{/if}>
+        <span class="nav-link j-ui-elem j-navbadge-inbox">
+            <span class="j-satNav-inbox-icon jive-icon-glyph icon-mention"></span>
+            <span id='js-news-updateIndicator'>
+                {call jive.welcome.updateIndicator}
+                    {param count:0 /}
+                    {param extraCssClasses:'j-ui-elem' /}
+                    {param type:'count' /}
+                    {param showZero: true /}
+                    {param initial: true /}
+                {/call}
+            </span>
+            {call jive.shared.soy.resourceInlineJs}
+                {param code}
+                    $j(function(){lb}
+                        jive.namespace('Navbar.Menu.Home');
+                        require(['apps/navbar/menu/home/navbar_menu_home_main'], function(Main) {lb}
+                            jive.Navbar.Menu.Home.GlobalController =
+                                new Main('#js-news-updateIndicator');
+                        {rb});
+                    {rb});
+                {/param}
+            {/call}
+        </span>
+    </a>
+{/template}
+/**
+ * @param customizeSite
+ * @param user
+ * @param useJiveViews
+ * @param avatarOnly
+ */
+{template .legacySatNavIcon}
+    <a id="j-satNav" class="j-globalNavLink j-ui-elem" href="#"{if $useJiveViews} data-jive-view="minimal/nav/user_menu"{/if}>
+
+        <span class="nav-link j-ui-elem">
+            // Avatar
+            {call jive.shared.displayutil.avatar data="$user"}
+                {param hideLink:true /}
+                {param hideTooltip:true /}
+                {param size:24 /}
+            {/call}
+            // User name
+            {if $avatarOnly != true}
+                <span class="j-user-name j-navLabel">
+                    {if $customizeSite}
+                        Abercrombie McLongUserName
+                    {elseif $user.displayNameOverride}
+                        {$user.displayNameOverride}
+                    {else}
+                        {$user.displayName}
+                    {/if}
+                </span>
+            {/if}
+            // Arrow
+            <span id="j-satNav-more2" class="j-nav-more jive-icon-glyph icon-arrow-down2"></span>
+
+        </span>
+    </a>
+{/template}
+
+
+/**
+ * @param  satelliteMenuView
+ * @param  user
+ *
+ * @depends i18nKeys=profile.view_profile.link
+ * @depends i18nKeys=userbar.welcome.logout
+ * @depends i18nKeys=announcement.manage.system.title
+ */
+{template .profileMenu}
+    <div>
+        <section class="j-inbox-count visible-xs visible-sm">
+            {call jive.nav.menu.home.inbox}
+                {param unreadCount: 0 /}
+            {/call}
+        </section>
+        <section class="j-user-profile">
+            {call jive.browse.user.userProfileImage data="$user" /}
+
+            <ul>
+                <li>
+                    <a class="j-user-name" href="{buildUrl('/people/' + UrlEncode($user.username))|noAutoescape}">
+                        {$user.displayNameOverride ? $user.displayNameOverride : $user.displayName}
+                    </a>
+                    {sp}
+                    {if $user.prop.roleBadgeInfo}
+                        {call jive.shared.displayutil.userRoleBadgeImage data="$user.prop.roleBadgeInfo"/}
+                    {/if}
+                </li>
+
+                {if $user.prop.profile.title}
+                    <li class="j-user-prop title">{$user.prop.profile.title}</li>
+                {/if}
+
+                {if $user.prop.profile.department}
+                    <li class="font-color-meta j-user-prop department">{$user.prop.profile.department}</li>
+                {/if}
+            </ul>
+
+            <ul class="j-other-info font-color-meta">
+                <li>{$user.email}</li>
+
+                {if $user.prop.profile.primaryPhoneNumber}
+                    <li>{$user.prop.profile.primaryPhoneNumber.phoneNumber}</li>
+                {/if}
+
+                <li>{if $user.prop.statuslevel}
+                {call jive.people.profile.statusLevel data="$user.prop.statuslevel"}{param showPoints: true/}{/call}
+                {/if}</li>
+            </ul>
+        </section>
+
+        <section class="j-nav-menu-scrollable js-nav-menu-scrollable j-satellite-links j-nav-menu j-menu clearfix">
+            {foreach $section in $satelliteMenuView.sections}
+                {if $section.visible}
+                    {if $satelliteMenuView.numVisibleSections > 0}
+                    <h3 class="j-nav-menu-section font-color-meta-light">{i18nText($section.nameKey)}</h3>
+                    {/if}
+                    {if index($section)+1 == $satelliteMenuView.numVisibleSections  and $satelliteMenuView.logoutLink}
+                        {call jive.nav.menu.generic}
+                            {param links:$section.items /}
+                            {param lastLink:$satelliteMenuView.logoutLink /}
+                        {/call}
+                    {else}
+                        {call jive.nav.menu.generic}
+                            {param links:$section.items /}
+                        {/call}
+                    {/if}
+                {/if}
+            {/foreach}
+        </section>
+
+        <section class="j-satellite-mobile-links clearfix">
+            <ul>
+                <li><a href="{buildUrl('/content','filterID','contentstatus[published]')|noAutoescape}">{i18nText('profile.your_content.link')}</a></li>
+                <li><a href="{buildUrl('/places','filterID','following')|noAutoescape}">{i18nText('profile.your_places.link')}</a></li>
+                <li><a href="{buildUrl('/logout.jspa')|noAutoescape}">{i18nText('userbar.welcome.logout')}</a></li>
+            </ul>
+        </section>
+    </div>
+{/template}

@@ -1,0 +1,179 @@
+{namespace jive.documents}
+
+/**
+ * Edit a document.
+ *
+ * @depends path=/resources/scripts/apps/content/documents/main.js
+ * @depends path=/resources/scripts/apps/outcomes/eventShim.js
+ *
+ * @param bean com.jivesoftware.community.content.document.action.beans.EditDocumentActionBean
+ * @param fieldErrors - list of com.jivesoftware.community.action.util.SoyActionUtil.ActionStatus
+ * @param actionErrors - list of com.jivesoftware.community.action.util.SoyActionUtil.ActionStatus
+ * @param actionMessages - list of com.jivesoftware.community.action.util.SoyActionUtil.ActionStatus
+ * @param templateView The model to render the page template.
+ */
+{template .edit}
+     {call jive.skin.template.main data="$templateView"}
+        {param title: i18nText('doc.edit_document.title', $bean.subject) /}
+        {param asyncLoadRTE: false/}
+        {param headContent}
+		<link rel="stylesheet" href="/themes/rkp_theme/style/rkp.css" type="text/css" media="all" />
+            {call jive.content.head/}
+            {call jive.shared.soy.resourceInlineJs}
+                {param code}
+                    $j(function() {lb}
+                        var main = new jive.content.documents.Main({lb}
+                            actionBean: {buildJson($bean)|noAutoescape},
+                            selector: '#edit-document',
+                            suffix: '/{$bean.documentID}',
+                            method: 'PUT',
+                            unloadURL: '/unload'
+                        {rb});
+                        require(['appContainer'], function(appContainer) {lb}
+                            appContainer.initEditContext({buildJson($bean)|noAutoescape});
+                        {rb});
+                    {rb});
+                {/param}
+            {/call}
+        {/param}
+		{param showNav: 'true'/}
+        {param bodyClass: 'jive-body-formpage jive-body-formpage-document j-doc'/}
+        {param bodyContent}
+
+            <form class="j-form" method="post" name="edit-document" id="edit-document" {if $bean.formDataBean.canAttach}enctype="multipart/form-data"{/if}>
+
+            <!-- BEGIN main body -->
+                <div class="jive-create-doc jive-create-large jive-content doc-page clearfix">
+
+                    {call jive.error.form.actionErrors}
+                        {param fieldErrors:$fieldErrors /}
+                        {param actionErrors:$actionErrors /}
+                        {param actionMessages:$actionMessages /}
+                    {/call}
+
+                    {call jive.content.moderationWarning/}
+
+                    {call jive.content.outcomeRemovalWarning}
+                        {param outcomes: $bean.outcomes /}
+                        {param user: $templateView.user /}
+                    {/call}
+
+                    {call jive.content.header}
+                        {param header: i18nText('doc.edit_document.title', $bean.subject) /}
+                        {param headerIcon: 'jive-icon-document' /}
+                        {param containerContext: $bean.containerContextBean /}
+                    {/call}
+
+
+                        {if $bean.guest}
+                            {call jive.content.guestinfo data="$bean.userContextBean" /}
+                        {/if}
+
+                        {call jive.documents.dataPassthrough}
+                            {param bean: $bean /}
+                        {/call}
+
+                        {call jive.content.subject}
+                            {param subject: $bean.subject /}
+                            {param required: i18nText('doc.create.error_title.text') /}
+                        {/call}
+
+                        {call jive.content.editor}
+                            {param body: $bean.body /}
+                            {param required: i18nText('doc.create.error_text.text') /}
+                        {/call}
+
+                        {call jive.content.rte_message data="$bean"}
+                            {param objectId: $bean.objectID/}
+                            {param objectType: $bean.contentType/}
+                            {param type: 'document'/}
+                        {/call}
+                </div>
+
+                {call jive.publishbar.main data="$bean.publishBarViewBean" /}
+
+             
+				<!-- Start Grail changes -->
+		
+				<label style="float:left; padding-right:10px; font-weight:bold;">Country:</label>
+				<select style="float:left; height:100px;" name="country" multiple="true">
+					{foreach $n in $bean.countryList}  
+					{if strContains($bean.country, $n)}
+						<option value="{$n}" selected="selected">{$n}</option>				
+					{else}	
+						<option value="{$n}" >{$n}</option>				
+					{/if}
+				{/foreach}
+				</select>
+				
+				<label style="float:left; padding-right:10px; font-weight:bold;">Brand:</label>
+				<select style="float:left; height:100px;" name="brand" multiple="true">
+					{foreach $n in $bean.brandList}  
+					{if strContains($bean.brand, $n)}
+						<option value="{$n}" selected="selected">{$n}</option>				
+					{else}	
+						<option value="{$n}" >{$n}</option>				
+					{/if}
+				{/foreach}
+				</select>
+				
+				<label style="float:left; padding-right:10px; font-weight:bold;">Methodology:</label>
+				<select style="float:left; height:100px;" name="methodology" multiple="true">
+					{foreach $n in $bean.methodologyList}  
+					{if strContains($bean.methodology, $n)}
+						<option value="{$n}" selected="selected">{$n}</option>				
+					{else}	
+						<option value="{$n}" >{$n}</option>				
+					{/if}
+				{/foreach}
+				</select>
+				
+				<label style="float:left; padding-right:10px; font-weight:bold;">Period:</label>
+				<select style="float:left;margin-right:5px;" name="periodMonth">
+					{foreach $n in $bean.periodMonth}  
+					{if strContains($bean.month, $n)}
+						<option value="{$n}" selected="selected">{$n}</option>				
+					{else}	
+						<option value="{$n}" >{$n}</option>				
+					{/if}
+				{/foreach}
+				</select>
+				
+				<select style="float:left;" name="periodYear">
+					{foreach $n in $bean.periodYear}  
+					{if strContains($bean.year, $n)}
+						<option value="{$n}" selected="selected">{$n}</option>				
+					{else}	
+						<option value="{$n}" >{$n}</option>				
+					{/if}
+				{/foreach}
+				</select>
+				
+				   {call jive.content.minoredit }
+                    {param isMinorEdit: $bean.minorEdit/}
+                {/call}
+
+                {call jive.content.composebuttons}
+                    {param submitButton: i18nText('doc.create.publish.button') /}
+                    {param showDraftButton: $bean.draftDisabled == false /}
+                {/call}
+
+                <input type="hidden" name="editedVersion" id="editedVersion" value="{$bean.editedVersion}">
+				
+				 
+				 
+		</div>
+
+            </form>
+
+            <!-- END main body -->
+
+
+            {call jive.documents.comments data="$bean.commentBean" /}
+        {/param}
+     {/call}
+{/template}
+
+
+
+

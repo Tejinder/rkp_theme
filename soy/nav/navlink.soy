@@ -1,0 +1,198 @@
+{namespace jive.nav autoescape="contextual"}
+
+/**
+* Renders a link for the global nav.
+*
+* @param id The link ID.
+* @param? url The link url.
+* @param nameKey The text key for getting the link name.
+* @param? anchorID The anchor ID.
+* @param? titleKey The text key to use on the link title attribute.
+* @param? selectedLinkID The ID of the selected link.
+* @param? itemCss A base CSS classes to apply to the list item.
+* @param linkCss A base CSS classes to apply to the link.
+* @param? count The amount to show in the indicator if includeCounter is true
+* @param? nameCss A base CSS classes to apply to the span around the link name.
+* @param? extraLinkCss Additional CSS classes to apply to the link.
+* @param? iconCss Additional CSS classes to apply to the link.
+* @param? includeCounter Include a space to fill in a count
+* @param? showChildren Show children (build subnav).
+* @param? children A subnav to build if the link has children.
+* @param? nestedChildren Are the children nested links inside this link item?
+* @param? dynamicChildren A subnav to build if the link has children that are dynamically populated.
+* @param? menuAppScript The javascript for instantiating the menu app.
+* @param? actionPopover Flag to indicate whether its action menu or not.
+* @param? cid
+* @param? useJiveViews
+*
+* Theming
+* -------
+* @param? customizeSite True if in the Theming UI
+* @param? editable Is editable via the Theming UI
+* @param? sortable Is sortable via the Theming UI
+* @param? type home|content|people|places|browse|apps|create|news|single|multiple
+* @depends template=jive.nav.menu.generic
+*/
+{template .globalLink}
+{let $hasPopup:$showChildren and ($dynamicChildren or ($children and length($children) > 0)) /}
+
+<li id="{$id}"
+        {if $hasPopup}aria-haspopup="true"{/if}
+        class="{call .selectedLink data="all"/}{if $itemCss} {$itemCss}{/if} j-ui-elem{if $customizeSite and $sortable} j-sortable-item js-sortable-item{/if}"
+        {if $customizeSite}
+            data-editable="{$editable}"
+            data-sortable="{$sortable}"
+            data-default-name-key="{$nameKey}"
+            data-id="{$id}"
+            {if $cid}
+                data-cid="{$cid}"
+            {/if}
+            data-type="{$type ? $type : 'single'}"
+        {/if}
+        {if $useJiveViews}
+            {switch $id}
+                {case 'jive-nav-link-apps'}
+                    data-jive-view="minimal/nav/apps_menu"
+            {/switch}
+        {/if}
+        >
+    {if $customizeSite}
+        {if $sortable and $type != 'child'}
+            <span class="j-draggit j-ui-elem"></span>
+        {/if}
+
+        {if $editable}
+            {call jive.theme.controls.customNavControl}
+                {param menuItemId:$id /}
+            {/call}
+        {/if}
+    {/if}
+
+    {if ($nestedChildren and ($children and length($children) > 0))}
+        <ul>
+            {foreach $child in $children}
+                {if $child.visible}
+                    {call .globalLink data="$child"}
+                        {param selectedLinkID : $selectedLinkID/}
+                        {param type:'child' /}
+                    {/call}
+                {/if}
+            {/foreach}
+        </ul>
+    {else}
+		{if $url != '/news'}
+			
+			{if $url == '/welcome'}
+	   <a {if $anchorID}id={$anchorID}{/if} href="/portal-options.jspa" {if $titleKey}title="{i18nText($titleKey)}"{/if}{sp}
+                   class="{$linkCss} {if $extraLinkCss}{$extraLinkCss}{/if}" role="menuitem">
+            <span class="nav-link {if $nameCss}{$nameCss}{/if} {if $hasPopup} j-ui-elem{/if}">
+                {if $iconCss}
+                    <span class="{$iconCss}"></span><span class="j-navLabel">{call .getName data="all" /}</span>
+                {else}
+                    {call .getName data="all" /}
+                {/if}
+                {if $hasPopup}<span class="j-nav-more jive-icon-glyph icon-arrow-down2"></span>{/if}
+            </span>
+        </a>
+			{else}
+				<a {if $anchorID}id={$anchorID}{/if} href="{buildUrl($url ? $url : '#')}" {if $titleKey}title="{i18nText($titleKey)}"{/if}{sp}
+                   class="{$linkCss} {if $extraLinkCss}{$extraLinkCss}{/if}" role="menuitem">
+            <span class="nav-link {if $nameCss}{$nameCss}{/if} {if $hasPopup} j-ui-elem{/if}">
+                {if $iconCss}
+                    <span class="{$iconCss}"></span><span class="j-navLabel">{call .getName data="all" /}</span>
+                {else}
+                    {call .getName data="all" /}
+                {/if}
+                {if $hasPopup}<span class="j-nav-more jive-icon-glyph icon-arrow-down2"></span>{/if}
+            </span>
+        </a>
+			{/if}
+		{/if}
+        {if $hasPopup and not $dynamicChildren}
+            {call .globalLinkSubMenu}
+                {param customizeSite:$customizeSite /}
+                {param id: $id/}
+                {param links: $children/}
+                {param menuAppScript: $menuAppScript/}
+                {param actionPopover: $actionPopover/}
+            {/call}
+        {elseif $includeCounter}
+            {call jive.welcome.updateIndicator}
+                {param count:$count /}
+                {param extraCssClasses:' j-navbadge-count j-sidenav-count j-ui-elem' /}
+                {param type:'count' /}
+            {/call}
+        {/if}
+    {/if}
+</li>
+{/template}
+
+/**
+* Outputs "selected" class name if link or children is selected.
+* @param id The ID of the current link.
+* @param selectedLinkID The ID of the selected link.
+* @param? children The children of the current link.
+*/
+{template .selectedLink}
+    {if $id == $selectedLinkID}active{else}
+        {if $children}
+            {foreach $child in $children}
+                {call .selectedLink data="$child"}
+                    {param selectedLinkID : $selectedLinkID/}
+                {/call}
+            {/foreach}
+        {/if}
+    {/if}
+{/template}
+
+/**
+* @param id The parent ID
+* @param? links The menu items.
+* @param menuAppScript The script to initialize the JS menu application for this link.
+* @param actionPopover Whether or not this is a dark action popover
+* @param? customizeSite
+* @depends path=/resources/scripts/apps/navbar/menu/custom/main.js
+*/
+{template .globalLinkSubMenu private="true"}
+    {if not $customizeSite}
+        {call jive.shared.soy.resourceInlineJs}{param code}{$menuAppScript|noAutoescape}{/param}{/call}
+    {/if}
+
+    <div {if $id}id="{$id}-menu"{/if} class="{if $actionPopover}j-pop-main j-menu j-quick-menu{/if}" style="display: none;">
+        {if $links}
+            {call jive.nav.menu.generic}
+                {param links:$links/}
+            {/call}
+        {/if}
+    </div>
+{/template}
+
+
+/**
+ * @param  nameKey
+ * @param? name
+ */
+{template .getName}
+    {if $name}
+        {$name|truncate:23}
+    {else}
+        {i18nText(i18nKey($nameKey, true))|truncate:23|noAutoescape}
+    {/if}
+{/template}
+
+
+/**
+ */
+{template .addCustomLink}
+    {call .globalLink}
+        {param id:'j-theming-add-nav-item' /}
+        {param url:'#' /}
+        {param nameKey:'global.add_symbol' /}
+        {param itemCss:'j-globalNav-li j-custom-link' /}
+        {param titleKey:'theming.custom.add_navigation_item' /}
+        {param linkCss:'j-globalNavLink j-ui-elem js-add-nav-item' /}
+        {param editable:true /}
+        {param sortable:false /}
+        {param customizeSite:true /}
+    {/call}
+{/template}

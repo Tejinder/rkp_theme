@@ -1,0 +1,107 @@
+html body{font-family:arial !important; background:#ececec !important	;}
+
+* input, * select, * textarea, .chosen-single, .chosen-choices, .mce-tinymce,.border-inputradius,.jive-login-formblock,.j-rc4,.jive-body-formpage-validate .jive-validate-formblock,.j-box-changepassword{border-radius:0 !important; }
+
+a, a:link, a:visited{color:#00adc3 !important}
+#j-header-wrap #j-header, #j-header-wrap #j-compact-header{min-width:970px;}
+a:hover{color:#507b88 !important}
+#j-main-wrapper,.j-layout.j-layout-l.clearfix{min-height:calc(100% - 38px)}
+.j-form input[type="text"]:focus, .j-form input[type="search"]:focus, .j-form input[type="password"]:focus, .j-form textarea:focus, .j-fake-input.focus, input.j-publish-input-entry:focus, .hteSkin table.mceLayout.focus, #jive-people-search input[type=text]:focus{box-shadow:none !important;border:1px solid #666 !important;outline:none}
+
+.j-layout.j-layout-l.clearfix{background:#fff}
+.j-layout.j-layout-l.clearfix input{border:1px solid #666 } 
+
+
+#jive-login-formblock #jive-login-username input, #jive-login-formblock #jive-login-password input, #jive-login-formblock #jive-login-captcha input{border:1px solid #666}
+.jive-icon-redalert{border-right:0; min-height:auto}
+.jive-error-box{margin-bottom:10px !important}
+
+#jive-login-formblock div#jive-login-button .jive-form-button-submit,#jive-login-formblock div#jive-login-button .jive-form-button-submit.processing,input[type=submit].jive-form-button-submit.j-btn-callout{ background:#f1b127;border-radius:0 !important; text-transform:uppercase;font-weight:bold; text-align:center !important; padding:9px 18px !important; color:#fff; text-shadow: none; margin:0; border:0 ;box-shadow:none; width:auto; font-size:12px;}
+input[type=submit].jive-form-button-submit.j-btn-callout:hover,input[type=submit].jive-form-button-submit.j-btn-callout:focus{ background:#f1b127; text-shadow:none;box-shadow:none }
+
+#jive-login-formblock div#jive-login-button .jive-form-button-submit:hover{background:#f4b127 !important; opacity:1!important}
+input[type=submit].jive-form-button-cancel
+{ background:#808080;border-radius:0 !important; text-transform:uppercase;font-weight:bold; text-align:center !important; padding:9px 18px !important; color:#fff !important;    text-shadow: none;margin:0; border:0 !important;box-shadow:none ; width:auto; font-size:12px;}
+input[type=submit].jive-form-button-cancel:hover{background:#808080;}
+#jive-body-maincol .jive-login-reg-formblock{background:#ececec}
+
+
+#jive-body h1{font-weight:bold !important}
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+	outline: none!important
+}
+#jive-login-formblock #jive-login-username input, #jive-login-formblock #jive-login-password input{font-size:1em !important; padding:5px !important;}
+.jive-standard-formblock{padding-right:20px !important}
+input.continue{background:#f4b127 !important; border-radius:0 !important; text-transform:uppercase;font-weight:bold !important; text-align:center !important; padding:9px 18px !important; color:#fff !important}
+input.cancel{background:#808080 !important; border-radius:0 !important; text-transform:uppercase;font-weight:bold !important; text-align:center !important; padding:9px 18px !important; color:#fff !important; text-shadow:none !important}
+.j-box-changepassword{padding-bottom:20px;}
+.project-wrapper .project_portfolio_div ul li.bottom a.disabled ,.project-wrapper .project_portfolio_div ul li.first a.disabled , .project-wrapper .project_portfolio_div ul li.last a.disabled{opacity:0.4; filter: alpha(opacity=40); cursor:default !important;}
+.project_portfolio_div ul li.first {cursor:default;}
+
+
+.project-wrapper .project_portfolio_div ul li.bottom{ cursor:default}
+#jive-body .project-wrapper{background-size:cover !important}
+.j-box.j-enhanced{border-radius:0 !important; padding-bottom:20px}
+
+
+
+/*---------25---01-2019--------*/
+.project_portfolio_div ul li.synchro{
+	border-right: 1px solid #ccc;
+    margin-bottom: 0 !important;
+    padding:40px 0 20px 0;
+}
+.project_portfolio_div ul li.rkp{
+	margin-bottom: 0 !important;
+	padding:40px 0 20px 0;
+}
+.project_portfolio_div ul li.kantar-report{
+	border-right: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    margin-bottom: 0 !important;
+	padding:40px 0 20px 0;
+}
+.project_portfolio_div ul li.oracle-documents{
+	border-top: 1px solid #ccc;
+    margin-bottom: 0 !important;
+	padding:40px 0 20px 0;
+}
+
+.project_portfolio .project_portfolio_div {
+    padding: 20px 30px;
+    margin-bottom: 15px;
+}
+#project_portfolio {
+    
+    margin-bottom: 30px;
+}
+#jive-body-main .synchro-nav-bar a
+{color: #5d5d5d !important;}
+
+.synchro-nav-bar > ul > li{
+width: auto;
+}
+
+.synchro-nav-bar > ul > li.edit-profile{
+padding-right: 30px;
+}
+
+.synchro-nav-bar > ul{
+    width: 28%;
+}
+
+.synchro-nav-bar.homepage-logout-wrap
+{
+	width: 775px;
+}
+.project_portfolio_div ul li a{
+width: 325px;
+}
+
+.project_portfolio_div ul li{
+width: 50%;
+}
+
+
+

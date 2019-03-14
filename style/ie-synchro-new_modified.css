@@ -1,0 +1,22 @@
+ @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) { 
+ .project_names .project_name_div > .waiver-error-box.jive-error-box#jive-error-box {
+   width:650px;
+}
+
+ /*
+.pop-upinner-scroll .pit-estimate-cost input.text_field{margin-top:10px}
+
+
+.view_edit_pib #expenseDetailsContainer .total-cost.region-inner{width:65%}
+.view_edit_pib #expenseDetailsContainer .total-cost.region-inner{width:353px}
+
+
+
+.pop-upinner-scroll .expense_row input.text_field, .pop-upinner-scroll .project_details .region-inner .form-select_div .pit-estimate-cost .text_field, .pop-upinner-scroll .pib .expense_row input[type='text'], .pop-upinner-scroll .expense_row input[type='text']{margin-left:0px;}
+
+
+.float-right{margin-right:432px}
+*/
+
+
+ }

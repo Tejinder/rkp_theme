@@ -1,0 +1,204 @@
+{namespace jive.inbox autoescape="contextual"}
+
+/**
+ * Renders the communications secton for "my inbox".
+ *
+ * @param activityStream - the inbox data stream
+ * @param activityStream4JS - the inbox data stream stripped of unnecessary sub activities for JSON serialization
+ * @param filterType - the initial filter applied to the data
+ * @param lastViewedObjectType - objectType of the last item the user expanded
+ * @param lastViewedObjectID - objectID of the last item the user expanded
+ * @param streamID
+ * @param? dmEnabled - true if direct messages are enabled
+ * @param preferredMode - RTE option
+ * @param startMode - RTE option
+ * @param mobileUI - RTE option
+ * @param communityName - RTE option
+ * @param inboxViewType
+ * @param inboxListHeight
+ * @param fromHomeMenu
+ * @param homeNavHelper properties for home nav
+ * @param hasImagePerms
+ * @param newUserMode
+ * @param templateView The model to render the page template.
+ * @depends path=/resources/scripts/jive/acclaim.js
+ */
+{template .communications}
+    {call jive.skin.template.main data="$templateView"}
+        {param title}
+            {i18nText('nav.bar.inbox.link')}
+        {/param}
+        {param metaDescription: i18nText('eae.inbox.description')/}
+        {param selectedLinkID: 'jive-nav-link-home'/}
+        {param bodyClass: 'j-body-home j-body-inbox' + ($mobileUI ? ' j-mobile-ui' : '')/}
+		{param showNav: 'true'/}
+        {param bodyContent}
+<link rel="stylesheet" href="/themes/rkp_theme/style/rkp.css" type="text/css" media="all" />
+	<link rel="shortcut icon" type="image/x-icon" href="/themes/rkp_theme/images/favicon.ico" />
+	<link rel="icon" type="image/png" href="/themes/rkp_theme/images/favicon.png" />
+            <div class="j-layout j-layout-sl clearfix">
+                // Sidebar layout
+                <div class="j-column-wrap-s">
+                    <nav class="j-column j-column-s" role="navigation" aria-label="{i18nText('eae.stream.nav')}">
+                        {call jive.welcome.homeSideNav}
+                            {param homeNavHelper: $homeNavHelper/}
+                            {param selectedLinkID: 'jive-nav-link-communications'/}
+                        {/call}
+                    </nav>
+                </div>
+
+                <!-- BEGIN large column -->
+                <div class="j-column-wrap-l">
+                    <div id="j-dynamic-pane" class="j-column j-column-l">
+                        {call .dynamicPaneContents}
+                            {param activityStream: $activityStream /}
+                            {param activityStream4JS: $activityStream4JS /}
+                            {param filterType: $filterType /}
+                            {param lastViewedObjectType: $lastViewedObjectType /}
+                            {param lastViewedObjectID: $lastViewedObjectID /}
+                            {param streamID: $streamID /}
+                            {param dmEnabled: $dmEnabled /}
+                            {param preferredMode: $preferredMode /}
+                            {param startMode: $startMode /}
+                            {param mobileUI: $mobileUI /}
+                            {param communityName: $communityName /}
+                            {param inboxViewType: $inboxViewType /}
+                            {param inboxListHeight: $inboxListHeight /}
+                            {param fromHomeMenu: $fromHomeMenu /}
+                            {param hasImagePerms: $hasImagePerms /}
+                            {param newUserMode: $newUserMode /}
+                        {/call}
+                    </div>
+                </div>
+            </div>
+        {/param}
+    {/call}
+{/template}
+
+/**
+ * Renders the communications secton for "my inbox".
+ *
+ * @param activityStream - the inbox data stream
+ * @param activityStream4JS - the inbox data stream stripped of unnecessary sub activities for JSON serialization
+ * @param filterType - the filter applied to the data
+ * @param lastViewedObjectType - objectType of the last item the user expanded
+ * @param lastViewedObjectID - objectID of the last item the user expanded
+ * @param streamID
+ * @param dmEnabled - true if direct messages are enabled
+ * @param preferredMode - RTE option
+ * @param startMode - RTE option
+ * @param mobileUI - RTE option
+ * @param communityName - RTE option
+ * @param inboxViewType
+ * @param inboxListHeight
+ * @param fromHomeMenu
+ * @param hasImagePerms
+ * @param newUserMode
+ * @depends path=/resources/scripts/apps/read_tracking/main.js
+ */
+{template .dynamicPaneContents}
+    <div id="j-js-communications" class="j-act j-split-view-rl j-communications j-{$inboxViewType}-view {if $inboxViewType == 'full' and $fromHomeMenu}j-list-hidden{else}j-list-visible{/if}" style="display:block;" role="main" aria-label="{i18nText('eae.header.text.inbox')}">
+        {call jive.eae.inbox.commStream}
+            {param activityStream: $activityStream /}
+            {param activityStream4JS: $activityStream4JS /}
+            {param viewingUser: $activityStream.viewingUser /}
+            {param filterType: $filterType /}
+            {param lastViewedObjectType: $lastViewedObjectType /}
+            {param lastViewedObjectID: $lastViewedObjectID /}
+            {param streamID: $streamID /}
+            {param dmEnabled: $dmEnabled /}
+            {param preferredMode: $preferredMode /}
+            {param startMode: $startMode /}
+            {param mobileUI: $mobileUI /}
+            {param communityName: $communityName /}
+            {param viewType: $inboxViewType /}
+            {param listHeight: $inboxListHeight /}
+            {param fromHomeMenu: $fromHomeMenu /}
+            {param hasImagePerms: $hasImagePerms /}
+            {param newUserMode: $newUserMode /}
+        {/call}
+
+        {call .streamReadingPane}
+            {param lastViewedObjectType: $lastViewedObjectType /}
+            {param lastViewedObjectID: $lastViewedObjectID /}
+        {/call}
+    </div>
+
+    {call jive.shared.soy.resourceInlineJs}
+        {param code}
+            $j(function() {lb}
+                require([
+                    'apps/read_tracking/main'
+                ], function(ReadTrackingMain) {lb}
+                    var i18n = {lb}
+                        eaeStreamRead : '{i18nText('eae.stream.read') |escapeJs}',
+                        eaeStreamUnread : '{i18nText('eae.stream.mark.read') |escapeJs}'
+                    {rb};
+                    jive.ReadTracking.readController = new ReadTrackingMain({lb}i18n:i18n{rb});
+                    jive.ReadTracking.readController.attachReadActions();
+                {rb});
+            {rb});
+        {/param}
+    {/call}
+{/template}
+
+/**
+ * Renders the reading pane containers for the stream views
+ * @param lastViewedObjectType
+ * @param lastViewedObjectID
+ */
+{template .streamReadingPane}
+    <div id="j-js-communications-exp" class="j-act-panel">
+        <div class="j-ibx-content-controls j-rc3 j-rc-none-left j-rc-none-bottom">
+            <a href="#" id="j-back-to-list" class="j-goto-commlist">
+                <span class="jive-icon-glyph icon-angle-left"></span>{sp}
+                {i18nText('eae.communications.backtoinbox')}
+            </a>
+            <span class="j-pagination-prevnext j-prev-disabled j-next-disabled">
+                <span class="j-pagination-prev j-disabled font-color-meta">
+                    {i18nText('global.previous')}
+                </span>
+                <a href="#" class="j-pagination-prev" data-start="20">
+                    {i18nText('global.previous')}
+                </a>
+                <span class="j-pagination-next j-disabled font-color-meta">
+                    {i18nText('global.next')}
+                </span>
+                <a href="#" class="j-pagination-next" data-start="20">
+                    {i18nText('global.next')}
+                </a>
+            </span>
+        </div>
+        {call .readingPaneDefault}
+            {param lastViewedObjectType: $lastViewedObjectType /}
+            {param lastViewedObjectID: $lastViewedObjectID /}
+        {/call}
+    </div>
+{/template}
+
+/**
+ * Renders the default initial text in the reading pane
+ * @param? lastViewedObjectType
+ * @param? lastViewedObjectID
+ */
+{template .readingPaneDefault}
+    <div class="j-act-exp-view j-act-ibx-exp-list">
+        {if not $lastViewedObjectType and not $lastViewedObjectID}
+            <section class="j-panel-instructions font-color-meta">
+                {i18nText('eae.inbox.panel.message')}
+            </section>
+        {else}
+            // if given a last viewed object, show loader because the reading pane is about to be
+            // filled with the fleshed-out item, but might take a wee bit of time.
+            <div class="j-loading-container">
+                <div class="j-loading-content">
+                    <span class="font-color-meta j-loading-label">
+                        {i18nText('customize.loading')}
+                    </span>
+                    <img class="j-ibx-reading-pane-loader"
+                        src="{resourceUrl('/images/j-loader-large-wht.gif')}" title="{i18nText('customize.loading')}"  alt="{i18nText('customize.loading')}" />
+                </div>
+            </div>
+        {/if}
+    </div>
+{/template}

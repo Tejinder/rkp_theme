@@ -1,0 +1,384 @@
+/**
+* Using this to import dependency tree.
+*/
+{namespace jive.search}
+
+
+
+/**
+* Displays the search page.
+*
+ * @param templateView The model to render the page template.
+*
+* @depends template=jive.search.main
+* @depends template=jive.search.facets.main
+* @depends path=/resources/scripts/jive/search/search-page.js
+*/
+{template .page}
+    {call jive.skin.template.main data="$templateView"}
+        {param title}{i18nText('search.space_search.title')}{/param}
+        {param headContent}
+            <link rel="stylesheet" href="{resourceUrl('/styles/jive-search.css')}" type="text/css" media="all" />
+			<link rel="stylesheet" href="/themes/rkp_theme/style/rkp.css" type="text/css" media="all" />
+			
+        {/param}
+        {param bodyClass: 'jive-body-search'/}
+		{param showNav: 'true'/}
+        
+		{param bodyContent}
+            <div id="container">
+                <header></header>
+                <div class="j-body-main clearfix">
+                    <div class="j-layout-sl">
+                        {call jive.search.facets.main data="all"/}
+                        {call .main data="all"/}
+                    </div>
+                </div>
+            </div>
+        {/param}
+		
+		
+    {/call}
+{/template}
+
+/**
+* main
+*
+* @param showOpenSearch
+* @param searchEngines
+* @param orgChartingEnabled
+* @depends template=jive.search.searchResults
+* @depends template=jive.search.altSearchResults
+* @depends template=jive.search.openSearchResults
+* @depends template=jive.search.helpTips
+* @depends i18nKeys=search.title
+*/
+{template .main}
+<div class="j-column-wrap-l">
+    <div class="j-column-l">
+        <div class="j-search-container j-box j-rc5">
+             <form id="j-search-form" data-org-charting-enabled="{$orgChartingEnabled}">
+                <label for="j-search-input">{i18nText('search.title')}</label>
+                <input type="text" placeholder="Search" name="j-search-input" id="j-search-input" class="j-search" />
+                <input type="submit" value="{i18nText('search.title')}" name="search-submit" class="js-search-submit j-btn-global j-btn-callout" />
+                <div class="j-searchtips">
+                    <a href="#" class="j-searchtips-link">{i18nText('search.search_tips.link')}</a>
+                </div>
+            </form>
+        </div>
+        <div class="j-search-results-main-container">
+            <div id="j-main-results" class="j-search-results-main j-rc5">
+                <ol class="j-search-results">
+                    {call .loadingBar/}
+                </ol>
+            </div>
+            {if $showOpenSearch and length($searchEngines)}
+                {foreach $engine in $searchEngines}
+                    <div id="j-engine-results-{$engine.id}" class="j-search-results-main" style="display:none">
+                        <h2><a href="{$engine.externalSearchURL}" class="j-opensearch-link" target="_new">{i18nText('search.results.os.view_more', $engine.shortName)}</a></h2>
+                        <ol class="j-search-results">
+                            {call .loadingBar/}
+                        </ol>
+                    </div>
+                {/foreach}
+            {/if}
+        </div>
+        <div class="j-search-results-aside-container">
+            <div class="j-search-results-aside j-box j-rc5">
+                <div class="j-alternate-search"></div>
+                <div class="j-alternate-search"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{/template}
+
+
+/**
+* main search results section
+*
+* @param view
+* @param results
+* @param socialSearchDisabled
+* @depends template=jive.search.result.contentResult
+* @depends template=jive.search.result.peopleResult
+* @depends template=jive.search.result.placeResult
+* @depends template=jive.search.loadingBar
+* @depends template=jive.search.loadMore
+* @depends template=jive.search.noMore
+* @depends template=jive.search.noResults
+*/
+{template .searchResults}
+{if $view == 'content'}
+	<h2>{i18nText('search.search_for.content')}</h2>
+{elseif $view == 'people'}
+	<h2>{i18nText('search.search_for.people')}</h2>
+{elseif $view == 'places'}
+	<h2>{i18nText('search.search_for.places')}</h2>
+{/if}
+<span class="j-search-rss-link">
+    <a href="#"><span title="RSS feed of search results" class="jive-icon-glyph icon-feed"></span></a>
+</span>
+
+{if ($view == 'content' or $view == 'places') and $socialSearchDisabled}
+    <div class="j-socialsearch-disabled-warning">
+        {i18nText('search.alert.social_disabled')}
+        &nbsp;
+        <a href="#" class="j-socialsearch-enable">{i18nText('search.alert.social_disabled.reenable_link')}</a>
+    </div>
+{/if}
+
+<ol class="j-search-results j-{$view}-results">
+    {if $view == 'content'}
+        {foreach $result in $results}
+            {call jive.search.result.contentResult data="$result"/}	
+        {/foreach}
+    {elseif $view == 'people'}
+        {foreach $result in $results}
+            {call jive.search.result.peopleResult data="$result"/}
+        {/foreach}
+    {elseif $view == 'places'}
+        {foreach $result in $results}
+            {call jive.search.result.placeResult data="$result"/}
+        {/foreach}
+    {/if}
+    {if length($results) > 0}
+    {call .loadingBar/}
+    {/if}
+</ol>
+{/template}
+
+
+
+/**
+ * main search results section
+ *
+ * @param results
+ * @param name
+ * @param url
+ * @depends template=jive.search.result.openSearchResult
+ * @depends template=jive.search.loadingBar
+ * @depends template=jive.search.loadMore
+ * @depends template=jive.search.noMore
+ * @depends template=jive.search.noResults
+ */
+{template .openSearchResults}
+<h2><a href="{$url}">{i18nText('search.results.os.view_more', $name)}</a></h2>
+<ol class="j-search-results">
+    {foreach $result in $results}
+        {call jive.search.result.openSearchResult data="$result"/}
+    {/foreach}
+</ol>
+{/template}
+
+
+
+/**
+ * No results
+ *
+ * @param? list
+ * @param? suggestedQuery
+ */
+{template .noResults}
+<li class="j-no-results">
+    <div class="j-result-content">
+        <p class="j-disambiguation"><span class="jive-icon-glyph icon-info2"></span>{sp}
+            {if not $list or length($list) == 0 }
+                {i18nText('search.result.none')}{sp}
+            {/if}
+            {if $suggestedQuery}
+                {i18nText('search.did_you_mean.label')}{sp}<a class="mark" href="{'?q=' + UrlEncode($suggestedQuery)|noAutoescape}">{$suggestedQuery}</a>?
+            {/if}
+        </p>
+    </div>
+</li>
+{/template}
+
+
+
+/**
+ * loader bar
+ */
+{template .loadingBar}
+<li class="j-loading-bar">
+    <span class="j-js-load-more j-act-append j-rc6">
+        <div class="j-loading-container">
+            <div class="j-loading-content"></div>
+        </div>
+    </span>
+</li>
+{/template}
+
+/**
+* loader bar loaded with more
+*/
+{template .loadMore}
+<a href="#" class="j-js-load-more j-act-append j-rc6">
+    <span class="j-rc6 j-more-label">{i18nText('search.result.load.more')}</span>
+</a>
+{/template}
+
+/**
+* loader bar loaded with more
+*/
+{template .noMore}
+<span href="#" class="j-js-load-more j-act-append j-rc6 j-no-more">
+    <span class="j-rc6">{i18nText('search.result.load.no_more')}</span>
+</span>
+{/template}
+
+
+/**
+* alternate search results section
+*
+* @param view
+* @param results
+* @depends template=jive.search.result.altContentResult
+* @depends template=jive.search.result.altPeopleResult
+* @depends template=jive.search.result.altPlaceResult
+*
+* @allowDependsWildcard
+*
+* @depends i18nKeys=search.view_more.*
+*/
+{template .altSearchResults}
+<div>
+	{if $results.length > 0 and $view == 'content'}
+		<h3>{i18nText('search.search_for.content')}</h3>
+	{elseif $results.length > 0 and $view == 'people'}
+		<h3>{i18nText('search.search_for.people')}</h3>
+	{elseif $results.length > 0 and $view == 'places'}
+		<h3>{i18nText('search.search_for.places')}</h3>
+	{/if}
+    <ol class="j-search-results j-{$view}-results">
+        {if $view == 'content'}
+            {foreach $result in $results}
+                {if index($result) < 15}
+                    {call jive.search.result.altContentResult data="$result"/}
+                {/if}
+            {/foreach}
+        {elseif $view == 'people'}
+            {foreach $result in $results}
+                {if index($result) < 15}
+                    {call jive.search.result.altPeopleResult data="$result"/}
+                {/if}
+            {/foreach}
+        {elseif $view == 'places'}
+            {foreach $result in $results}
+                {if index($result) < 15}
+                    {call jive.search.result.altPlaceResult data="$result"/}
+                {/if}
+            {/foreach}
+        {/if}
+		{if $results.length > 0}
+    		<li class="j-view-more font-color-meta" data-facet="{$view}"><a href="#facet={$view}">{i18nText(i18nKey('search.view_more.'+$view, true))}</a></li>
+        {/if}
+    </ol>
+</div>
+{/template}
+
+
+
+
+/**
+* Search help tips
+*/
+{template .helpTips}
+<div class="jive-modal jive-modal-searchtips">
+    <header>
+        <h2>{i18nText('search.search_tips.gtitle')}</h2>
+    </header>
+    <label class="j-508-label" id="close-modal-508">{i18nText('global.close.modal')}</label>
+    <a href="#" class="j-modal-close-top close" aria-labelledby="close-modal-508" title="{i18nText('global.close.modal')}">{i18nText('global.close')} <span class="j-close-icon j-ui-elem" role="img"></span></a>
+	<div class="jive-modal-content" id="search-tips-modal">
+		<h3>{i18nText('searchtips.intro.text')}</h3>
+
+	    <section>
+	        <h4>{i18nText('searchtips.search.specific_words.heading')}</h4>
+	        <p>{i18nText('searchtips.search.specific_words.desc')}</p>
+	    </section>
+
+	    <section>
+	        <h4>{i18nText('searchtips.search.search_for_people.heading')}</h4>
+	        <p>{i18nText('searchtips.search.search_for_people.desc')}</p>
+	    </section>
+
+	    <section>
+	        <h4>{i18nText('searchtips.search.search_for_phrases.heading')}</h4>
+	        <p>{i18nText('searchtips.search.search_for_phrases.desc')}</p>
+	        <p class="note">
+				<strong>{i18nText('searchtips.note.heading')}{i18nText('global.colon')}</strong>
+				{i18nText('searchtips.search.search_for_phrases.note')}
+			</p>
+	    </section>
+
+	    <section>
+	        <h4>{i18nText('searchtips.search.search_certain_letter_sequences.heading')}</h4>
+	        <p>{i18nText('searchtips.search.search_certain_letter_sequences.desc')}</p>
+			<dl class="j-rc4">
+				<dt>
+					<pre>{i18nText('searchtips.search.search_certain_letter_sequences.example1.topic')}</pre>
+				</dt>
+				<dd>
+					{i18nText('searchtips.search.search_certain_letter_sequences.example1.definition')}
+				</dd>
+				<dt>
+					<pre>{i18nText('searchtips.search.search_certain_letter_sequences.example2.topic')}</pre>
+				</dt>
+				<dd>
+					{i18nText('searchtips.search.search_certain_letter_sequences.example2.definition')}
+					</dd>
+			</dl>
+	        <p class="note">
+				<strong>{i18nText('searchtips.note.heading')}{i18nText('global.colon')}</strong>
+				{i18nText('searchtips.search.search_certain_letter_sequences.note')}
+			</p>
+	    </section>
+
+	    <section>
+	        <h4>{i18nText('searchtips.search.compound_expressions.heading')}</h4>
+	        <p>{i18nText('searchtips.search.compound_expressions.desc')}</p>
+	        <p>{i18nText('searchtips.search.compound_expressions.desc2')}</p>
+	    </section>
+
+	    <section>
+			<dl class="j-rc4">
+				<dt>
+					<pre>{i18nText('searchtips.search.compound_expressions.example1.topic')}</pre>
+				</dt>
+				<dd>
+					{i18nText('searchtips.search.compound_expressions.example1.definition')}
+				</dd>
+				<dt>
+					<pre>{i18nText('searchtips.search.compound_expressions.example2.topic')}</pre>
+				</dt>
+				<dd>
+					{i18nText('searchtips.search.compound_expressions.example2.definition')}
+				</dd>
+				<dt>
+					<pre>{i18nText('searchtips.search.compound_expressions.example3.topic')}</pre>
+				</dt>
+				<dd>
+					{i18nText('searchtips.search.compound_expressions.example3.definition')}
+				</dd>
+			</dl>
+	        <p class="note">
+				<strong>{i18nText('searchtips.note.heading')}{i18nText('global.colon')}</strong>
+				{i18nText('searchtips.search.compound_expressions.note')}
+			</p>
+	    </section>
+
+	    <section>
+	        <h4>{i18nText('searchtips.search.spotlight_search.heading')}</h4>
+	        <p>{i18nText('searchtips.search.spotlight_search.desc')}</p>
+	        <p>{i18nText('searchtips.search.spotlight_search.desc2')}</p>
+	    </section>
+
+	    <section>
+	        <h4>{i18nText('searchtips.search.special_characters_words.heading')}</h4>
+	        <p>{i18nText('searchtips.search.special_characters_words.desc')}{i18nText('global.colon')} {i18nText('searchtips.search.special_characters_words.example1.topic')}</p>
+	        <p>{i18nText('searchtips.search.special_characters_words.desc2')}</p>
+	    </section>
+	</div>
+</div>
+{/template}

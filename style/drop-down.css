@@ -1,0 +1,77 @@
+.dropdown 
+{
+color: #555;
+margin: 0;
+position: relative;
+text-align:left;
+float:left;
+padding-right:15px;
+width:60px;
+height:18px;
+}
+.my-dashboard-dropdown {
+  width: 105px;
+}
+.initiate-new-dropdown {
+    width: 84px;
+}
+.submenu
+{
+background: #fff;
+position: absolute;
+top: 24px;
+left: -20px;
+z-index: 100;
+width: 150px;
+display: none;
+margin-left: 10px;
+padding: 0px 0 5px;
+border-radius: 6px;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+.dropdown li a 
+{
+color: #555555;
+display: block;
+font-family: arial;
+font-weight: bold;
+padding: 6px 15px;
+cursor: pointer;
+text-decoration:none;
+}
+
+.dropdown li a:hover
+{
+background:#155FB0;
+color: #FFFFFF;
+text-decoration: none;
+}
+a.account 
+{
+width:77px;
+height:18px;
+color: #555;
+position: absolute;
+z-index: 110;
+text-decoration: none;
+background: url(../images/down-arrow.png) 55px 3px no-repeat;
+top:3px;
+cursor:pointer;
+padding-left:0px;
+}
+a.my-dashboard {
+  background: url(../images/down-arrow.png) 83px 3px no-repeat;
+  width:105px;
+}
+a.initiate-new {
+    background: url(../images/down-arrow.png) 82px 3px no-repeat;
+    width:94px;
+}
+.root {
+list-style:none;
+margin:0px;
+padding:0px;
+font-size: 11px;
+padding: 11px 0 0 0px;
+border-top:1px solid #dedede;
+}

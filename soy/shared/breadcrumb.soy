@@ -1,0 +1,416 @@
+{namespace jive.shared.breadcrumb autoescape="contextual"}
+
+/**
+* Renders the parents block
+*
+* @param userContainer true if the place is the user container, false otherwise
+* @param? place the current place
+* @param? parents the list of parent places for the current place
+* @param? placeLinkCount if item is content, flag indicating whether content is linked to other places
+* @param? linkedContentID if item is content and item is linked to other places, ID of the content
+* @param? linkedContentType if item is content and item is linked to other places, type of the content
+*
+* @depends path=/resources/scripts/breadcrumb.js
+*/
+{template .contextMenu}
+    {if $place and not $userContainer}
+        {sp}
+        <a href="#" id="js-place-parents-link" class="j-nav-more jive-icon-glyph icon-angle-down" title="{i18nText('browse.breadcrumb.button.label')}"></a>
+        {call .contextPopover}
+            {param place: $place /}
+            {param parents: $parents /}
+        {/call}
+    {/if}
+    {call .placeLinkBreadcrumbContainer}
+        {param placeLinkCount: $placeLinkCount /}
+        {param linkedContentID: $linkedContentID /}
+        {param linkedContentType: $linkedContentType /}
+        {param userContainer: $userContainer /}
+    {/call}
+{/template}
+
+/**
+* Renders the place link breadcrumb container
+*
+* @param placeLinkCount if item is content, flag indicating whether content is linked to other places
+* @param linkedContentID if item is content and item is linked to other places, ID of the content
+* @param linkedContentType if item is content and item is linked to other places, type of the content
+* @param userContainer true if the place is the user container, false otherwise
+* @param? legacy legacy breadcrumb display
+* @param? place exists if place info is available
+* @param? parents exists if this this breadcrumb displays a place hierarchy
+*/
+{template .placeLinkBreadcrumbContainer}
+    <span id="js-place-link-breadcrumb"
+            data-place-link-count="{if $placeLinkCount}{$placeLinkCount}{else}0{/if}"
+            {if $linkedContentID}data-linked-content-id="{$linkedContentID}"{/if}
+            {if $linkedContentType}data-linked-content-type="{$linkedContentType}"{/if}
+            {if $userContainer}data-is-usercontainer="{$userContainer}"{/if}
+            {if $legacy}data-legacy="{$legacy}"{/if}
+            {if $place}data-place="true"{/if}
+            {if $parents}data-parents="true"{/if}>
+        {call .placeLinkBreadcrumb}
+            {param placeLinkCount: $placeLinkCount /}
+            {param linkedContentID: $linkedContentID /}
+            {param linkedContentType: $linkedContentType /}
+            {param userContainer: $userContainer /}
+            {param legacy: $legacy /}
+            {param place: $place /}
+            {param parents: $parents /}
+            {param renderPopoverContainer: true /}
+        {/call}
+    </span>
+{/template}
+
+/**
+* Renders the place link breadcrumb
+*
+* @param placeLinkCount if item is content, flag indicating whether content is linked to other places
+* @param linkedContentID if item is content and item is linked to other places, ID of the content
+* @param linkedContentType if item is content and item is linked to other places, type of the content
+* @param userContainer true if the place is the user container, false otherwise
+* @param? legacy legacy breadcrumb display
+* @param? place legacy breadcrumb display
+* @param? parents legacy breadcrumb display
+* @param? renderPopoverContainer true if popover container should be rendered
+*/
+{template .placeLinkBreadcrumb}
+    {if $placeLinkCount and $placeLinkCount > 0 and $linkedContentType and $linkedContentID}
+        {if $legacy}
+
+            {if $place or $parents}
+                {sp}{i18nText('global.pipe')}{sp}
+            {/if}
+            <a href="#" class="js-place-linked-content-link">
+               {if ($placeLinkCount == 1)}
+                    {i18nText('contentPlaceRel.browse.breadcrumb.legacy.one.related', $placeLinkCount)}
+               {elseif ($placeLinkCount == 2)}
+                    {i18nText('contentPlaceRel.browse.breadcrumb.legacy.two.related', $placeLinkCount)}
+               {elseif ($placeLinkCount == 3)}
+                    {i18nText('contentPlaceRel.browse.breadcrumb.legacy.three.related', $placeLinkCount)}
+               {else}
+                    {i18nText('contentPlaceRel.browse.breadcrumb.legacy.many.related', $placeLinkCount)}
+               {/if}
+           </a>
+        {elseif $userContainer}
+            <span>{if $linkedContentType != 38}{i18nText('global.pipe')}{/if} <a href="#" class="js-place-linked-content-link">
+                           {if ($placeLinkCount == 1)}
+                                {i18nText('contentPlaceRel.browse.breadcrumb.usercontainer.one.related', $placeLinkCount)}
+                           {elseif ($placeLinkCount == 2)}
+                                {i18nText('contentPlaceRel.browse.breadcrumb.usercontainer.two.related', $placeLinkCount)}
+                           {elseif ($placeLinkCount == 3)}
+                                {i18nText('contentPlaceRel.browse.breadcrumb.usercontainer.three.related', $placeLinkCount)}
+                           {else}
+                                {i18nText('contentPlaceRel.browse.breadcrumb.usercontainer.many.related', $placeLinkCount)}
+                           {/if}
+                       </a>{i18nText('global.period')}
+            </span>
+        {else}
+            <span> {i18nText('contentPlaceRel.browse.breadcrumb.and')} <a href="#" class="js-place-linked-content-link">
+                           {if ($placeLinkCount == 1)}
+                                {i18nText('contentPlaceRel.browse.breadcrumb.one.related', $placeLinkCount)}
+                           {elseif ($placeLinkCount == 2)}
+                                {i18nText('contentPlaceRel.browse.breadcrumb.two.related', $placeLinkCount)}
+                           {elseif ($placeLinkCount == 3)}
+                                {i18nText('contentPlaceRel.browse.breadcrumb.three.related', $placeLinkCount)}
+                           {else}
+                                {i18nText('contentPlaceRel.browse.breadcrumb.many.related', $placeLinkCount)}
+                           {/if}
+                       </a>
+            </span>
+        {/if}
+        {if $renderPopoverContainer}
+            {call .placeLinkPopover /}
+        {/if}
+    {/if}
+{/template}
+
+/**
+* Renders the popover alone
+*
+* @param place the current place
+* @param parents the list of parent places for the current place
+*
+*/
+{template .contextPopover}
+    <div id="js-place-parents-container" class="j-pop-main j-menu j-quick-menu j-breadcrumb-popover" style="display: none">
+        <ul class="j-icon-list">
+            <li>
+                <a href="{buildUrl('/places')}" class="noIcon">
+                    <span class="lnk">
+                        {i18nText('browse.breadcrumb.place.link')}
+                    </span>
+                </a>
+
+                {if (length($parents) > 0)}
+                {foreach $parent in $parents}
+                    <ul>
+                    <li>
+                        {if $parent.viewableByUser}
+                            <a href="{buildUrl($parent.objectURL)}"><span class="jive-icon-med {$parent.iconCssClass}"></span>
+                                <span class="lnk">
+                                    {$parent.name}
+                                </span>
+                            </a>
+                        {else}
+                            <span><span class="jive-icon-med {$parent.iconCssClass}"></span>
+                                {$parent.name}
+                            </span>
+                        {/if}
+                        <span class="jive-icon-glyph icon-angle-down jive-breadcrumb-arrow"></span>
+                {/foreach}
+                {/if}
+                <ul>
+                    <li>
+                        <a href="{buildUrl($place.objectURL)}" class="last-child">
+                        <span class="jive-icon-med {$place.iconCssClass}"></span>
+                            <span class="lnk">
+                            {$place.name}
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+        {if (length($parents) > 0)}
+        {foreach $parent in $parents}
+            </li>
+            </ul>
+        {/foreach}
+        {/if}
+        </li>
+        </ul>
+    </div>
+{/template}
+
+/**
+ * Renders the popover for content linked to other places
+ */
+{template .placeLinkPopover}
+    <span id="js-place-linked-content-container-placeholder"></span>
+    <div id="js-place-linked-content-container" class="j-pop-main j-place-linked-content-container js-place-linked-content-container" style="display: none">
+    </div>
+{/template}
+
+/**
+ * Renders the related places inside the popover
+ *
+ * @param places
+ * @param placeLinkCount
+ */
+{template .placeLinkPopoverResults}
+    <ul class="j-icon-list">
+        {if (length($places) > 0)}
+            {foreach $place in $places}
+                    <li class="j-shared-place-link">
+                        {if $place.name}
+                            <a href="{buildUrl($place.resources.html.ref)}" class="j-shared-place js-shared-place-link"><span class="jive-icon-big {$place.iconCss} js-place-link-popover-icon"></span>
+                                <span class="lnk js-place-link-popover-name">
+                                    {$place.name}
+                                </span>
+                            </a>
+                        {else}
+                            <span>{i18nText('contentPlaceRel.browse.breadcrumb.noaccess.placeName')}</span>
+                        {/if}
+
+                        {if $place.canDeletePlaceRelationship}
+                            <a href="#" class="js-remove-rel-confirm j-remove-share font-color-meta" title="{i18nText('contentPlaceRel.browse.breadcrumb.remove.link')}"{i18nText('contentPlaceRel.browse.breadcrumb.remove.link')} data-relationship-id="{$place.contentPlaceRelationshipID}">
+
+                                <span>{i18nText('contentPlaceRel.browse.breadcrumb.remove.link')}</span>
+                            </a>
+                        {/if}
+                    </li>
+            {/foreach}
+            {if ($placeLinkCount - (length($places))) > 0}
+                {switch ($placeLinkCount - (length($places)))}
+                    {case 0}
+                    {case 1}
+                            <li>
+                                <span>{i18nText('contentPlaceRel.browse.breadcrumb.noaccess.one', ($placeLinkCount - (length($places))))}</span>
+                            </li>
+                    {case 2}
+                                <li>
+                                    <span>{i18nText('contentPlaceRel.browse.breadcrumb.noaccess.two', ($placeLinkCount - (length($places))))}</span>
+                                </li>
+                    {case 3}
+                                <li>
+                                    <span>{i18nText('contentPlaceRel.browse.breadcrumb.noaccess.three', ($placeLinkCount - (length($places))))}</span>
+                                </li>
+                    {default}
+                                <li>
+                                    {i18nText('contentPlaceRel.browse.breadcrumb.noaccess.many', ($placeLinkCount - (length($places))))}
+                                </li>
+                {/switch}
+            {/if}
+        {else}
+            <li>
+                {if $placeLinkCount == 1}
+                    {i18nText('contentPlaceRel.browse.breadcrumb.noresults.singular')}
+                {else}
+                    {i18nText('contentPlaceRel.browse.breadcrumb.noresults')}
+                {/if}
+            </li>
+        {/if}
+    </ul>
+{/template}
+
+/**
+ * Special version just for place headers
+ */
+{template .placeHeaderLegacyBreadcrumbs}
+    {call .legacyBreadcrumbs data="all"}
+        {param placeHeader: true/}
+    {/call}
+{/template}
+
+/**
+* Renders the parents block and link if supplied
+*
+* @param showHomeURL true if we should render a custom homeURL
+* @param fullHomeURL true if the homeURL is a fully qualified link, false to render the link in context
+* @param homeURL an optional homeURL
+* @param place the current container
+* @param parents the list of parent places for the current place
+* @param userContainer true if the place is the user container, false otherwise
+* @param separator The separator to use between links, if any.
+* @param? link The last link to show, if any.
+* @param? placeHeader Is in the placeHeader
+* @param? placeLinkCount if item is content, flag indicating whether content is linked to other places
+* @param? linkedContentID if item is content and item is linked to other places, ID of the content
+* @param? linkedContentType if item is content and item is linked to other places, type of the content
+*
+* @depends path=/resources/scripts/breadcrumb.js
+*/
+{template .legacyBreadcrumbs}
+<div id="jive-breadcrumb">
+    <span>
+    {if $place}
+        {if $showHomeURL}
+            {if $fullHomeURL}
+                <a href="{$homeURL}">{i18nText('global.home')}</a>
+            {else}
+                <a href="{buildUrl('/')}{$homeURL}">{i18nText('global.home')}</a>
+            {/if}
+            {if $separator}{sp}{$separator|noAutoescape}{sp}{/if}
+        {/if}
+
+        {if not $userContainer}
+            <a {if not $link and length($parents) == 0}class="jive-breadcrumb-last"{/if}
+            href="{buildUrl('/places')}">{i18nText('browse.breadcrumb.place.link')}</a>
+        {else}
+            <a {if not $link and length($parents) == 0}class="jive-breadcrumb-last"{/if}
+             href="{buildUrl('/people')}">{i18nText('browse.breadcrumb.people.link')}</a>
+        {/if}
+        {if $separator}{sp}{$separator|noAutoescape}{sp}{/if}
+
+        {if length($parents) > 0}
+        {foreach $parent in $parents}
+            {if $parent.viewableByUser}
+                <a {if not $link and isLast($parent)}class="jive-breadcrumb-last"{/if} href="{buildUrl($parent.objectURL)}">{$parent.name}</a>
+            {else}
+                <span class='jive-breadcrumb-unauthorized{if not $link and isLast($parent)} jive-breadcrumb-last{/if}'
+                title='{i18nText('community.list.spaces.unauthorized.tooltip')}'>{$parent.name}</span>
+            {/if}
+            {if $separator and not (isLast($parent) and $placeHeader)}
+                {sp}{$separator|noAutoescape}{sp}
+            {/if}
+            {if not $placeHeader and isLast($parent)}
+                <a href="{buildUrl($place.objectURL)}">{$place.name}</a>
+            {/if}
+        {/foreach}
+        {else}
+            {if not $placeHeader}
+                <a href="{buildUrl($place.objectURL)}">{$place.name}</a>
+            {/if}
+        {/if}
+
+        {if $link}
+            {if $separator} {$separator|noAutoescape} {/if}
+            {$link|noAutoescape}
+        {/if}
+    {/if}
+    {call .placeLinkBreadcrumbContainer}
+        {param placeLinkCount: $placeLinkCount /}
+        {param linkedContentID: $linkedContentID /}
+        {param linkedContentType: $linkedContentType /}
+        {param legacy: true /}
+        {param place: $place /}
+        {param parents: $parents /}
+        {param userContainer: $userContainer /}
+    {/call}
+    </span>
+</div>
+{/template}
+
+/**
+ * Renders the confirmation for removing place links
+ *
+ * @param relationshipID
+ * @param? placeLink
+ * @param? placeIconCss
+ * @param? placeName
+ * @depends path=/resources/scripts/jive/contentplace_relationship.js
+ */
+{template .placeLinkRemoveConfirm}
+<div class="j-remove-share-confirm">
+    {if $placeLink and $placeIconCss and $placeName}
+        <p>
+        {i18nText('contentPlaceRel.browse.breadcrumb.remove.confirm.place')}
+        &nbsp;
+        </p>
+        <p class="clearfix">
+        <a href="{$placeLink}"><span class="jive-icon-med {$placeIconCss}"></span>{$placeName}</a>
+        {i18nText('global.question_mark')}
+        </p>
+    {else}
+        <p>{i18nText('contentPlaceRel.browse.breadcrumb.remove.confirm')}</p>
+    {/if}
+    <a href="#" class="js-remove-rel j-remove-rel-confirm j-btn-global"
+                                       data-relationship-id="{$relationshipID}"
+                                        data-command="deleteContentPlaceRelBreadcrumb"
+                               >{i18nText('contentPlaceRel.browse.breadcrumb.remove.confirm.yes')}</a>
+    <a href="#" class="js-remove-rel-cancel j-remove-rel-confirm close j-btn-global">{i18nText('contentPlaceRel.browse.breadcrumb.remove.confirm.no')}</a>
+</div>
+{/template}
+
+/**
+ *
+ * @param messageKey i18n key
+ * @param hasRelationships
+ * @param containerName
+ * @param containerUrl
+ * @param containerCss
+ * @param? browseFilter
+ * @param? browseFromRootSpace - special case for polls in the root community
+ */
+{template .breadcrumbIntroText}
+    {if $hasRelationships}
+        {call jive.shared.soy.i18nHelper}
+            {param i18nKey}
+                {i18nKey($messageKey, true)}
+            {/param}
+            {param arg0}
+                <a href="{$containerUrl}"><span class="{$containerCss}"></span>{$containerName}</a>
+            {/param}
+            {param noAutoEscape: true /}
+        {/call}
+    {else}
+        {call jive.shared.soy.i18nHelper}
+            {param i18nKey}
+                {i18nKey($messageKey, true)}
+            {/param}
+            {param arg0}
+                {if $browseFromRootSpace}
+                    <a href="{if $browseFilter}{$browseFilter}{/if}">
+                {else}
+                    <a href="{$containerUrl}{if $browseFilter}{$browseFilter}{/if}">
+                {/if}
+            {/param}
+            {param arg1}
+                </a>
+            {/param}
+            {param arg2}
+                <a href="{$containerUrl}"><span class="{$containerCss}"></span>{$containerName}</a>
+            {/param}
+            {param noAutoEscape: true /}
+        {/call}
+    {/if}
+{/template}

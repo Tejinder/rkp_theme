@@ -1,0 +1,200 @@
+{namespace jive.place autoescape="contextual"}
+
+
+/**
+ * Renders the overview section for a "place".
+ *
+ * @param place the {@link Place} that we are displaying.
+ * @param widgetMarkup the html markup from the widget layout
+ * @param widgetTypeKey the key for the specified widget type
+ * @param canManageContainer true if the user can manage the container
+ * @param customizeMessageSeen true if the place customize message has been seen
+ * @param placeOverviewMessageSeen true if the place overview message has been seen for this place (the banner on the overview page)
+ * @param customizeNow true if we need to open the customization panel automatically, false otherwise. This is triggered from the manage link
+ * @param? suppressTabs whether to suppress tabs
+ * @param canonicalUrl
+ * @param templateView The model to render the page template.
+ *
+ * @depends path=/resources/scripts/jquery/ui/jquery.ui.draggable.js
+ * @depends path=/resources/scripts/jquery/ui/jquery.ui.slider.js
+ * @depends path=/resources/scripts/jquery/jquery.ui.touch-punch.js
+ * @depends path=/resources/scripts/jivewidgets.js
+ * @depends path=/resources/scripts/jivewidgetbridges.js
+ * @depends path=/resources/scripts/jive/widget/widget-container.js
+ * @depends path=/resources/scripts/jquery/jquery.safelyLoad.js
+ */
+{template .overview}
+    {call jive.skin.template.main data="$templateView"}
+        {param title}
+            {$place.placeTypeName|noAutoescape}: {$place.name|noAutoescape}
+        {/param}
+        {param canonicalUrl: $canonicalUrl/}
+        {param metaDescription: $place.description/}
+        {param selectedLinkID: 'jive-nav-link-place'/}
+        {param headContent}
+            {call .head data="all" /}
+
+            <link rel="stylesheet" href="{resourceUrl('/styles/jive-widgets.css')}" type="text/css" media="all" />
+			<link rel="stylesheet" href="/themes/rkp_theme/style/rkp.css" type="text/css" media="all" />
+            {if $place.objectType == jive.constants.PROJECT}
+                <link rel="stylesheet" href="{resourceUrl('/styles/jive-project.css')}" type="text/css" media="all" />
+
+            {/if}
+
+            {call jive.shared.soy.resourceInlineJs}
+            {param code}
+                function toggleWidgetPanel() {lb}
+                    $j(document.body).addClass('jive-widget-progresscursor').addClass('jive-body-widget-customizing');
+                    // hide the page header, tab bar, and customize info message (if present), and hide popover
+                    $j("#j-place-manage-container").trigger("close");
+                    $j('.j-page-header').hide();
+                    $j('.j-tab-nav').hide();
+                    $j('.j-page-customizable-message').hide();
+                    // show loading panel
+                    $j("#jive-widgets-panel-loading").show();
+                    $j("#jive-widget-container").safelyLoad('{buildUrl('customize-container.jspa', 'containerType', $place.objectType, 'containerID', $place.id)|noAutoescape}', {lb} cache: false {rb}, function() {lb}
+                        $j("#jive-widgets-panel-loading").hide();
+                        $j("#jive-widgets-panel").fadeIn(500);
+                        $j("#jive-widgets-warning").fadeIn(500);
+                        $j(document.body).removeClass('jive-widget-progresscursor');
+                        {if not $customizeMessageSeen}
+                            $j('#customize-message').slideDown();
+                        {/if}
+                    {rb});
+                {rb}
+
+                // Piggy backing off of widgetBridges to the gadget tab switching as well
+                var bridgeIDs = new Array();
+                var widgetBridges = new WidgetBridges({lb}
+                    bridgeAction : "{buildUrl('bridge-widgets.jspa')}",
+                    bridgeLoginAction : "{buildUrl('bridge-widgets!login.jspa')}",
+                    bridgeLogoutAction : "{buildUrl('bridge-widgets!logout.jspa')}",
+                    bridgeIDs: bridgeIDs
+                {rb});
+
+                function dismissCustomizeMessage() {lb}
+                    $j('#customize-message').slideUp();
+                    if ($j('#customize-message').find('#dont-display-message').prop('checked')) {lb}
+                        var userSource = new jive.Browse.User.ItemSource();
+                        userSource.setUserProperty({lb} userID: 'current', propName: 'jive.customizeWidgetMsg.closed', propValue: 'true' {rb});
+                    {rb}
+                    return false;
+                {rb}
+
+                function dismissPlaceOverviewMessage() {lb}
+                    $j('a.j-box-dismiss').closest('div.j-page-customizable-message').slideUp();
+                    var userSource = new jive.Browse.User.ItemSource();
+                    var placeOverviewProp =  'jive.placeOverviewMsg.closed.' + {$place.objectType} + '.' + {$place.id};
+                    userSource.setUserProperty({lb} userID: 'current', propName: placeOverviewProp, propValue: 'true' {rb});
+                    return false;
+                {rb}
+
+                function removeWidgetFrame(button) {lb}
+                    var frameID = widgets.getWidgetFrameID(button);
+                    if (frameID) {lb}
+                        widgets.removeWidgetFrame(frameID);
+                    {rb}
+                {rb}
+
+                function editWidgetFrame(button) {lb}
+                    var frameID = widgets.getWidgetFrameID(button);
+                    if (frameID) {lb}
+                        widgets.editWidgetFrame(frameID);
+                    {rb}
+                {rb}
+
+                function dismissWidgetMessage(e) {lb}
+                    $j(this).closest('.widget-message').slideUp();
+                    var prop = $j(link).attr('data-property');
+                    if (prop) {lb}
+                        var userSource = new jive.Browse.User.ItemSource();
+                        userSource.setUserProperty({lb} userID: 'current', propName: prop, propValue: 'true' {rb});
+                    {rb}
+                    e.preventDefault();
+                {rb}
+
+            function dismissWidgetMessage(link) {lb}
+                $j(link).closest('.widget-message').slideUp();
+            {rb}
+
+            if (!window.widgetContainer) {lb}
+                require(['jive/widget/widget-container'], function(WidgetContainer) {lb}
+                    window.widgetContainer = new WidgetContainer({lb}
+                        'widgetType': '{$widgetTypeKey}',
+                        'renderWidgetAction': '{buildUrl('/render-widget.jspa')}',
+                        'containerID': '{$place.id}',
+                        'containerType': '{$place.objectType}'
+                    {rb});
+                    define('widgetContainer', window.widgetContainer);
+                {rb});
+            {rb}
+
+                $j(document).ready(function() {lb}
+                    window.widgetContainer.renderAll();
+                    // this message is when the user is in edit mode with some additional widget config instructions.
+                    $j('#customize-message #dismiss-link').click(dismissCustomizeMessage);
+                    var $widgetContent = $j('#jive-widget-content');
+                    $widgetContent.on('click','.widget-remove-link', function(e) {lb} removeWidgetFrame(this); e.preventDefault(); {rb});
+                    $widgetContent.on('click','.widget-edit-link', function(e) {lb} editWidgetFrame(this); e.preventDefault(); {rb});
+                    $widgetContent.on('click','.widget-dismiss-link', function(e) {lb} dismissWidgetMessage(this); e.preventDefault(); {rb});
+
+                    $j('#jive-place-link-manage-overview').click(function(e) {lb}
+                        toggleWidgetPanel();
+                        e.preventDefault();
+                        {rb}
+                    );
+                    // this message is on the overview page in the standard view with an indication that the user can configure the home page.
+                    $j('a.j-box-dismiss').click(dismissPlaceOverviewMessage);
+
+                    {if $customizeNow}
+                        toggleWidgetPanel();
+                    {/if}
+                {rb});
+            {/param}
+            {/call}
+        {/param}
+		{param showNav: 'true'/}
+        {param bodyClass: 'j-body-place'/}
+        {param bodyContent}
+            {if not $customizeMessageSeen}
+                {call .editPageMessage /}
+            {/if}
+
+            {call .header data="all" /}
+
+
+            <div class="j-layout j-contained j-rc4 clearfix">
+
+                {if $canManageContainer}
+                    {if not $placeOverviewMessageSeen}
+                    <div class="j-box j-page-customizable-message j-rc5">
+                        <header>
+                            <h3>{i18nText('place.customize.heading')}</h3>
+                            <nav>
+                                <a href="#" class="j-box-dismiss" title="{i18nText('place.dismiss.link')}"> <span class="jive-icon-glyph icon-close-med"></span></a>
+                            </nav>
+                        </header>
+                        <div class="j-box-body">
+                            <p>{i18nText('place.customize.instructions')}</p>
+
+                            <a href="#" onclick="toggleWidgetPanel(); return false;" class="j-button">{i18nText('sgroup.tab.customize')}</a>
+                        </div>
+                    </div>
+                    {/if}
+                {/if}
+
+                <div id="jive-widgets-panel-loading" style="display: none">
+                    <p class="font-color-meta-light"><img src="{buildUrl('/images/jive-image-loading.gif')}" alt=""/>{i18nText('customize.loading')}</p>
+                </div>
+
+
+                <div id="jive-widget-container">
+                    <div id="jive-widget-content" class="clearfix">
+                        {$widgetMarkup |noAutoescape}
+                    </div>
+                </div>
+
+            </div>
+        {/param}
+    {/call}
+{/template}

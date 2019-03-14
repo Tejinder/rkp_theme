@@ -1,0 +1,801 @@
+{namespace jive.browse.content autoescape="contextual"}
+
+/**
+* Renders a single detail item from a {@link BrowseViewItemBean} instance.
+*
+* @param id The object ID
+* @param type The object type
+*/
+{template .defaultDetailContentItem}
+	<!-- Cannot find template for object type:{$type}, id:{$id} -->
+{/template}
+
+
+/**
+* Renders a single detail item from a {@link BrowseViewItemBean} instance.
+*
+* @param link A relative link to the item.
+* @param iconCss An icon representing the item.
+* @param subject The item subject.
+* @param id The object ID
+* @param type The object type
+* @param columns The columns shown in the details view.
+* @param creationDate The creation date of the item.
+* @param prop Properties of the content object.
+* @depends template=jive.eae.acclaim.count
+*
+* @allowDependsWildcard
+* @depends i18nKeys=global.access.content.type.*
+* @depends i18nKeys=browse.heading.lastmodifiedby
+* @depends i18nKeys=global.by_author
+*/
+{template .detailContentItem}
+    <tr class="js-browse-item" data-object-id={$id} data-object-type="{$type}">
+        <td class="j-td-icon">
+            <img src="{resourceUrl('/images/transparent.png')}" alt="{i18nText(i18nKey('global.access.content.type.' + $type, true))}" class="{$iconCss} jive-icon-big" />
+        </td>
+        <td class="j-td-title">
+            <div>
+                <a href="{buildUrl($link)}">
+                    {if $prop.hasUnreadReplies}<strong>{/if}{$subject |noAutoescape}{if $prop.hasUnreadReplies}</strong>{/if}
+                    {if $prop.privacyInfo and $prop.privacyInfo.private}
+                        <span src="{buildUrl('/images/transparent.png')}"
+                        class="jive-icon-sml jive-icon-content-private{if $prop.privacyInfo.shared}-shared{/if}"
+                        title="{if $prop.privacyInfo.shared}{i18nText('doc.visibility.restricted.tooltip')}{else}{i18nText('doc.visibility.private.tooltip')}{/if}"
+                        ></span>
+                    {/if}
+                </a>
+                {if $prop.isVisibleToPartner}
+                    <span class="font-color-meta-light j-browse-external-access"> - <em>{i18nText('partner.browse.ext_access')}</em></span>
+                {/if}
+                {call jive.browse.content.parentInfo data="all"/}
+                {call jive.browse.content.contentPlaceRelationshipCount data="all"/}
+            </div>
+        </td>
+        <td class="j-td-author font-color-meta">
+			{if $prop.author}
+				{if not $prop.isOriginalAuthor}
+					{call jive.shared.soy.i18nHelper}
+						{param i18nKey}
+						    {i18nKey('browse.heading.lastmodifiedby')}
+						{/param}
+						{param arg0}{call jive.shared.displayutil.userDisplayNameLink data="$prop.author"}{/call}{/param}
+						{param noAutoEscape}true{/param}
+					{/call}
+				 {else}
+					{call jive.shared.displayutil.userDisplayNameLink data="$prop.author"}{/call}
+				 {/if}
+			{/if}
+		</td>
+
+        {if $columns and $columns.creationDate}
+            <td class="j-td-date font-color-meta">{formatDate($creationDate)}</td>
+        {elseif $prop.lastActivityDate}
+            <td class="j-td-date font-color-meta">{formatDate($prop.lastActivityDate)} <span class="font-color-meta-light" style="display: none">
+				{call jive.shared.soy.i18nHelper}
+					{param i18nKey}
+					    {i18nKey('global.by_author')}
+					{/param}
+					{param arg0}{call jive.shared.displayutil.userDisplayNameLink data="$prop.author"} {/call}{/param}
+					{param noAutoEscape}true{/param}
+				{/call}
+				</span>
+			</td>
+       	{else}
+       	    <td></td>
+       	{/if}
+		
+		  {if $columns and not $columns.ratedDocs}
+		  {else}
+		  <td class="j-td-rating font-color-meta">
+
+                <div class="jive-content-avgrating">
+                      <div class="jive-content-avgrating-score" title="{i18nText('rate.avg_user_rating.label')}: {$prop.ratingInfo.meanRating}">
+                          {for $availableRating in range(1, $prop.ratingInfo.availableRatingCount + 1)}
+                                 <span class="jive-icon-avgrating-{$availableRating} jive-icon-med jive-icon-rate-avg-
+                                 {if $prop.ratingInfo.meanRating >= $availableRating}
+                                     on
+                                 {elseif $prop.ratingInfo.meanRating >= ($availableRating - 0.50)}
+                                     half
+                                 {else}
+                                     off
+                                 {/if}
+                                 "></span>
+                          {/for}
+                  </div>
+                  <div class="jive-content-rating-print" style="display: none;">{$prop.ratingInfo.meanRating}</div>
+                 </div>
+           </td>
+		 {/if}
+		 
+        <td class="j-td-views number font-color-meta">
+            <span title="{i18nText('browse.heading.viewcount')}">
+            {if $prop.viewCount and $prop.viewCount > -1}{$prop.viewCount}
+            {else}
+                &nbsp;
+            {/if}
+            </span>
+        </td>
+       	<td class="j-td-likes number font-color-meta">
+            <span title="{i18nText('browse.heading.likecount')}">
+                <span class="jive-icon-sml jive-icon-meta-like"></span>
+                {call jive.eae.acclaim.count}
+                    {param command:'showAcclaim' /}
+                    {param count}{$prop.activityInfo ? $prop.activityInfo.likeCount : 0}{/param}
+                    {param acclaimType : 'like' /}
+                    {param objectId:$id /}
+                    {param objectType:$type /}
+                    {param classes:'j-meta-number' /}
+                    {param accessibilityLinkLabel}
+                        {call jive.shared.soy.getCountTextByType}
+                            {param count}{$prop.activityInfo ? $prop.activityInfo.likeCount : 0}{/param}
+                            {param type:'showlikescount'/}
+                        {/call}
+                    {/param}
+                {/call}
+            </span>
+        </td>
+        <td class="j-td-bookmarks number font-color-meta">
+            <span title="{i18nText('browse.heading.bookmarkcount')}">
+                <span class="jive-icon-sml jive-icon-meta-bookmark"></span>
+                {call jive.eae.acclaim.count}
+                    {param command:'showBookmarks' /}
+                    {param count}{$prop.activityInfo ? $prop.activityInfo.bookmarkCount : 0}{/param}
+                    {param objectId:$id /}
+                    {param objectType:$type /}
+                    {param classes:'j-meta-number' /}
+                    {param accessibilityLinkLabel}
+                        {call jive.shared.soy.getCountTextByType}
+                            {param count}{$prop.activityInfo ? $prop.activityInfo.bookmarkCount : 0}{/param}
+                            {param type:'showbookmarkscount'/}
+                        {/call}
+                    {/param}
+                {/call}
+            </span>
+        </td>
+        <td class="j-td-replies number font-color-meta">
+            {let $accessibilityLinkLabel}
+                {call jive.shared.soy.getCountTextByType}
+                    {param count}{$prop.activityInfo ? $prop.activityInfo.replyCount : 0}{/param}
+                    {param type:'reply'/}
+                {/call}
+            {/let}
+            <span title="{i18nText('browse.heading.replycount')}"><img src="{resourceUrl('/images/transparent.png')}" alt="" class="jive-icon-sml jive-icon-meta-comment"/>
+            {if $accessibilityLinkLabel}
+                <label class="j-508-label" id="replies-{$id}-{$type}-count-label">
+                {$accessibilityLinkLabel}
+                </label>
+            {/if}
+            <a href="{buildUrl($prop.activityInfo.objectUrl + '#comments')}"
+                {if $accessibilityLinkLabel}aria-labelledby="replies-{$id}-{$type}-count-label" title="{$accessibilityLinkLabel}"{/if}>
+                 {if $prop.activityInfo}{$prop.activityInfo.replyCount}{else}0{/if}</span>
+            </a>
+        </td>
+        <td class="j-td-actions">
+            {call .flippable data="$prop"}
+                {param body}{call .detailActionPanel data="all"/}{/param}
+            {/call}
+        </td>
+    </tr>
+{/template}
+
+
+/**
+* Renders a single thumbnail item from a {@link BrowseViewItemBean} instance.
+*
+* @param id The object ID
+* @param type The object type
+*/
+{template .defaultThumbnailContentItem}
+	<!-- Cannot find template for object type:{$type}, id:{$id} -->
+{/template}
+
+
+/**
+* Renders a single thumbnail item from a {@link BrowseViewItemBean} instance.
+*
+* @depends path=/resources/scripts/apps/browse/content/view/binary_preview.js
+*
+* @param id The object ID
+* @param type The object type
+* @param link A relative link to the item.
+* @param iconCss An icon representing the item
+* @param subject The item subject.
+* @param prop Item properties.
+* @param columns
+*
+* @allowDependsWildcard
+* @depends i18nKeys=global.access.content.type.*
+*/
+{template .thumbnailContentItem}
+<div class="card">
+    <div class="j-content-thumb j-doc-thumb j-thumb js-browse-item face card-front {call .flippable data="$prop"}{param body: 'flippable'/}{/call}" data-object-type="{$type}" data-object-id="{$id}">
+        <header class="js-thumb-header">
+            <h4>
+                <p class="j-508-label" aria-hidden="true" id="label-{$type}-{$id}">{i18nText(i18nKey('global.access.content.type.' + $type, true))} {$subject|noAutoescape}</p>
+                <a href="{buildUrl($link)}" aria-labelledby="label-{$type}-{$id}" title="{i18nText(i18nKey('global.access.content.type.' + $type, true))} {$subject|noAutoescape}">
+                    <span class="jive-icon-med {$iconCss}" role="img"></span>
+                    <span class="js-header-text j-header-text" role="header">{$subject|noAutoescape}</span>
+                </a>
+            </h4>
+        </header>
+        <section>
+            <article>
+                {if $prop.binaryPreview}
+                    {if $prop.binaryPreview.showViewer}
+                        <a href="{buildUrl($link)}" data-preview-url="{buildUrl($prop.binaryPreview.previewUrl)}">
+                            <img src="{buildUrl($prop.binaryPreview.thumbnailUrl)}" class="binary-preview"
+                                alt="{$prop.bodysnippet|noAutoescape}" title="{$prop.bodysnippet|noAutoescape}"/>
+                        </a>
+                    {else}
+                        <a href="{buildUrl($prop.binaryPreview.previewUrl)}">
+                                                    <img src="{buildUrl($prop.binaryPreview.thumbnailUrl)}" class="binary-preview"
+                                                        alt="{$prop.bodysnippet|noAutoescape}" title="{$prop.bodysnippet|noAutoescape}"/>
+                                                </a>
+                    {/if}
+                {elseif $prop.bodysnippet}
+                    {$prop.bodysnippet|noAutoescape}
+//                    <a href="{buildUrl($link)}" class="j-more">{i18nText('browse.action.viewmore')}</a>
+                {/if}
+            </article>
+
+            {if ($prop.author)}
+            <div class="j-author-block">
+                <span class="j-avatar-container">
+                    {call jive.shared.displayutil.avatar data="$prop.author"}
+                        {param size: 24 /}
+                    {/call}
+                </span>
+                <div class="j-author-info font-color-meta">
+                {call .thumbnailDateBlock data="all"/}
+                </div>
+            </div>
+            {/if}
+        </section>
+        <footer>
+            <div class="j-thumb-footer">
+                {call .activityInfoBlock data="$prop"}
+                    {param objectId:$id /}
+                    {param objectType:$type /}
+                {/call}
+                 <span class="j-thumb-title-meta">
+                    {if $prop.privacyInfo and $prop.privacyInfo.private}
+                        <span src="{buildUrl('/images/transparent.png')}"
+                            class="jive-icon-sml jive-icon-content-private{if $prop.privacyInfo.shared}-shared{/if}"
+                            title="{if $prop.privacyInfo.shared}{i18nText('doc.visibility.restricted.tooltip')}{else}{i18nText('doc.visibility.private.tooltip')}{/if}"
+                            ></span>
+                    {/if}
+                    {if $prop.attachmentInfo and $prop.attachmentInfo.hasAttachments}
+                        <span class="jive-icon-sml jive-icon-content-attachment"></span>
+                    {/if}
+                    {if $prop.isVisibleToPartner}
+                        <span class="jive-icon-med jive-icon-partner" title="{i18nText('partner.browse.ext_access')}"></span>
+                    {/if}
+                </span>
+            </div>
+        </footer>
+        {call .flipperControl data="$prop"/}
+    </div>
+    <div class="j-thumb-back face card-back j-thumb-back-small" aria-hidden="true">
+        <header>
+            <h6 class="font-color-white"><span class="jive-icon-med {$iconCss}"></span>{$subject|noAutoescape}</h6>
+            {call jive.browse.content.parentInfo data="all"/}
+            {call jive.browse.content.contentPlaceRelationshipCount data="all"/}
+        </header>
+        {call .thumbnailActionPanel data="all"/}
+        <a href="#" class="j-back-btn"><span class="jive-icon-glyph icon-angle-left"></span> {i18nText('global.back.button')}</a>
+    </div>
+</div>
+{/template}
+
+/**
+* Renders a single thumbnail item from a {@link BrowseViewItemBean} instance for a bookmark/favorite.
+*
+* @param id The object ID
+* @param type The object type
+* @param link A relative link to the item.
+* @param subject The item subject.
+* @param prop Item properties.
+*
+* @allowDependsWildcard
+* @depends i18nKeys=global.access.content.type.*
+*/
+{template .thumbnailBookmarkItem}
+<div class="card">
+    <div class="j-content-thumb j-bookmark-thumb j-thumb js-browse-item face card-front {call .flippable data="$prop"}{param body: 'flippable'/}{/call}" data-object-type="{$type}" data-object-id="{$id}">
+        <header class="js-thumb-header">
+            <h4>
+                <a href="{buildUrl($link)}" title="{$subject|noAutoescape}">
+                    <span class="jive-icon-med jive-icon-external-site" role="img" title="{i18nText(i18nKey('global.access.content.type.' + $type, true))}"></span>
+                    <span class="js-header-text j-header-text">{$subject|noAutoescape}</span>
+                </a>
+                <span class="j-thumb-title-meta">
+                    {if $prop.privacyInfo and $prop.privacyInfo.private}
+                         <span src="{buildUrl('/images/transparent.png')}"
+                            class="jive-icon-sml jive-icon-content-private{if $prop.privacyInfo.shared}-shared{/if}"
+                            title="{if $prop.privacyInfo.shared}{i18nText('doc.visibility.restricted.tooltip')}{else}{i18nText('doc.visibility.private.tooltip')}{/if}"
+                            ></span>
+                    {/if}
+                </span>
+            </h4>
+        </header>
+        <section>
+            <article>
+                {if $prop.bodysnippet}
+                    {$prop.bodysnippet|noAutoescape}
+                    <a href="{buildUrl($link)}" class="j-more">{i18nText('browse.action.viewmore')}</a>
+                {/if}
+            </article>
+            {call .activityInfoBlock data="$prop"}
+                {param link: $link /}
+                {param objectId:$id /}
+                {param objectType:$type /}
+                {param displaySharedContentCue:$prop.isVisibleToPartner /}
+            {/call}
+            <div class="j-author-block">
+                <span class="j-avatar-container">
+                    {call jive.shared.displayutil.avatar data="$prop.author"}
+                        {param size: 24 /}
+                    {/call}
+                </span>
+                <div class="j-author-info font-color-meta">
+                {call .thumbnailDateBlock data="all"/}
+                </div>
+            </div>
+        </section>
+        {call .flipperControl data="$prop"/}
+    </div>
+    <div class="j-thumb-back face card-back" aria-hidden="true">
+        <header>
+            <h6 class="font-color-white">{$subject|noAutoescape}</h6>
+        </header>
+        {call .thumbnailActionPanel data="all"/}
+        <a href="#" class="j-back-btn"><span class="icon-angle-left"></span> {i18nText('global.back.button')}</a>
+    </div>
+</div>
+{/template}
+
+/**
+* Renders a single document thumbnail item from a {@link BrowseViewItemBean} instance.
+*
+* @param id The object ID
+* @param type The object type
+* @param link A relative link to the item.
+* @param iconCss An icon representing the item.
+* @param subject The item subject.
+* @param prop Item properties.
+* @param columns The columns shown in the details view.
+*/
+{template .thumbnailDocumentItem}
+    {call .thumbnailContentItem data="all"}
+    {/call}
+{/template}
+
+/**
+* Renders a single discussion thumbnail item from a {@link BrowseViewItemBean} instance.
+*
+* @param id The object ID
+* @param type The object type
+* @param link A relative link to the item.
+* @param iconCss An icon representing the item.
+* @param subject The item subject.
+* @param prop Item properties.
+* @param columns The columns shown in the details view.
+*/
+{template .thumbnailDiscussionItem}
+    {call .thumbnailContentItem data="all"}
+    {/call}
+{/template}
+
+/**
+* Renders a single blog post thumbnail item from a {@link BrowseViewItemBean} instance.
+*
+* @param id The object ID
+* @param type The object type
+* @param link A relative link to the item.
+* @param iconCss An icon representing the item.
+* @param subject The item subject.
+* @param prop Item properties.
+* @param columns The columns shown in the details view.
+*/
+{template .thumbnailBlogPostItem}
+{call .thumbnailContentItem data="all"}
+    {/call}
+{/template}
+
+/**
+* Renders a single status thumbnail item from a {@link BrowseViewItemBean} instance.
+*
+* @param id The object ID
+* @param type The object type
+* @param link A relative link to the item.
+* @param iconCss An icon representing the item.
+* @param prop Item properties.
+* @param columns The columns shown in the details view.
+*/
+{template .thumbnailStatusItem}
+   {call .thumbnailContentItem data="all"}
+    {/call}
+{/template}
+
+/**
+* Renders a single tile stream thumbnail item from a {@link BrowseViewItemBean} instance.
+*
+* @param id The object ID
+* @param type The object type
+* @param link A relative link to the item.
+* @param iconCss An icon representing the item.
+* @param subject The item subject.
+* @param prop Item properties.
+* @param columns The columns shown in the details view.
+*/
+{template .thumbnailTileStreamItem}
+    {call .thumbnailContentItem data="all"}
+    {/call}
+{/template}
+
+/**
+* Renders a single tile stream thumbnail item from a {@link BrowseViewItemBean} instance.
+*
+* @param link A relative link to the item.
+* @param iconCss An icon representing the item.
+* @param subject The item subject.
+* @param id The object ID
+* @param type The object type
+* @param columns The columns shown in the details view.
+* @param creationDate The creation date of the item.
+* @param prop Properties of the content object.
+*/
+{template .detailTileStreamItem}
+    {call .detailContentItem data="all"}
+    {/call}
+{/template}
+
+
+/**
+* Renders a single poll thumbnail item from a {@link BrowseViewItemBean} instance.
+*
+* @param id The object ID
+* @param type The object type
+* @param link A relative link to the item.
+* @param iconCss An icon representing the item.
+* @param subject The item subject.
+* @param prop Item properties.
+* @param columns The columns shown in the details view.
+*/
+{template .thumbnailPollItem}
+    {call .thumbnailContentItem data="all"}
+    {/call}
+{/template}
+
+
+/**
+* Renders the date block for a thumbnail item.
+*
+* @param prop The content properties
+* @param unmodified The item hasn't been modified since creation.
+* @param columns The columns shown in the details view.
+* @depends i18nKeys=browse.created_by
+* @depends i18nKeys=browse.updated_by
+*/
+{template .thumbnailDateBlock}
+    {if $unmodified or ($columns and $columns.showCreator)}
+        {call jive.shared.soy.i18nHelper}
+            {param i18nKey}
+                {i18nKey('browse.created_by')}
+            {/param}
+            {param arg0}
+                <span>
+            {/param}
+            {param arg1}
+                </span>
+            {/param}
+            {param arg2}
+                <span class="j-line2">
+                    {call jive.shared.displayutil.userDisplayNameLink data="$prop.author" /}
+                </span>
+            {/param}
+            {param noAutoEscape: true /}
+        {/call}
+    {else}
+        {call jive.shared.soy.i18nHelper}
+            {param i18nKey}
+                {i18nKey('browse.updated_by')}
+            {/param}
+            {param arg0}
+                <span>
+            {/param}
+            {param arg1}
+                </span>
+            {/param}
+            {param arg2}
+                <span class="j-line2">
+                    {call jive.shared.displayutil.userDisplayNameLink data="$prop.author" /}
+                </span>
+            {/param}
+            {param noAutoEscape: true /}
+        {/call}
+    {/if}
+{/template}
+
+/**
+* Render the activityInfoFooter.
+*
+* @param  objectId
+* @param  objectType
+* @param? activityInfo An {@link com.jivesoftware.community.browse.rest.impl.ItemActivityBean} instance.
+*/
+{template .activityInfoBlock}
+    <ul class="j-stats">
+        <li><span class="jive-icon-sml jive-icon-meta-like"></span>
+        {call jive.eae.acclaim.count}
+            {param command:'showAcclaim' /}
+            {param acclaimType : 'like' /}
+            {param count}{if $activityInfo}{$activityInfo.likeCount}{else}0{/if}{/param}
+            {param objectId:$objectId /}
+            {param objectType:$objectType /}
+            {param classes:'j-meta-number' /}
+            {param accessibilityLinkLabel}
+                {call jive.shared.soy.getCountTextByType}
+                    {param count}{if $activityInfo}{$activityInfo.likeCount}{else}0{/if}{/param}
+                    {param type:'showlikescount'/}
+                {/call}
+            {/param}
+        {/call}
+        </li>
+        <li><span class="jive-icon-sml jive-icon-meta-bookmark"></span>
+        {call jive.eae.acclaim.count}
+            {param command:'showBookmarks' /}
+            {param count}{if $activityInfo}{$activityInfo.bookmarkCount}{else}0{/if}{/param}
+            {param objectId:$objectId /}
+            {param objectType:$objectType /}
+            {param classes:'j-meta-number' /}
+            {param accessibilityLinkLabel}
+                {call jive.shared.soy.getCountTextByType}
+                    {param count}{if $activityInfo}{$activityInfo.bookmarkCount}{else}0{/if}{/param}
+                    {param type:'showbookmarkscount'/}
+                {/call}
+            {/param}
+        {/call}
+        </li>
+        <li>
+            {let $accessibilityLinkLabel}
+                {call jive.shared.soy.getCountTextByType}
+                    {param count}{$activityInfo ? $activityInfo.replyCount : 0}{/param}
+                    {param type:'reply'/}
+                {/call}
+            {/let}
+            {if $accessibilityLinkLabel}
+                <label class="j-508-label" id="replies-{$objectId}-{$objectType}-count-label">
+                    {$accessibilityLinkLabel}
+                </label>
+            {/if}
+            <span class="jive-icon-sml jive-icon-meta-comment"></span>
+            <a href="{buildUrl($activityInfo.objectUrl + '#comments')}"
+                {if $accessibilityLinkLabel}aria-labelledby="replies-{$objectId}-{$objectType}-count-label" title="{$accessibilityLinkLabel}"{/if}>
+                {if $activityInfo}{$activityInfo.replyCount}{else}0{/if}
+            </a>
+        </li>
+    </ul>
+{/template}
+
+
+/**
+* If a card is flippable, render something.
+* @param followInfo
+* @param shareInfo
+* @param bookmarkInfo
+* @param body
+*/
+{template .flippable}
+    {if ($followInfo and $followInfo.showFollowControls) or ($shareInfo and $shareInfo.shareable) or ($bookmarkInfo and $bookmarkInfo.showBookmarkControls)}
+        {$body|noAutoescape}
+    {/if}
+{/template}
+
+/** Render the flipper controls
+*/
+{template .flipperControl}
+    {call .flippable data="all"}
+        {param body}<a href="#" class="j-card-flipper j-ui-elem">{i18nText('global.actions')}</a>{/param}
+    {/call}
+{/template}
+
+/**
+* Render thumbnail action panel
+*
+* @depends template=jive.soy.share.control
+*
+* @param id The object ID
+* @param type The object type
+* @param prop Item properties.
+*/
+{template .thumbnailActionPanel}
+    <ul class="j-social-actions j-icon-list" role="toolbar" aria-label="{i18nText('browse.action.label')}">
+        {if $prop.followInfo and $prop.followInfo.showFollowControls}
+            <li class="j-js-follow-controls" data-location="browse" data-streamsassoc="{length($prop.followInfo.streamsAssociatedBean.streamIDs)}" aria-live="polite" aria-atomic="true">
+                <span class="start-follow">
+                    <a class="button j-follow-button j-social-action" href="#"{sp}
+                        data-objecttype="{$prop.followInfo.objectType}"{sp}
+                        data-objectid="{$prop.followInfo.objectID}"{sp}
+                        {if $prop.followInfo.followed}style="display: none;"{/if}>
+                        <span class="jive-icon-glyph icon-plus-circle2"></span>
+                        {i18nText('browse.action.follow')}
+                    </a>
+                </span>
+                <span class="following">
+                    <a class="button j-follow-button j-social-action" href="#"{sp}
+                        data-objecttype="{$prop.followInfo.objectType}"{sp}
+                        data-objectid="{$prop.followInfo.objectID}"{sp}
+                        {if not $prop.followInfo.followed}style="display: none;"{/if}>
+                        <span class="jive-icon-glyph icon-plus-circle2"></span>
+                        {call jive.people.profile.followingAssociatedStreamCount}
+                            {param count: length($prop.followInfo.streamsAssociatedBean.streamIDs) /}
+                            {param renderLocation: 'browse' /}
+                        {/call}
+                    </a>
+                </span>
+
+            </li>
+        {/if}
+        {if $prop.shareInfo and $prop.shareInfo.shareable}
+            <li>
+                {call jive.soy.share.control}
+                    {param objectId:$id /}
+                    {param objectType:$type /}
+                    {param type:'text' /}
+                    {param icon:true /}
+                    {param classes:'j-social-action' /}
+                {/call}
+            </li>
+        {/if}
+        {if $prop.bookmarkInfo and $prop.bookmarkInfo.showBookmarkControls}
+            <li class="js-bookmark">
+                <a class="bookmark-content j-social-action" data-objecttype="{$type}" data-objectid="{$id}" href="#" {if $prop.bookmarkInfo.bookmarked}style="display: none;"{/if}>
+                    <span><span class="jive-icon-glyph icon-bookmark"></span>{i18nText('browse.action.bookmark')}</span>
+                </a>
+                <a class="bookmarked-content j-social-action" data-objecttype="{$type}" data-objectid="{$id}" href="#" {if not $prop.bookmarkInfo.bookmarked}style="display: none;"{/if}>
+                    <span><span class="jive-icon-glyph icon-bookmark"></span>{i18nText('browse.action.unbookmark')}</span>
+                </a>
+                <div class="js-bookmark-actions j-menu j-quick-menu" style="display: none;">
+                    <ul>
+                        <li><a href="#" class="edit-bookmark lnk" data-objecttype="{$type}" data-objectid="{$id}">{i18nText('global.edit')}</a></li>
+                        <li><a href="#" class="unbookmark-content lnk" data-objecttype="{$type}" data-objectid="{$id}" data-bookmarkid="{$prop.bookmarkInfo.bookmarkID}">{i18nText('global.remove')}</a></li>
+                    </ul>
+                </div>
+            </li>
+        {/if}
+    </ul>
+{/template}
+
+/**
+* Render thumbnail action panel
+*
+* @depends template=jive.soy.share.control
+*
+* @param id The object ID
+* @param type The object type
+* @param prop Item properties.
+* @param? contentPlaceRelInfo content-place relationship info
+*/
+{template .detailActionPanel}
+<a href="#" class="j-browse-action-button" title="{i18nText('global.actions')}">
+    <span class="jive-icon-glyph icon-gear"></span>
+    <span class="jive-icon-glyph icon-arrow-down2"></span>
+    <span class="j-508-label">{i18nText('browse.action.btn')}</span>
+</a>
+
+<div class="j-menu j-quick-menu j-js-browse-actions-container" style="display: none">
+    <ul>
+        {if $prop.followInfo and $prop.followInfo.showFollowControls}
+            <li class="j-js-follow-controls" data-location="browse" data-streamsassoc="{length($prop.followInfo.streamsAssociatedBean.streamIDs)}">
+                <span class="start-follow">
+                    <a class="button j-follow-button lnk" href="#" data-objecttype="{$type}" data-objectid="{$id}" {if $prop.followInfo.followed}style="display: none;"{/if}>
+                        {i18nText('browse.action.follow')}
+                    </a>
+                </span>
+                <span class="following">
+                    <a class="button j-follow-button lnk" href="#" data-objecttype="{$type}" data-objectid="{$id}" {if not $prop.followInfo.followed}style="display: none;"{/if}>
+                        {call jive.people.profile.followingAssociatedStreamCount}
+                            {param count: length($prop.followInfo.streamsAssociatedBean.streamIDs) /}
+                            {param renderLocation: 'browse' /}
+                        {/call}
+                    </a>
+                </span>
+
+            </li>
+        {/if}
+
+        {if $prop.shareInfo and $prop.shareInfo.shareable}
+            <li>
+                {call jive.soy.share.control}
+                    {param objectId:$id /}
+                    {param objectType:$type /}
+                    {param type:'text' /}
+                    {param contentPlaceRelInfo: $contentPlaceRelInfo /}
+                {/call}
+            </li>
+        {/if}
+
+        {if $prop.bookmarkInfo and $prop.bookmarkInfo.showBookmarkControls}
+            <li class="js-bookmark" {if $prop.bookmarkInfo.bookmarked}style="display: none;"{/if}>
+                <a class="bookmark-content lnk" data-objecttype="{$type}" data-objectid="{$id}" href="#">
+                    <span>{i18nText('browse.action.bookmark')}</span>
+                </a>
+            </li>
+            <li class="js-bookmark" {if not $prop.bookmarkInfo.bookmarked}style="display: none;"{/if}>
+                <a href="#" class="edit-bookmark bookmarked-content lnk" data-objecttype="{$type}" data-objectid="{$id}">{i18nText('browse.action.editbookmark')}</a>
+            </li>
+            <li class="js-bookmark" {if not $prop.bookmarkInfo.bookmarked}style="display: none;"{/if}>
+                <a href="#" class="unbookmark-content bookmarked-content lnk" data-objecttype="{$type}"{sp}
+                    data-objectid="{$id}" data-bookmarkid="{$prop.bookmarkInfo.bookmarkID}">
+                    {i18nText('browse.action.removebookmark')}
+                </a>
+            </li>
+        {/if}
+        {if $contentPlaceRelInfo and $contentPlaceRelInfo.removable}
+            <li class="js-content-place-rel">
+                {call jive.soy.share.removeContentPlaceLinkControl}
+                    {param contentPlaceRelationship : $contentPlaceRelInfo /}
+                {/call}
+            </li>
+        {/if}
+    </ul>
+    </ul>
+</div>
+{/template}
+
+/**
+ * Display parent place about where this content item is published.
+ * @param prop Item properties.
+ * @param columns whether or not to display parent information
+ *
+ * @depends i18nKeys=global.by_author
+ * @depends i18nKeys=global.in_place.with_placeholder
+ */
+{template .parentInfo}
+    {if $columns and $columns.parentInfo and $prop.place}
+        <p class="j-browse-content-location font-color-meta-light">
+            {if $prop.place.type == 2020 or $prop.place.type == 37}
+                // if the place is a usercontainer or personal blog ...
+                {call jive.shared.soy.i18nHelper}
+					{param i18nKey}
+					    {i18nKey('global.by_author')}
+					{/param}
+					{param arg0}
+						{call jive.shared.displayutil.userDisplayNameLink data="$prop.author"}
+							{param extraCss: 'font-color-meta-light'/}
+						{/call}
+					{/param}
+					{param noAutoEscape}true{/param}
+				{/call}
+            {else}
+                {call jive.shared.soy.i18nHelper}
+					{param i18nKey}
+					    {i18nKey('global.in_place.with_placeholder')}
+					{/param}
+					{param arg0}
+						<a href="{buildUrl($prop.place.link)}" class="font-color-meta-light jivecontainerTT-hover-container" data-objectId="{$prop.place.id}" data-objectType="{$prop.place.type}">{$prop.place.subject}</a>
+					{/param}
+					{param noAutoEscape}true{/param}
+				{/call}
+            {/if}
+        </p>
+    {/if}
+{/template}
+
+/**
+ * Display how many other places this content item appears in
+ * @param prop Item properties.
+ */
+{template .contentPlaceRelationshipCount}
+    {if $prop.contentPlaceRelationshipCount and $prop.contentPlaceRelationshipCount > 0}
+        <p class="j-browse-content-location font-color-meta-light">
+            {if $prop.contentPlaceRelationshipCount == 1}
+                {i18nText('share.place.content.appears.singular', $prop.contentPlaceRelationshipCount)}
+            {else}
+                {i18nText('share.place.content.appears.plural', $prop.contentPlaceRelationshipCount)}
+            {/if}
+        </p>
+    {/if}
+{/template}

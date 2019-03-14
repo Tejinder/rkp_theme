@@ -1,0 +1,985 @@
+html body{font-family:arial !important; background:#ececec !important	;}
+	*{outline:none}
+
+* input, * select, * textarea, .chosen-single, .chosen-choices, .mce-tinymce,.border-inputradius,.ui-dialog,.ui-dialog .ui-dialog-buttonpane button,.result-form-popup,.chosen-container-single .chosen-drop,.iris_summery_box_align{border-radius:0 !important}
+a#project_save_draft_link, a.publish-details, .buttons a:link { border-radius:0 !important; text-transform:uppercase;font-weight:bold; text-align:center !important; padding:9px 18px !important; color:#fff; font-size:12px ; }
+.region-inner label{margin-bottom:0}
+a.publish-details:after, input.publish-details:after, .result-form-popup .filter-btn .popup-search:hover{background-image:none !important;  }
+.end_market_details h3 a.close-form, .end_market_details_div h3 a.close-form, .financial_details h3 a.close-form, .coordination_details h3 a.close-form{background-position:1px -106px !important}
+.tooltip-wrap>.tip-ico{width:15px !important; height:15px !important}
+a:link, a, a:visited{color:#00adc3 }
+.welcome .withmenu, a:hover, a:focus{color:#507b88}
+.header-nav li a{border-right:1px solid #507b88 !important }
+.header-nav li:last-child a, .header-nav li.header-nav-home a{border-right:none !important }
+#header-menu.jMenu li ul li a{padding:5px !important; width:100px !important; border-bottom:1px solid #23bdc2 !important; border-right:0 !important}
+#header-menu.jMenu li ul{left:0 !important}
+#header-menu.jMenu li ul li{border:0 !important}
+.jMenu li ul li a:hover{font-weight:normal !important}
+#header-menu.jMenu li ul li:last-child a{border-bottom:none !important}
+.end_market_details, .financial_details, .coordination_details{margin-top:0 !important}
+
+.maindiv{width:1024px;margin:0 auto; background:#fff }
+.maindiv #j-header .j-header-logo{margin-left:43px; }
+#main-container.container{width:1024px !important}
+.footer_main{margin-top:0 !important}
+.project-initiate-container .jive-error-box{margin:10px 0 10px 14% !important; color:red !important; background:none !important; font-weight:bold !important}
+.footer_main{padding:0 5px !important}
+.chosen-container-active .chosen-choices, .chosen-container-active .chosen-single, .chosen-container .chosen-drop{box-shadow:none !important; -webkit-box-shadow:none !important;}
+#expenseDetailsContainer .border-box{width:73% !important}
+.mce-container-body,.jive-success-box,.new-page-wrapper{background:#edf2f3 !important}
+#main-container.conThome:before{background:none}
+#main-container.conThome{padding:0}
+.chosen-container-multi .chosen-choices .search-choice{border-radius:0 !important; background:#edf2f3 !important}
+ .project_continue_main .dashboard_menu span.dashoboard-text{left:44px !important}
+ .project_continue_main .dashboard_menu li.last .dashoboard-text{left:59px !important}
+.container{width:100% !important}
+.new-page-nav li .nav-select{background:#00adc3 !important}
+.new-page-nav li.disable .nav-select{background:#b7e4e8 !important}
+
+
+.ui-widget-header{text-shadow:none;}
+	.ui-widget-header{background:#5a5a5a}
+	.ui-widget-content{border:0}
+	.ui-dialog .ui-dialog-buttonpane button{background:#808080;border:0}
+	.ui-dialog .ui-dialog-buttonpane button:first-child	{background:#ef6a6c}
+	.ui-dialog .ui-dialog-content{ padding:0 125px 20px 55px;}
+	.ui-dialog  #termsndCondition.ui-dialog-content{ padding: .5em 1em;}
+	.ui-dialog .ui-dialog-buttonpane{position:absolute;bottom:0px; right:0}
+	i.warningErr{
+    content: "";
+    width: 18px;
+    display: block;
+    background: url(../images/synchro/warning-icon.png) no-repeat;
+    background-size: 100%;
+    position: absolute;
+    top: 2px;
+    height: 20px;
+    left: 20px;
+}
+i.warningErr.erMsg{left:136px}
+.project-initiate-container .jive-error-box{width:470px; text-align:left; margin:5px auto 0 !important; padding-left:40px}
+.ui-widget-overlay{background:#808080; opacity:.6}
+.scrollable-table.project_status_table thead, .project_view,.scrollable-table.project_status_table tbody{width:auto}
+.project_status_table tr .catalogue-name{width:14%}
+.project_name_menu li a{text-transform:uppercase; font-weight:bold; background:#edf2f3}
+.jPaginate{margin-top:-23px}
+.research_content{padding-right:18px}
+.lb_overlay.js_lb_overlay
+{
+	    background: #808080 !important;
+    opacity: 0.6 !important;
+}
+.popup-title-overlay
+{
+	height: 32px;
+    width: 100%;
+    background: #5a5a5a;
+    border-radius: 0px;
+}
+.pop-upinner-scroll
+{
+	    height: 500px;
+    overflow-y: auto;
+	overflow-x:hidden;
+	margin-bottom: 25px;
+	background:#fff;
+}
+.j-form-popup
+{
+    box-shadow: 0 0;
+    border-radius: 0px;
+    padding: 0;
+	width:855px !important;
+	box-shadow: 0 0 !important;
+	 -moz-box-shadow:0 0;
+    -webkit-box-shadow:0 0;
+}
+.j-form-popup h3,.result-filter h3 {
+	font-size:24px;
+	color:#00adc3;
+}
+.result-filter h3 {margin:0 0 15px;}
+.filter-dates{margin-left:10.2%;}
+.new-filter .result-form-popup .project_start_date input, .new-filter .result-form-popup .project_complete_date input, .evaluation_report .result-form-popup .project_start_date input, .evaluation_report .result-form-popup .project_complete_date input{width:177px;}
+#project-name-filter{margin:15px 0 0px; padding-bottom:0px}
+
+
+#expenseDetailsContainer .region-inner{width:141px;}
+.view_edit_pib #expenseDetailsContainer .region-inner.total-cost{width:70%;}
+
+.view_edit_pib .expense_row input.text_field{max-width:100%;}
+#form-create .expense_row .chosen-container{width:150px}
+.project_details .pit-estimate-cost label{text-align:right;}
+div#brandSpecificStudyType{left:464px;}
+
+.j-form-popup input[value="Save"],input[value="Save"],input[value="Close Project "]
+{
+	box-shadow: 0 0;
+	 -moz-box-shadow:0 0;
+    -webkit-box-shadow:0 0;
+	background:rgba(244, 177, 39, 1) ;
+	padding:9px 18px !important;
+	width:auto;
+	font-weight: bold !important;
+	border: 0px;
+}
+.pib_band_view
+{
+	margin-right:0px;
+}
+.j-form-popup input[value="Save"]:hover{
+	background:rgba(244, 177, 39, 1);
+}
+.j-form-popup input[value="Save"]
+{
+	float:right;
+	margin: 6px 10px 0 0;
+}
+#project-eval-form   .form-text-div
+{
+	margin-top:0;
+	
+}
+.pib .research_content{padding-bottom:2px;}
+#mainAgencyRating input.remove{top:0; border:0; right:-9px; box-shadow:none}
+div#pitWindow{position:fixed !important; top:0 !important;margin-top:0 !important}
+.j-form-popup .close, .jive-modal .close, .result-filter .close, .evaluation_report .close {
+    position: absolute;
+    right: 9px;
+    top: 8px;
+    background: url(../images/close_new.png) no-repeat;
+    width: 14px;
+    height: 14px;
+    /* border: 0px solid #eee; */
+    border-radius: 0px;
+    opacity: 1;
+    background-position: center center;
+    background-color: #fff;
+    /* background-size: 100%; */
+    /* padding: 4px; */
+    background-size: 75%;
+}
+.right-sidebar-list li a:hover{
+	    background: rgb(0, 173, 195);
+}
+.j-form-popup .close:hover, .jive-modal .close:hover{
+	background-color:#fff;
+	opacity: 1;
+}
+.view_edit_pib label
+{
+	    padding: 0px 5px 0 0;
+}
+input#multiBrandStudyText {
+    width: 200px;
+    float: left;
+    padding: 8px;
+    margin: -40px 1px 15px 65px;
+    max-width: none;
+}
+.view_edit_pib #brandSpecificStudyType, .view_edit_pib #brandSpecific
+{
+	margin-left:0px;
+}
+#brand_chosen.chosen-container, #brandSpecificStudyType_chosen {
+    min-width: 180px;
+    max-width: 180px;
+}
+#MultibrandTextError
+{
+	    left: 66px;
+}
+.pit-estimate-cost  label
+{
+	padding: 3px 5px 0 0 !important;
+}
+#research_methodology input#multiBrandStudyText
+{
+	margin: -34px 1px 15px 15px;
+}
+#research_methodology  #MultibrandTextError
+{
+	left:16px;
+}
+.j-form-popup h3{
+	
+	margin: 10px 0 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+.view_edit_pib .form-select_div .j-form-datepicker-btn
+{
+	left:52%;
+}
+
+.synchro-pit-form .j-form-popup input[value="Save"]
+{
+	    margin: 6px 10px 0 0;
+}
+
+.j-form-popup .form-select_div .right-sidebar-list
+{
+	margin-left: 0px;
+}
+.j-form-popup .form-select_div .right-sidebar-list a
+{
+	margin-left:-10px !important;
+	border-radius:0px;
+	font-weight:bold;
+	
+}
+.pop-upinner-content 
+{
+	padding:0px 10px 0px 20px;;
+}
+.resetpadd-marg
+{
+	margin-top: 0px;
+    padding-top: 0px;
+}
+
+.j-form-popup input.j-btn-callout
+{
+	background: #00adc3;
+    box-shadow: 0 0;
+   -moz-box-shadow:0 0;
+    -webkit-box-shadow:0 0;
+}
+#initiateKantarWaiverButton a{border-radius: 0px;
+    font-weight: bold;}
+	
+.ui-dialog .ui-dialog-titlebar-close
+{
+	border-radius:0px;
+}
+.ui-dialog .ui-dialog-content {
+    padding: 0 125px 12px 55px;
+}
+.methodology-status label{
+	font-weight:normal;
+}
+.methodology-status span
+{
+	    font-weight: bold;
+    color: #00adc3;
+}
+
+.research_pib .research_content #nonKantarWaiverStatus {
+    left: 49%;
+}
+.research_pib .research_content #nonKantarWaiverStatus
+{
+	    left: 47.5%;
+}
+.research_pib .research_content #nonKantarWaiverStatus label, .methodology-status label{
+	text-align:right;
+}
+.margtop15
+{
+	margin-top:15px !important;
+	margin-left: 15px;
+    margin-right: 15px;
+}
+.status-txt
+{
+	  font-weight: bold;
+    color: #00adc3;
+}
+.agency_methodology
+{
+	    margin: 8px 326px 9px 3px;
+}
+#initiateKantarWaiverButtonPIT a{
+	font-weight:bold;
+}
+.j-form-popup input[value="Save"]
+{
+	    background: rgba(244, 177, 39, 1);
+}
+.light-box {
+    box-shadow: 0 0 !important;
+    border-radius: 0px;
+}
+#initiateKantarWaiverButtonPIT a{border-radius:0px;}
+.light-box-title:before{
+	    content: "";
+    height: 30px;
+    width: 100%;
+    background: #5a5a5a;
+    display: block;
+}
+.light-box .light-box-title h4 {
+    padding-left: 10px;
+}
+.light-box .close-btn {
+    position: absolute;
+    right: -3px;
+    top: 8px;
+    background: url(../images/close_new.png) no-repeat;
+	width: 14px;
+    height: 14px;
+    /* border: 0px solid #eee; */
+    border-radius: 0px;
+    opacity: 1;
+    background-position: center center;
+    background-color: #fff;
+    /* background-size: 100%; */
+    /* padding: 4px; */
+    background-size: 75%;
+
+}
+.light-box
+{padding:0px;}
+.synchro-field-attachment-popup
+{
+	padding:10px;
+}
+
+.synchro-field-attachment-popup .views-field  input[value="Attach"]:hover{
+	background: #00adc3;
+}
+.synchro-field-attachment-popup .buttons
+{
+	margin-top:12px;
+}
+
+.ui-dialog .ui-dialog-buttonpane button.delete
+{
+	background: #00adc3;
+	font-weight:bold;
+	font-family:arial;
+
+}
+.ui-dialog .ui-dialog-buttonpane button.close
+{
+	font-weight:bold;
+	font-family:arial;
+	background: rgba(128, 128, 128, 1);
+	color:#fff;
+}
+.textorange-btn
+{
+	background:#f4b127 !important;
+	font-weight:bold;
+}
+#mainReportTypeDiv input.duplicate.add-icon[type="button"] {
+   
+    border-radius: 9px !important;
+    box-shadow: 0 0;
+    margin-top: 0px;
+}
+input.duplicate.add-icon[type="button"]
+{
+	 border-radius: 9px !important;
+    box-shadow: 0 0;
+    
+}
+.download-link-wrapper
+{
+	position:relative;
+	top:12px;
+}
+#synchro-pit-form .td .chosen-container
+{
+	    min-width: 151px;
+}
+#synchro-pit-form  .iris_summery_box_align
+{
+	width: 148px;
+	border-radius:0px;
+}
+#report-summary-form .table .td input[type="text"],#tpd-summary-form .table .td input[type="text"] {
+	max-width: 256px;
+	width:100%;
+}
+.th {
+    padding: 8px 10px;
+}
+
+#report-summary-form .jive-attachments .jive-attach-item a.j-remove-file.font-color-meta
+{
+	margin-right:20px;
+}
+#attachmentDiv input#removeLink, #mainIrisSummaryTypeDiv input#removeLink, #mainTPDSummaryTypeDiv input#removeLink {
+    margin-right: 0px;
+}
+.report-summary-table input.remove[type="button"], .report-summary-table input.removeRS[type="button"], #mainIrisSummaryTypeDiv input#removeLink, #mainTPDSummaryTypeDiv input#removeLink  {
+    border: none;
+    background-color: transparent;
+    box-shadow: 0 0;
+}
+.project_dashboard_header h2
+{
+	color:rgb(0, 173, 195);
+}
+.project_dashboard_header h3
+{
+	    font-size: 18px;
+    font-weight: bold;
+	 color: #00adc3;
+
+}
+#refSynchroCodeDiv  .jive-error-message {
+    margin-left: 0%;
+}
+#fieldWorkStudy_chosen,#fieldWorkStudyO_chosen
+{
+	float:left;
+}
+.pop-upinner-content .chosen-container-multi .chosen-choices .search-choice{margin-right:5px}
+
+.reference-custom
+{
+	float:left;
+    width: 262px;
+    margin-left: 50px;
+}
+.custom-refrence-code {
+    position: relative;
+    width: 370px;
+    float: left;
+    margin-left: 10px;
+}
+.container .expense_row input.remove[type="button"], .container .expense_row input.duplicate[type="button"]
+{
+	 border: 1px solid transparent;
+    background-color: transparent;
+    box-shadow: 0 0;
+}
+
+
+#fundingMarketsDiv .fundingMarketsError
+{
+	    margin-left: 33%;
+} 
+
+
+
+.popup-reset,.reset-btn
+{
+	 background: rgba(128,128, 128, 1) !important;;
+	 border-radius:0px !important;;
+	 box-shadow:0 0;
+	 color:#fff !important;;
+}
+#fundingMarketsDiv
+{
+	margin-top:-5px;
+}
+/*
+input[value="duplicate"],input[value="Remove"] {
+	 border: 2px solid transparent !important;
+    background-color: transparent !important;;
+    box-shadow: 0 0 !important;
+}
+input[value="duplicate"]:hover,input[value="Remove"]:hover {
+	border: 2px solid transparent !important;
+    background-color: transparent !important;;
+    box-shadow: 0 0 !important;
+}
+*/
+#form-create  .form-text_div input.form-text
+{
+	width: 100%;
+    max-width: 100%;
+}
+#form-create  .form-select_div_main.pit-category .form-select_div,#form-create .pit-category .form-select_div
+{
+	width: 353px;
+}
+#form-create .pit-category .form-select_div_brand
+{
+	margin-left:6px;
+}
+#form-create .pit-category.waiverSelect__fix .form-select_div_brand
+{
+	margin-left:0px;
+}
+
+#form-create .region-inner .pit-category .action_buttons {
+    left: auto;
+	right:-27px;
+}
+#form-create .region-inner .form-select_div_brand {
+    width: 312px;
+}
+
+.research_content .waiver-cancel
+{
+	background: rgba(128,128, 128, 1);
+	text-transform:uppercase;
+	font-weight:bold;
+}
+#approve
+{
+	background:rgb(0, 173, 195);
+	border-radius:0px;
+	font-weight:bold;
+	box-shadow:0 0;
+	text-transform:uppercase;
+}
+#save_waiver_link
+{
+	border-radius:0px;
+	font-weight:bold;
+	box-shadow:0 0;
+	background:#f1b127;
+	text-transform:uppercase;
+}
+#reject
+{
+	border-radius:0px;
+	font-weight:bold;
+	box-shadow:0 0;
+	background:rgba(128,128, 128, 1);
+	text-transform:uppercase;
+}
+.research_content .waiver-cancel:hover{
+	background: rgba(128,128, 128, 1);
+}
+[type="button"].btn-yellow 
+{
+	background:#f1b127;
+		text-transform:uppercase;
+}
+.selectedReportsSelect,.listresportsSelect
+{
+	    width: 327px !important;
+}
+.leftselectWrapper
+{
+	width: 36% !important;
+}
+.form-select_div_brand.right.rightmargin
+{
+	margin-left: 21px;
+}
+.action_buttons.leftposition
+{
+	left: 14px !important;
+}
+.waiver-error-box
+{
+	   margin: 10px 0 10px 14% !important;
+    color: red !important;
+    background: none !important;
+    font-weight: bold !important;
+}
+.waiver-error-box i.warningErr.erMsg {
+    left: 124px;
+}
+.filter-dates > label{width:150px;}
+.project-adv-filter .project_start_date >div > label{width:108px !important; padding-right:0}
+.project-adv-filter .project_complete_date >div > label{padding-right:0}
+.project-adv-filter .project_start_date .year input#tpdSubmitDateBegin{margin-left:0}
+.project-adv-filter .filter-dates{margin-left:7%}
+.new-filter .form-select_div_main .action_buttons{left:312px}
+.new-filter .form-select_div_main .form-select_div_brand{margin-left:6px}
+.new-filter .pop-upinner-content .total-cost-field{margin-left:17%}
+.synchro-body-formpage #synchro-success-box-approved .jive-icon-med{width:39px; margin:0; height:90px; background:url(../images/synchro/approve-waiver.png) no-repeat 19px 17px;}
+.synchro-body-formpage .success-msg .success-text{font-size:13px; color:#507b88;}
+.synchro-body-formpage .jive-success-box{width:455px}
+.synchro-body-formpage .success-msg{width:400px; padding:16px 0 16px 10px !important}
+.project_name_menu li{margin-right:3px}
+.project_status_table thead tr th{font-size:12px !important; padding:10px 5px; }
+.scrollable-table.project_status_table tbody{display:block; overflow-y:auto; max-height:399px !important; }
+.project_status_table tbody tr td{padding:10px 5px}
+.scrollable-table.project_status_table thead{width:977px}
+.scrollable-table.project_status_table tbody{width:993px; background:#fff}
+.project_status_table thead tr th:last-child{border-right:0}
+.project_status_table{background:#507b88}
+#img-load{left:50%; margin-left:-50px;}
+#overlay{width:100%}
+.mce-panel label{width:100%; max-width:100%; float:right;}
+#result-filter-form .filter-btn, #result-filter-form input.cancel{margin-right:0}
+.wellLayoutform{padding:0 10px;}
+.generate-report-filter-popup .wellLayoutform label{width:150px; float:left; padding:0px 0 0; margin-top:0}
+.wellLayoutform .region-inner{margin-bottom:10px;}
+.wellLayoutPop .j-form-popup{width:550px !important}
+.wellLayoutPop .pop-upinner-scroll{height:auto}
+.project_names .project_name_div > #jive-error-box.jive-error-box.waiver-error-box {width:625px;}
+.icon_remove:before{background:none !important;display:none !important; }
+.icon_remove{left:0 !important; color:#00adc3 !important;}
+#legalApprovalStatusO_chosen{margin-right:10px;}
+.status_right_group > span{margin:10px 0 7px}
+.j-form-popup input[value="Save"]{margin:0 10px}
+.synchro-field-attachment-popup .views-field input[value="Attach"].add{float:left;margin-right:10px}
+.project_owner_names div.reminder-wrapper{margin-left:10px}
+.statusPending .right-sidebar-list{float:left;}
+.statusPending .form-select_div.methodology-status{position:relative; float:left !important;left:0 !important; bottom:0 !important;padding-top:6px;}
+.statusPending.form-select_div .chosen-container{float:left}
+
+.statusPending .agency_methodology{float:left;margin:8px 0 9px 3px}
+.pop-upinner-scroll .pib_band_view div .popup-reset{margin-left:10px}
+.filter-btn.clearfix input[value=Reset].popup-search-reset{margin:0 10px}
+.pop-upinner-scroll .pib_view_popup{padding-left:0}
+
+.pop-upinner-scroll .expense_row input.text_field,
+.pop-upinner-scroll .project_details .region-inner .form-select_div .pit-estimate-cost .text_field,
+
+.pib_inner_main .tr .full-width.jive-error-message{margin-left:0}
+#tpdStatusPopup .pop-upinner-scroll #tpdSummary-rs-file-list .jive-attach-item{width:428px; padding-left:190px;float:left}
+.pib .jive-attachments .jive-attach-item a.j-remove-file, .view_edit_pib .jive-attachments a.j-remove-file{width:18px; height:18px;}
+.field-attachments{max-width:73%}
+.standard-report-download-link a{padding-bottom:5px;}
+.disableMenu{cursor:default}
+form#agency-Evaluation-Report-Form .filter-btn input[value=Reset].reset-agency-filter{margin:0 10px}
+form#agency-Evaluation-Report-Form.result-form-popup{margin:0}
+form#agency-Evaluation-Report-Form .filter-btn{margin-top:20px}
+.ui-dialog .ui-dialog-titlebar-close{background:url(../images/close_new.png) no-repeat #fff;top: 18px;
+    width: 14px;
+    height: 14px;
+    background-size: 95%;}
+.container input.remove.deleteButtonAlignment[type="button"],.expense_row input[type="button"][value="duplicate"].duplicate,.expense_row input[type="button"][value="Remove"].remove{border:0; box-shadow:none;background-position:0; width:20px;height:20px;}
+.j-form-popup .close, .jive-modal .close, .result-filter .close, .evaluation_report .close{top:8px;width:14px;height:14px;background-size:60%}
+.dashboard_menu li a.disabled{background:none; padding:0 !important}
+#pitWindow .view_edit_pib .project-eval-container #commentDiv textarea#comment{width:94%; float:right; margin-top:0px}
+.pop-upinner-content div#brandSpecificStudyType, .pop-upinner-content #brandSpecific {
+    /*position: absolute;
+    left: 50%;
+    width: 290px;
+	*/
+	float:left;
+	padding-left:4px;
+	position:relative;
+	left:0
+}
+.pop-upinner-content input#multiBrandStudyText{width:180px;margin:-40px 0px 15px 92px}
+#expenseDetailsContainer .region-inner.total-cost{width:332px; margin-bottom:0}
+.total-cost .text_field{margin-left:9px !important;width:113px !important}
+
+#expenseDetailsContainer .border-box .jive-error-message{width:114px;}
+.pop-upinner-content .project_names_dates > label{margin-bottom:5px;}
+#project-name-filter.region-inner{margin-top:0}
+.pop-upinner-content #expenseDetailsContainer  .border-box{width:629px !important;padding:10px 0 10px 10px}
+.view_edit_pib  .pop-upinner-content .region-inner label{width:159px !important; }
+.view_edit_pib .gbp-costalignment label{max-width:130px !important}
+.pop-upinner-content  .blank{margin-left:45px;}
+
+.right-sidebar-list li#initiateKantarWaiverButton{width:100%}
+
+#pitWindow .view_edit_pib .pop-upinner-content #expenseDetailsContainer .region-inner.total-cost{width:285px;float:right}
+
+.pop-upinner-content .region-inner .chosen-container {
+    margin: 0px 5px 0px 0;
+	float:left;
+}
+
+#fundingMarketsDiv{margin-top:4px}
+.view_edit_pib form#synchro-pit-form .pop-upinner-content .region-inner.two-column label{margin-top:0 !Important; padding-top:0px; }
+.view_edit_pib form#synchro-pit-form .pop-upinner-content .region-inner.two-column .second-column label{padding-left:15px;width:31.5%;}
+
+/*disabled button start */
+.project_details .buttons .approve-btn.disabled, .project_names [type="button"].disabled, a.disabled, .g-btn, input[type=button].g-btn,input[type="button"]:disabled,#pib-form  .legal_approval_dropdown_height .publish-details.disabled,#proposal-form .legal_approval_dropdown_height .publish-details.disabled,input[type="button"][disabled].btn-blue,a.publish-details.disabledg,a.publish-details.disabled, button.j-btn-callout[disabled], [type="button"].j-btn-callout[disabled], [type="reset"].j-btn-callout[disabled],[type="button"].j-btn-callout[disabled], [type="reset"].j-btn-callout[disabled], [type="submit"].j-btn-callout[disabled],button[disabled], html input[disabled]{
+ background:#ececec !important;border-radius:0 !important; text-transform:uppercase; padding:9px 18px ; color:#333 ; text-shadow: none; margin:0; border:0 ;box-shadow:none; width:auto;font-size:12px;opacity:1;    cursor: not-allowed !important;pointer-events:none;
+	
+}
+button.j-btn-callout[disabled]:hover, button.j-btn-callout[disabled]:focus, input.j-btn-callout[type="button"][disabled]:hover, input.j-btn-callout[type="button"][disabled]:focus, input.j-btn-callout[type="reset"][disabled]:hover, input.j-btn-callout[type="reset"][disabled]:focus, input.j-btn-callout[type="submit"][disabled]:hover, input.j-btn-callout[type="submit"][disabled]:focus,a.disabled:hover,a.disabled:focus, a.publish-details.disabled:hover,a.publish-details.disabled:focus{
+ background:#ececec;border-radius:0 !important; text-transform:uppercase;font-weight:bold; text-align:center !important; padding:9px 18px !important; color:#333 ; text-shadow: none; margin:0; border:0;box-shadow:none; width:auto;font-size:12px;opacity:1
+	
+}
+.chosen-disabled .chosen-single{cursor: not-allowed !important;}
+.confirm-msg h3{padding-left:10px}
+.filter_label__fix label{width:159px !important}
+.action_buttons__fix .action_buttons{top:23px !important}
+.result-form-popup{width:717px}
+#tpdStatusPopup label{width:190px !important;}
+#tpdStatusPopup .form-select_div .jive-error-message{padding-left:190px;margin-left:0}
+#tpdStatusPopup.view_edit_pib .pop-upinner-content .form-select_div .j-form-datepicker-btn{float:left; position:relative; }
+#tpdStatusPopup.view_edit_pib .pop-upinner-content{padding-top:20px;}
+#tpd-summary-form .changeTpD{float:left;margin:0px 10px;}
+.posRel.ui-dialog .ui-dialog-buttonpane{position:relative}
+#expenseDetailsContainer .chosen-container .chosen-single.chosen-default span{padding-right:10px;}
+
+
+.project_details .region-inner, .project_details .region-inner .form-select_div.start_date{margin-bottom:10px;}
+.topPanelWell{margin-top:10px}
+.marginBottomWell{margin-bottom:10px;}
+span.jive-error-message.textarea-error-message{position:absolute;}
+#form-create .pit-description-textarea span.jive-error-message.textarea-error-message{position:relative;}
+.table.report-summary-table #attachmentDiv input#removeLink{margin-right:14px;}
+#proposal-form .research_content{padding-bottom:60px;}
+
+#pitWindow .region-inner, .pib_view_popup{padding:0 10px;}
+
+.project_names .pib_inner_main .region-inner, #tpdStatusPopup .pop-upinner-content .region-inner{margin-bottom:10px;}
+
+
+
+
+input[type="button"][disabled]:hover{background:#ebebeb; border:none; text-shadow:none; color:#333}
+.view_edit_pib #synchro-pit-form .jive-attachments .jive-attach-item a.j-remove-file{right:8px}
+.view_edit_pib #synchro-pit-form .form-select_div .j-form-datepicker-btn{left:53%}
+/*disabled button end */
+
+
+/*Blue button Start*/
+.generate-report .report-body .generate-report-button .save,input[type="button"].btn-blue,#pib-form  .legal_approval_dropdown_height .publish-details,#proposal-form .legal_approval_dropdown_height .publish-details,[type="button"].btn-blue,#initiateKantarWaiverButton a, .right-sidebar-list li a,.synchro-field-attachment-popup .views-field  input[value="Attach"],input#downloadReport, input#downloadVideo, a.blueButton,a.j-btn-global {
+ background:#00adc3;border-radius:0 !important; text-transform:uppercase;font-weight:bold; text-align:center !important; padding:9px 18px !important; color:#fff ; text-shadow: none; margin:0; border:0;box-shadow:none; width:auto; font-size:12px; }
+ .right-sidebar-list li a:hover,a.blueButton:hover,a.j-btn-global:hover{ background:#00adc3; color:#fff}
+
+/*Blue Button End*/
+
+/*Orange Button start*/
+.result-form-popup .filter-btn .popup-search,.generate-report-filter-popup .buttons .apply,[type="button"].btn-yellow,a.publish-details,input#genertateReports, .orangeButton,.research_pib .buttons input.save,.research_pib .buttons input.save.continue{ background:#f1b127;border-radius:0 !important; text-transform:uppercase;font-weight:bold; text-align:center !important; padding:9px 18px !important; color:#fff; text-shadow: none; margin:0; border:0;box-shadow:none; width:auto; font-size:12px;}
+.orangeButton{background:#f1b127 !important;}
+.result-form-popup .filter-btn .popup-search:hover,.generate-report-filter-popup .buttons .apply:hover,[type="button"].btn-yellow:hover,a.publish-details:hover,input#genertateReports:hover,.result-form-popup .filter-btn .popup-search:focus,.generate-report-filter-popup .buttons .apply:focus,[type="button"].btn-yellow:focus,a.publish-details:focus,input#genertateReports:focus{background:#f1b127;color:#fff}
+/* orange Button end */
+
+
+/*Grey Button start*/
+input[type="button"].popup-search-reset, input[type="button"].reset-agency-filter, a.popup-reset,input.cancel, input[type="button"].cancel-agency-filter,.generate-report-filter-popup .buttons .reset,.generate-report-filter-popup .buttons input[type=button].cancel,.synchro-field-attachment-popup .views-field    input[value="Cancel"], a.cancel-btn{ background:#808080;border-radius:0 !important; text-transform:uppercase;font-weight:bold; text-align:center !important; padding:9px 18px !important; color:#fff !important;    text-shadow: none;margin:0; border:0;box-shadow:none ; width:auto; font-size:12px;}
+.greyButton{background:#808080 !important;}
+
+input[type="button"].popup-search-reset:hover, a.popup-reset:hover,input.cancel:hover,a.cancel-btn:hover{ background:#808080;color:#fff !important;}
+/* grey Button end */
+/*input box alignment css start */
+#pitWindow .pop-upinner-content .region-inner{margin-bottom:10px;}
+#pitWindow .pop-upinner-content .total-cost .text_field, #pitWindow .pop-upinner-content .total-cost .longField{width:121px !important; margin-left:10px !important; }
+#pitWindow .view_edit_pib .pop-upinner-content #expenseDetailsContainer .region-inner.total-cost{width:289px}
+#pitWindow .view_edit_pib .pop-upinner-content .total-cost  input[name="prefCost"]{width:121px !important; margin-left:10px !important;  }
+#pitWindow .region-inner > .region-inner{padding:0}
+#pitWindow .view_edit_pib .pop-upinner-content .total-cost .pit-estimate-cost:last-child{padding-top:10px; float:left}
+
+
+#pitWindow .view_edit_pib .pop-upinner-content .second-column{top:0; left:0;position:relative;width:auto !important; clear:right;margin-top:0;float:right;}
+.pop-upinner-content .region-inner #fundingMarketsDiv .chosen-container{margin-right:0}
+#pitWindow .view_edit_pib .region-inner input[type="text"],#pitWindow .view_edit_pib .region-inner .form-text_div,.view_edit_pib .table{width:629px;}
+#pitWindow .view_edit_pib .region-inner .col-lg-6 .chosen-container, #pitWindow .col-lg-6 #endMarkets_chosen, #pitWindow .col-lg-6 #methodologyDetails_chosen{min-width:389px;}
+#pitWindow .view_edit_pib .pop-upinner-content input#multiBrandStudyText{ margin: -34px 0px 0 73px; width:232px;}
+#pitWindow .view_edit_pib .region-inner .chosen-search input[type="text"]{width:100%}
+#pitWindow .view_edit_pib .region-inner .table input[type="text"]{width:168px;}
+#pitWindow .project-reports .reports-tpd-summary.reports-tpd-summary-dynamic{margin-top:10px}
+#pitWindow #MultibrandTextDiv{width:305px; margin:0}
+#pitWindow .region-inner .form-select_div .j-form-datepicker-btn{position:relative; top:0; left:0; margin-left:10px;}
+#pitWindow .view_edit_pib .second-column label{width:180px !important}
+#pitWindow label.mce-wordcount{margin:9px 10px 2px 10px !important; padding-right:15px !important}
+#pitWindow .form-select_div .jive-error-message{margin-left:160px;}
+#pitWindow .form-select_div .col-lg-6 .jive-error-message{margin-left:0px;}
+#pitWindow .full-width .jive-error-message, #pitWindow .form-select_div #brandError.jive-error-message,#pitWindow .form-select_div #brandSpecificStudyTypeError.jive-error-message{margin-left:0}
+#pitWindow .form-select_div.MultibrandTextDivPitPosition #MultibrandTextError.jive-error-message{margin-left:0; left:73px; top:0}
+
+#pitWindow .form-select_div .fundingMarketsError.jive-error-message{margin-left:180px; position:absolute;bottom:0}
+.view_edit_pib .field-attachments{left:170px;max-width:620px; padding-bottom:10px;}
+.view_edit_pib span#briefLegalApproverError{position:relative; top:0; left:0}
+.result-form-popup .region-inner,#project-name-filter, #project-date-filter{padding-bottom:10px;}
+.view_edit_pib #synchro-pit-form .form-select_div .j-form-datepicker-btn{position:relative;left:0;top:0}
+#pitWindow .region-inner .col-md-5 .boxinnerContainer{float:left}
+#pitWindow .view_edit_pib .table{margin-bottom:0}
+.pop-upinner-content label{margin-bottom:0}
+#project-date-filter .project_start_date, .evaluation_report .result-form-popup .project_names_dates .project_start_date{margin-bottom:10px;}
+#kantar-waiver-form .pop-upinner-content .pib_view_popup{padding:10px 0; float:left; width:100%;}
+#initiateKantarWaiver h3{margin-bottom:0}
+#pitWindow  .reference-custom{width:auto;}
+#pitWindow .view_edit_pib .region-inner .reference-custom input[type="text"]{width:215px;} 
+/*input box alignment css end */
+.chosen-container-single .chosen-single{z-index:9}
+.region-inner .col-md-5 .boxinnerContainer{margin:0 0 10px 0;}
+.pib_left div .form-select_div,.pib_left .statusPending, .pib_left .project_owner_brief{padding-bottom:10px;}
+.project_owner_brief .total-cost-details input#totalCost{margin-right:7px;}
+#legalApprovalDate_button{margin-left:7px;}
+#pitWindow ul.right-sidebar-list + .waiver_methodology{position:absolute;top:0;left:545px;}
+#proposal-form .project_owner_names.legal_approval_dropdown_height sub{margin-left:40px; bottom:-4px !important}
+.table .td .jive-attachments{padding-left:0; margin-left:0}
+#pitWindow .view_edit_pib .region-inner .table input#tpdSummaryLegalApprover[type="text"]{margin-bottom:10px}
+.table .td input[type="text"][name="tpdSummaryDates"],.table .td input[type="text"][name="tpdSummaryDate"]{margin-top:10px;}
+#pitWindow .table .td input[type="text"][name="tpdSummaryDates"],#pitWindow .table .td input[type="text"][name="tpdSummaryDate"]{margin-top:0}
+#pitWindow .view_edit_pib .table.project-reports.pit_window_field_width{padding-bottom:10px;}
+#pitWindow .project-reports .td span.j-link{left:0}
+
+#pitWindow .pib_band_view input[type="button"][disabled]#postButton{margin-right:10px}
+.td div#reportType_chosen.chosen-disabled{margin-left:0}
+.new-filter .pop-upinner-content #project-name-filter.region-inner .total-cost-field{margin-left:104px}
+#result-filter-form .pop-upinner-content .project-adv-filter.region-inner{padding-top:5px;}
+.project_status_table tr .catalogue-name.cat-sett{width:4%}
+div.reminder-wrapper + span.approval-status, #briefLegalApprover_chosen + span.approval-status, #briefLegalApproverError + span.approval-status, .project_owner_names .approval-status {float: left; position: relative; padding-left: 10px;top:5px; right:0}
+.view_edit_pib .approval-status.popTpd{margin-left:0 ;position:relative; left:378px; top:23px; }
+.statusPending .approval-status{margin-left:10px; float:left}
+.total-cost-details input#totalCost:nth-child(4){margin-top:10px;}
+#pitWindow #budgetYear_chosen, #pitWindow #budgetLocation_chosen{min-width:389px;}
+#pitWindow .pop-upinner-content .region-inner .form-select_div.form-select_div_project_completion{margin-top:10px;}
+#DynamicMarketparticipatingFunding{float:left}
+.fundErr__fix{width:70% !important; margin-left:0 !important}
+.attachmentsNew__fix{width:100%!important; padding-left:476px !important; padding-right:1px !important	}
+.pop_fundErr__fix{position:static !important; width:190px !important; margin-left:0 !important}
+.pitfundMsg__fix{float:left}
+.floatLeft{float:left}
+.view_edit_pib input[type="checkbox"]#legalsignoffreqdisable{margin-left:160px;}
+#pitWindow #proposalLegalApproverError.jive-error-message.full-width {float:left; position:relative; top:0}
+#pitWindow .form-select_div .agencyCostsError.jive-error-message {margin-left:0	}
+.agencyRating__fix{margin-bottom:0 !important	}
+.research_pib .region-inner .form-text_div.pib-description-textarea{padding-top:6px; width:712px;}
+.textarea__fix{width:712px !important}
+.showspendSelect__fix.region-inner .chosen-container,.showspendSelect__fix select#spendReportCurrency {width:327px !important}
+.pop-upinner-content #waiverAttachmentError.jive-error-message{padding-left:10px; top:-16px}
+.view_edit_pib .form-select_div_project_completion input[type="text"]#proposalLegalApprover{width:200px}
+
+
+
+.chooseFile__fix {
+    overflow: hidden;
+    position: relative;
+}
+
+.chooseFile__fix [type=file] {
+    cursor: inherit;
+    display: block;
+    font-size: 999px;
+    filter: alpha(opacity=0);
+    min-height: 100%;
+    min-width: 100%;
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    text-align: right;
+    top: 0;
+	
+}
+
+/* Example stylistic flourishes */
+
+.chooseFile__fix {
+     background: #00adc3;
+   text-transform:uppercase;
+    padding:9px 15px !important;
+	color:#fff;
+}
+
+.chooseFile__fix [type=file] {
+    cursor: pointer;
+}
+.dashboard-download a:hover{text-decoration:none}
+.header-nav li a:hover{color:#507b88}
+.project_name_div h2.project_eval_hyperlink{width:264px}
+.waiver_note__fix{margin-left:0 !important}
+.pop-upinner-content .project-adv-filter .project_start_date >div > label{text-align:left;}
+.result-form-popup .pop-upinner-content .project-adv-filter .project_complete_date >div > label{width:108px}
+.selectWell__fix select#brand{margin:0 !important}
+.waiverSelect__fix select{height:87px !important; margin-bottom:0 !important; top:0 !important}
+ /*#main-container{display:none} */ 
+
+ /* qpr page changes and changes by jasmeet*/
+ .qpr-container .three-column input[type="text"] {
+    border: 1px solid #b9b7b7;
+}
+.ui-dialog .ui-dialog-content {
+    padding: 0 55px 5px 55px;
+}
+.ui-dialog .ui-dialog-buttonpane{
+	position: relative;
+}
+/* waiver alertsZ */
+#waiver-success-box-approved {
+    position: absolute;
+    margin: auto;
+    left: 27.5%;
+    top: 20px;
+}
+#waiver-success-box-approved.jive-error-box {
+    width: 507px;
+    background: #e4f1fd !important;
+    border: 1px solid #cacaca;
+    padding-left: 0;
+    right: auto;
+}
+#waiver-success-box-approved >div {
+    line-height: 23px;
+    color: #333;
+}
+/* global page alignment */
+.maindiv #j-header .j-header-logo{
+	margin-left: 13px;
+}
+.create_project {
+    margin-top: 10px;
+}
+#header-menu li:last-child a {
+    padding-right: 0;
+}
+#header-menu li:last-child .notification-alert {
+    right: 0;
+}
+.header-nav{
+	right: 15px;
+}
+#synchro-pit-form h3{
+	padding-left: 10px;
+}
+.legal-checkbox input[type="checkbox"]{
+	    vertical-align: top;
+    margin-right: 5px;
+    margin-top: 1px;
+}
+#pitWindow .region-inner > .region-inner#legal-checkbox {
+    margin-top: 10px;
+}
+.view_edit_pib input[type="checkbox"]#legalsignoffreqdisable {
+    vertical-align: top;
+}
+.confirm-msg{    margin-left: 30px;}
+.confirm-msg:before{left: -20px;}
+/* global right alignment */
+/* #report-summary-form .research_content {
+    padding-right: 0;
+}
+.cancel-project.view-edit{    padding-left: 20px;} */
+.disabled_help_link{opacity:0.4; filter: alpha(opacity=40); pointer-events: none; } 
+.disabled_help_link_active{opacity:0.4;filter: alpha(opacity=40);}
+.disabled_help_link_active .disabled_help_link{opacity:1;filter: alpha(opacity=100);}
+.disabled_help_link a{cursor:default; pointer-events: none;}
+.disabled_help_link a:hover{color:#00adc3; text-decoration:none;pointer-events: none;}
+.pendingStatus{color:#f1b127 !important}
+.rejectedStatus{color:#ef6a6c !important}
+.approvedStatus{color:#95d194 !important}
+
+ .tpdNoteStaus{   display: inline-block;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    color: #00adc3;
+ font-weight: bold;}
+ .container .container{position:relative}
+ .tooltip-wrap>.bubble{width:300px; right:-160px}
+ .budgetDownload__fix{float:left; padding-bottom:10px;}
+ .budgetDownload__fix .inner_div{float:left;  }
+ .budgetDownload__fix label{float:left; width:100px; margin-left: 22px;}
+ .errorMSgspanBuget{padding-left:100px}
+ .ui-dialog .ui-dialog-content.popupreport__fix{padding:10px 15px; min-height:300px !important}
+.bugetReport__popupfix{min-height:380px !important}
+ .popupreport__fix i label.popup-header-italics{padding-bottom:10px; color:#00adc3 }
+
+
+ /*   change  for methodlogy and agency waiver pop up */
+ .pop-upinner-scroll .pib_view_popup {
+    padding: 7px 10px 7px 0;
+}
+
+.popup-waiver .form-text_div {
+    padding-top: 10px;
+}
+ #all-project-Report label {
+    margin-left: 0;
+}
+#all-Videos #downloadVideo {
+    margin-top: 10px;
+    float: right;
+}
+#all-Videos {
+    padding: 20px;
+}
+#all-Videos input {
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+#all-Videos .icon_remove {
+    display: block;
+}
+.mar__top10{margin-top:10px !important;}
+.text_field_prefferedCurrency{margin-left:9px !important;width:113px !important;
+  height:34px;}
+  
+.tpd_dashboard_projectName
+{
+    word-break: break-all;
+}  

@@ -1,0 +1,490 @@
+{namespace jive.UserPicker.soy}
+
+/**
+ * the template for the user picker modal dialog
+ *
+ * @param body
+ */
+{template .renderUserPickerModal}
+<div class="jive-modal j-pop" id="user-autocomplete-modal-container" style="display: none;">
+    <header><h2>Select People</h2></header>
+    <label class="j-508-label" id="close-modal-508">{i18nText('global.close.modal')}</label>
+    <a href="javascript:;" class="j-modal-close-top close" aria-labelledby="close-modal-508" title="{i18nText('global.close.modal')}">Close <span class="j-close-icon j-ui-elem" role="img"></span></a>
+    <section id="user-picker-modal-content" class="jive-modal-content j-pop-main jive-modal-content-userpicker">{$body|noAutoescape}</section>
+</div>
+{/template}
+
+
+/**
+ * the browse button for the user picker
+ * @param plural if the text should be plural or not
+ */
+{template .renderModalBrowseButton}
+    <a href="javascript:;" class="jive-chooser-browse j-select-people j-btn-global" title="{if $plural}{i18nText('user.picker.title')}{else}{i18nText('user.picker.title.singular')}{/if}">
+        <span class="j-508-label">{if $plural}{i18nText('user.picker.title')}{else}{i18nText('user.picker.title.singular')}{/if}</span>
+        <span class="jive-icon-glyph icon-users"></span>
+    </a>
+{/template}
+
+/**
+ * the skill search button for the user picker
+ */
+{template .renderModalSkillSearchButton}
+    <a href="#" class="jive-chooser-browse j-skill-search-button">{i18nText('user.picker.skill.search')}</a>
+{/template}
+
+/**
+ * the place search button for the user picker
+ */
+{template .renderModalPlaceBrowseButton}
+    <a href="#" class="jive-choose-browse j-select-place j-btn-global" title="{i18nText('socialTask.selectPlace.link')}">
+        <span class="j-508-label">{i18nText('socialTask.selectPlace.link')}</span>
+        <span class="jive-icon-med jive-icon-group"></span>
+    </a>
+{/template}
+
+/**
+ * the browse button for the user picker
+ */
+{template .renderModalLoading}
+  <div class='jive-user-modal-loading'>{i18nText('user.picker.adding_users')}</div>
+{/template}
+
+
+/**
+ * search text
+ */
+{template .search}
+    {i18nText('global.search')}
+{/template}
+
+
+/**
+ * searching text
+ */
+{template .searching}
+    {i18nText('global.searching')}
+{/template}
+
+
+/**
+ * renders a message for document viewers who've
+ * been added to collaborate
+ */
+{template .renderDocumentViewersAdded}
+    <p>{i18nText('user.picker.invited.users')}<br></p>
+{/template}
+
+/**
+ * renderSelectedUsersList render status attachments
+ * @param results the users list to display
+ * @param disabled if the picker should be disabled or not
+ * @param? message the message to display, if any
+ * @param? relationship if relationship restriction enabled
+ */
+{template .renderSelectedUsersList}
+    {if length($results.userlists) > 0 or length($results.users) > 0 or length($results.containers) > 0}
+        {if $message}{$message |noAutoescape}{/if}
+        <ul class="clearfix">
+            {foreach $list in $results.userlists}
+                <li style="display: list-item;" class="connections d" data-list-id="{$list.id}">
+                    <img width="16" height="16" border="0" alt="{$list.displayName}" style="background-color: #{$list.style};" src="{resourceUrl('/images/transparent.png')}" class="lbl jive-icon-med jive-icon-label-frame">
+                    <a class="showConnections" href="javascript:;">{if $list.excluded}<span class="excluded">{/if}{$list.displayName} <span>({length($list.users)})</span>{if $list.excluded}</span>{/if}</a>
+                    {if $list.displayExternallyVisibleVisualCue}
+                        <span class="jive-icon-med jive-icon-partner" title="{i18nText('partner.browse.external.contributor')}"></span>
+                    {/if}
+                    <em>{if not $disabled} {if not $list.excluded}<a class="remove" href="javascript:;">{i18nText('user.picker.tab.remove.label')}</a>{else}<a class="add" href="javascript:;">{i18nText('user.picker.tab.add.label')}</a>{/if}{/if}</em>
+                    <div class="js-grouped-users-popover j-grouped-users-popover" id="listContents{$list.id}" style="display: none;">
+                        <ul class="j-simple-list">
+                        {foreach $user in $list.users}
+                            <li>
+                                <span class="lnk">{call jive.shared.displayutil.userDisplayNameLink data="$user"/}</span>
+                                {if not $user.entitled}<span class="jive-icon-sml jive-icon-warn"></span>{/if}
+                                {if $user.prop.isPartner}
+                                    <span class="jive-icon-med jive-icon-partner" title="{i18nText('partner.browse.external.contributor')}"></span>
+                                {/if}
+                            </li>
+                        {/foreach}
+                        </ul>
+                    </div>
+                    {if not $list.entitled}<span class="jive-icon-sml jive-icon-warn"></span>{/if}
+                </li>
+                {foreach $user in $list.users}
+                    // to pick up the uibs on the flip side
+                    {call .renderedUser}
+                        {param user: $user /}
+                        {param relationship: $relationship /}
+                        {param disabled: $disabled /}
+                        {param hidden: true /}
+                    {/call}
+                {/foreach}
+            {/foreach}
+            {foreach $user in $results.users}
+                {call .renderedUser}
+                    {param user: $user /}
+                    {param relationship: $relationship /}
+                    {param disabled: $disabled /}
+                    {param hidden: false /}
+                {/call}
+            {/foreach}
+            {foreach $container in $results.containers}
+                {call .renderedContainer}
+                    {param container: $container /}
+                    {param disabled: $disabled /}
+                {/call}
+            {/foreach}
+        </ul>
+        
+    {/if}
+{/template}
+
+/**
+ * @param user
+ * @param relationship
+ * @param disabled
+ * @param hidden
+ */
+{template .renderedUser}
+    <li class="{if $user.disabled}disabled{/if} {if not $user.entitled or (not $user.prop.hasConnection and $relationship)}j-warning{/if} js-single-user"
+            data-user-id="{$user.id}" data-user-email="{$user.email}" data-user-name="{$user.username}" data-uib="{buildJson($user)}"
+        {if $hidden} style="display:none;"{/if}
+        >
+        {if not $user.anonymous and not $user.external}
+            {call jive.shared.displayutil.avatar data="$user"}
+                {param size: 20/}
+                {param hideLink:true/}
+            {/call}
+        {else}
+            <span class="jive-icon-glyph icon-envelope"></span>
+        {/if}
+        <span class="{if $user.excluded}excluded{/if}">{$user.displayName}</span>
+        {if (((not $user.anonymous) and (not $user.external))) or ($user.prop.isPartner)}
+            {if $user.prop.isVisibleToPartner or $user.displayExternallyVisibleVisualCue or $user.prop.isPartner}
+                <span class="jive-icon-med jive-icon-partner" title="{i18nText('partner.browse.external.contributor')}"></span>
+            {/if}
+        {/if}
+        {if not $disabled and not $user.disabled}
+            <em>
+            {if not $user.excluded}<a class="remove" title="{i18nText('user.picker.tab.remove.label')} {$user.displayName}" href="#"><span class="jive-icon-glyph icon-close2"></span></a>
+            {else}<a class="add" href="#" title="{i18nText('user.picker.tab.add.label')}"><span class="jive-icon-glyph icon-plus2"></span></a>
+            {/if}
+             </em>
+         {/if}
+        {if not $user.entitled}<span class="jive-icon-sml jive-icon-warn"></span>{/if}
+        {if $relationship and not $user.prop.hasConnection}<span class="jive-icon-sml jive-icon-redalert"></span>{/if}
+    </li>
+{/template}
+
+/**
+ * @param container
+ * @param disabled
+ */
+{template .renderedContainer}
+    <li data-container-id="{$container.id}" data-container-type="{$container.type}"
+    class="{if $container.alreadyLinkedToPlace}j-warning{/if}"
+    data-uib="{buildJson($container)}">
+        <span class="jive-icon-med {$container.iconCss}"></span>
+        <span>{$container.subject}</span>
+        {if $container.prop and $container.prop.isVisibleToPartner}
+            <span class="jive-icon-med jive-icon-partner" title="{i18nText('partner.browse.ext_access.header')}"></span>
+        {/if}
+
+        {if not $disabled}
+            <em>
+                {if not $container.excluded}
+                    <a class="remove" href="javascript:;" title="{i18nText('user.picker.tab.remove.label')}"><span class="jive-icon-glyph icon-close2"></span></a>
+                {else}
+                    <a class="add" href="javascript:;" title="{i18nText('user.picker.tab.add.label')}"><span class="jive-icon-glyph icon-plus2"></span></a>
+                {/if}
+            </em>
+        {/if}
+        {if $container.alreadyLinkedToPlace}
+            <span class="jive-icon-sml jive-icon-warn"></span>
+        {else}
+            <span class="jive-icon-sml jive-icon-info"></span>
+        {/if}
+    </li>
+{/template}
+
+/**
+ * renderUserList render status attachments
+ * @param results the users list to display
+ * @param disabled if the picker should be disabled or not
+ */
+{template .renderSelectedUser}
+    {if length($results.users) > 0}
+        <ul class="jive-chooser-list j-people-list clearfix">
+            {foreach $user in $results.users}
+                {if isFirst($user)}
+                    <li style="display: list-item;" class="assignee{if $user.disabled} disabled{/if}{if not $user.entitled} notEntitled {/if}" data-user-id="{$user.id}" data-user-email="{$user.email}" data-user-name="{$user.username}">
+                     {if not $user.anonymous and not $user.external}
+                         {call jive.shared.displayutil.avatar data="$user"}
+                             {param size: 20/}
+                             {param hideLink:true/}
+                         {/call}
+                     {else}
+                         <span class="jive-icon-glyph icon-envelope"></span>
+                     {/if}
+                     <span>{$user.displayName}</span>
+                     {if not $user.anonymous and not $user.external}
+                        {if $user.prop.isVisibleToPartner or $user.prop.isPartner}
+                            <span class="jive-icon-med jive-icon-partner" title="{i18nText('partner.browse.external.contributor')}"></span>
+                         {/if}
+                     {/if}
+                     {if not $disabled}<em><a class="remove" href="javascript:;" style="display: inline;" title="{i18nText('user.picker.tab.change.label')} {$user.displayName}"><span class="jive-icon-glyph icon-close2"></span></a></em>{/if}
+                    </li>
+                 {/if}
+            {/foreach}
+        </ul>
+    {elseif length($results.containers) > 0}
+        {foreach $container in $results.containers}
+            {if isFirst($container)}
+                {call .renderedContainer data="all"}
+                    {param container: $container /}
+                {/call}
+             {/if}
+        {/foreach}
+    {/if}
+{/template}
+
+
+
+/**
+ * renderUserList render status attachments
+ * @param results the users list to display
+ * @param noResultsMessage
+ */
+{template .renderUserList}
+
+    <div class="j-pop-main j-menu j-quick-menu j-people-find">
+        {call jive.shared.displayutil.a11yBoundary}
+            {param type: 'menu' /}
+        {/call}
+        {if length($results.userlists) > 0}
+            <h4 id="user-picker-label-list-heading" class="j-menu-section-heading font-color-meta-light">{i18nText('profile.friends.labels.title')}</h4>
+            <ul class="j-label-list j-icon-list j-avatar-list" role="listbox" aria-labelledby="user-picker-label-list-heading">
+                {foreach $list in $results.userlists}
+                    <li class="user-autocomplete-item clearfix {if $list.displayExternallyVisibleVisualCue}external-access{/if}" role="option">
+                        <a href="#" id="userlist_{$list.id}" data-list-id="{$list.id}">
+                        <img width="26" height="26" border="0" alt="{$list.displayName}" style="background-color: #{$list.style};" src="{resourceUrl('/images/transparent.png')}" class="lbl jive-icon-med jive-icon-label-frame">
+                        <span class="lnk">{$list.displayName}</span>{sp}
+                        {if $list.displayExternallyVisibleVisualCue}
+                            <span class="jive-icon-med jive-icon-partner" title="{i18nText('partner.browse.external.contributor')}"></span>
+                        {/if}
+                        <span>({length($list.users)})</span>
+                        </a>
+                    </li>
+                {/foreach}
+            </ul>
+        {/if}
+
+        {if length($results.users) > 0}
+            {if (length($results.userlists) > 0) or (length($results.containers) > 0)}
+            <h4 id="user-picker-people-list-heading" class="j-menu-section-heading font-color-meta-light">{i18nText('global.people')}</h4>
+            {/if}
+            <ul class="j-avatar-list j-icon-list" role="listbox"
+                {if (length($results.userlists) > 0) or (length($results.containers) > 0)}
+                   aria-labelledby="user-picker-people-list-heading"
+                {/if}
+                >
+                {foreach $user in $results.users}
+                    <li class="user-autocomplete-item clearfix" role="option">
+                        <a href="#" id="user_{$user.id}"
+                        data-user-id="{$user.id}"
+                        data-user-email="{$user.email}"
+                        data-user-name="{$user.displayName}"
+                        data-user-username="{$user.username}">
+                            {if not $user.anonymous}
+                                 /*{call jive.shared.displayutil.avatar data="$user"}
+                                     {param size: 24/}
+                                     {param hideLink:true/}
+                                 {/call}*/
+								
+								<img class="custom_img" src="/avatar-display.jspa?avatarID={$user.avatarID}" height="24" width="24"/>
+                            {else}
+                                 <span class="jive-icon-glyph icon-envelope"></span>
+                            {/if}
+                            <span class="lnk {if $user.anonymous}user-email{/if}">{$user.displayName}</span>
+                            {let $title: $user.prop.title /}
+                            {let $department: $user.prop.department /}
+                            {if $title or $department}
+                            {sp}<em class="font-color-meta-light">
+                                {if $title and $department}
+                                    {i18nText('search.result.people.in', $title, $department)}
+                                {elseif $title}
+                                    {$title}
+                                {elseif $department}
+                                    {$department}
+                                {/if}
+                            </em>
+                            {/if}
+
+                            {if $user.displayExternallyVisibleVisualCue or $user.prop.isPartner}
+                                <span class="font-color-meta-light j-browse-external-access">
+                                    <em>{i18nText('partner.browse.external.contributor')}</em>
+                                </span>
+                            {/if}
+
+                        </a>
+                    </li>
+                {/foreach}
+            </ul>
+        {/if}
+
+        {if length($results.containers) > 0}
+            <h4 id="user-picker-places-list-heading" class="j-menu-section-heading font-color-meta-light">{i18nText('global.places')}</h4>
+            <ul class="j-icon-list" role="listbox" aria-labelledby="user-picker-place-list-heading">
+                {foreach $container in $results.containers}
+                    <li class="user-autocomplete-item clearfix" role="option">
+                        <a href="#" id="container_{$container.type}_{$container.id}" data-container-id="{$container.id}" data-container-type="{$container.type}">
+                            <span class="jive-icon-med {$container.iconCss}"></span>
+                            <span class="lnk">{$container.subject}</span>{sp}
+                            {if $container.prop and $container.prop.isVisibleToPartner}
+                                <em class="j-browse-external-access">{i18nText('partner.browse.ext_access')}</em>
+                            {/if}
+                        </a>
+                    </li>
+                {/foreach}
+            </ul>
+        {/if}
+
+        {if $results.users.length == 0 and length($results.userlists) == 0 and length($results.containers) == 0}
+            {$noResultsMessage |noAutoescape}
+        {/if}
+        {call jive.shared.displayutil.a11yBoundary}
+            {param type: 'menu' /}
+            {param isEnd: true /}
+        {/call}
+    </div>
+{/template}
+
+/**
+ * renders a message saying that no users match the autocomplete
+ * @param emailAllowed
+ * @param placeAllowed
+ */
+{template .noUsersMatchMessage}
+        {if $placeAllowed}
+            {if $emailAllowed}
+                <p class="font-color-meta empty">{i18nText('user.place.autocomplete.email.none')}</p>
+                {call .domainMessage data="all"/}
+            {else}
+                <p class="font-color-meta empty">{i18nText('user.place.autocomplete.none')}</p>
+                {/if}
+        {else}
+            {if $emailAllowed}
+                <p class="font-color-meta empty">{i18nText('user.autocomplete.email.none')}</p>
+                {call .domainMessage data="all"/}
+            {else}
+                <p class="font-color-meta empty">{i18nText('user.autocomplete.none')}</p>
+            {/if}
+        {/if}
+{/template}
+
+/**
+ * renders a message prompting the user to continue typing.
+ */
+{template .pleaseEnterEmail}
+    <p class="font-color-meta empty">{i18nText('user.autocomplete.email')}</p>
+{/template}
+
+
+/**
+ * renders a message saying the email address is not valid
+ */
+{template .pleaseEnterValidEmail}
+    <p class="font-color-meta empty">{i18nText('user.autocomplete.notemail')}</p>
+{/template}
+
+/**
+ * renders a message saying the email address does not have a valid domain
+ * @param trial
+ * @param domains
+ */
+{template .pleaseEnterValidDomain}
+    {if $trial}
+        <p class="font-color-normal empty">
+            <span class="jive-icon-sml jive-icon-group-private-glyph"></span>
+            <strong>{i18nText('user.autocomplete.note')}</strong>{sp}
+            {i18nText('user.autocomplete.emptyemail')}
+        </p>
+    {else}
+        {call .domainMessage data="all"/}
+    {/if}
+{/template}
+
+/**
+ * renders a message reminding users about domain restriction.
+ * @param trial
+ * @param domains
+ */
+{template .domainMessage}
+    {if $domains and length($domains) > 0}
+        <p class="font-color-meta empty"><strong>
+        {if $trial}
+            {i18nText('user.autocomplete.domains.trial', $domains)}
+        {else}
+            {i18nText('user.autocomplete.domains', $domains)}
+        {/if}
+        </strong></p>
+    {/if}
+{/template}
+
+/**
+* @param limit
+*/
+{template .limitMessage}
+{if ($limit and $limit > 0) }
+    <div class="jive-warn-box" aria-live="polite" aria-atomic="true">
+        <div>
+            <span class="jive-icon-warn jive-icon-sml"></span>{i18nText('user.autocomplete.limit', $limit)}
+        </div>
+    </div>
+{/if}
+{/template}
+
+/**
+* Render placeholder text for the input
+* @param userAllowed
+* @param emailAllowed
+* @param multiple can the userpicker select multiple people
+* @param? placeAllowed can the user select a place
+*/
+{template .inputPlaceholder}
+    {if $userAllowed}
+        {i18nText('user.autocomplete.placeholder.user')}
+    {/if}
+    {if $userAllowed and ($emailAllowed or $placeAllowed)}, {/if}
+    {if $emailAllowed}
+        {call .placeholderEmail data="all"}
+            {param index: 0 /}
+        {/call}
+        ,{sp}
+        {if $multiple and not($placeAllowed)}
+            {call .placeholderEmail data="all"}
+                {param index: 1 /}
+            {/call}
+            ,{sp}
+        {/if}
+    {/if}
+    {if $placeAllowed}
+        {call .placeholderPlace data="all"/},{sp}
+    {/if}
+    {if $userAllowed and ($emailAllowed or $placeAllowed)}...{/if}
+{/template}
+
+/**
+ * Example email address for placeholder.
+ * @param? domains for placeholder addresses
+ * @param index
+ */
+{template .placeholderEmail private="true"}
+{if $index == 0}{i18nText('user.autocomplete.placeholder.emailprefix')}{else}{i18nText('user.autocomplete.placeholder.anotheremailprefix')}{/if}{if $domains and length($domains) > $index}{$domains[$index]}{elseif $domains and length($domains)}{$domains[0]}{else}{i18nText('user.autocomplete.placeholder.domain')}{/if}
+{/template}
+
+/**
+ * Example place for placeholder.
+ */
+{template .placeholderPlace private="true"}
+    {i18nText('user.autocomplete.placeholder.place')}
+{/template}

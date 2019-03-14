@@ -1,0 +1,308 @@
+{namespace jive.bookmarks autoescape="contextual"}
+
+/**
+* Renders the page for "bookmarks".
+*
+* @depends path=/resources/scripts/apps/shared/models/bookmark_source.js
+* @depends path=/resources/scripts/apps/bookmark_app/browse/main.js
+* @depends path=/resources/scripts/apps/bookmark_app/main.js
+* @depends path=/resources/scripts/apps/filters/bookmarked.js
+*
+* @allowDependsWildcard
+*
+* @depends template=jive.browse.bookmark.*
+*
+* @param itemsView A collection of {@link ContentObjectViewBean}s.
+* @param filterGroup A {@link FilterGroupBean} object with nested filters.
+* @param communityName The name of the community.
+* @param subNavLinks Links to display as subnavigation for the browse view.
+* @param? guest Whether or not the current user is the guest user
+* @param? advertizeBookmarklet Whether or not to include a link and instructions for installing the bookmarklet
+* @param browseViewID A unique name for this browse view.
+* @param feedUrl The url of the resource that provides a feed representation of this view
+* @param feedsEnabled
+* @param canonicalUrl
+* @param templateView The model to render the page template.
+*/
+{template .main}
+    {call jive.skin.template.main data="$templateView"}
+        {param title}
+            {i18nText('global.browse')} - {i18nText('browse.bookmarks.title')}
+        {/param}
+        {param canonicalUrl: $canonicalUrl/}
+        {param selectedLinkID: 'jive-nav-link-bookmarks'/}
+        {param headContent}
+            {call jive.shared.soy.resourceInlineJs}
+                {param code}
+                    $j(document).ready(
+                        function() {lb}
+                            var jiveFollow = new jive.FollowApp.Main({lb} i18n:null {rb});
+                            var bookmarkApp = new jive.BookmarkApp.Main(
+                                {lb}createModalAction: '{buildUrl('create-favorite-popup!input.jspa')}'
+                            {rb});
+                        {rb});
+                {/param}
+            {/call}
+        {/param}
+        {param bodyClass: 'j-body-yourbookmarks'/}
+		{param showNav: 'true'/}
+        {param bodyContent}
+            {call jive.nav.browseSubNav}
+                {param links: $subNavLinks/}
+                {param labelHtml: i18nText('global.bookmarks') /}
+            {/call}
+
+            <!-- BEGIN main body -->
+
+            <header class="j-page-header"></header>
+			 <link rel="stylesheet" href="/themes/rkp_theme/style/rkp.css" type="text/css" media="all" />
+
+
+
+                {call jive.browse.layout.layout data="all"}
+                    {param contentSource: 'jive.BookmarkSource' /}
+                    {param browseAllLabel: i18nText('browse.bookmarks.browse_all') /}
+                    {param hideSidebar: $guest /}
+                    {param browseViewID: 'bookmarks'/}
+                    {param firstColumnContent}
+                        {if $advertizeBookmarklet}
+                            {call .installBookmarklet}
+                                {param communityName : $communityName /}
+                            {/call}
+                        {/if}
+                    {/param}
+                    {param mainClass: '(jive.oo.compose(jive.BookmarkApp.browse.Main,jive.Filters.Bookmarked))' /}
+                    {param lowerContent}
+                		<!-- BEGIN RSS Feed Link -->
+                		{if $feedsEnabled}
+                            <div id="j-friend-feed-link" class="j-friend-feed-link">
+                                <a class="js-content-feed-link" href="{$feedUrl}" data-base-url="{buildUrl('view-browse-bookmarks-feed.jspa','browseSite', 'bookmarks', 'browseViewID', $browseViewID)}">
+                                <span class="jive-icon-glyph icon-feed"></span> {i18nText('browse.rss.feed')}</a>
+                            </div>
+                        {/if}
+             			<!-- END RSS Feed Link -->
+                    {/param}
+                {/call}
+        {/param}
+    {/call}
+{/template}
+/**
+* Renders a modified version of the content section for "bookmarks". This is used on pages such as the user profile.
+*
+* @param itemsView A collection of {@link ContentObjectViewBean}s.
+* @param filterGroup A {@link FilterGroupBean} object with nested filters.
+* @param targetUserID The userID of the items being displayed.
+* @param browseViewID A unique name for this browse view.
+* @param feedUrl The url of the resource that provides a feed representation of this view
+* @param feedsEnabled
+*
+* @depends path=/resources/scripts/apps/shared/models/bookmark_source.js
+* @depends path=/resources/scripts/apps/bookmark_app/browse/main.js
+* @depends path=/resources/scripts/apps/bookmark_app/main.js
+* @depends path=/resources/scripts/apps/browse/activity/info/main.js
+*
+* @allowDependsWildcard
+*
+* @depends template=jive.browse.bookmark.*
+*/
+{template .body}
+    {call jive.shared.soy.resourceInlineJs}
+        {param code}
+            $j(document).ready(
+                function() {lb}
+                    var contentSource = new jive.BookmarkSource({lb}
+                        createModalAction: '{buildUrl('create-favorite-popup!input.jspa')}'
+                    {rb});
+                    var filterApp = new jive.BookmarkApp.browse.Main({lb}
+                        itemSource: contentSource,
+                        targetUserID: '{$targetUserID}',
+                        userPrefSource: new jive.Browse.User.ItemSource(),
+                        browseViewID: '{$browseViewID}',
+                        archetypeID: 'bookmarks',
+                        filterGroup: {buildJson($filterGroup) |noAutoescape},
+                        itemViewID: '{$itemsView.itemViewID |escapeJs}'
+                    {rb});
+
+                    var jiveFollow = new jive.FollowApp.Main({lb} i18n:null {rb});
+                    var bookmarkApp = new jive.BookmarkApp.Main(
+                        {lb}createModalAction: '{buildUrl('create-favorite-popup!input.jspa')}'
+                    {rb});
+                {rb});
+        {/param}
+    {/call}
+    {call jive.browse.layout.layoutBody data="all"}
+        {param hideSidebar: true/}
+        {param browseViewID: $browseViewID/}
+       	{param lowerContent}
+    		<!-- BEGIN RSS Feed Link -->
+    		{if $feedsEnabled}
+                <div id="j-friend-feed-link" class="j-friend-feed-link">
+                    <a class="js-content-feed-link" href="{$feedUrl}" data-base-url="{buildUrl('view-browse-bookmarks-feed.jspa','browseSite', 'bookmarks', 'browseViewID', $browseViewID)}">
+                    <span class="jive-icon-glyph icon-feed"></span>{i18nText('browse.rss.feed')}</a>
+                </div>
+            {/if}
+ 			<!-- END RSS Feed Link -->
+        {/param}
+    {/call}
+{/template}
+
+/**
+ * Bookmarklet install button.
+ *
+ * @param communityName the community name
+ */
+{template .installBookmarklet}
+    <div class="j-box j-bookmark-install">
+        <header>
+            <h4>{i18nText('bookmarklet.sidebar.header')}</h4>
+        </header>
+        <div class="j-box-body">
+            <p>{i18nText('bookmarklet.sidebar.info', $communityName)}</p>
+            <a href="#" class="js-install-button j-btn-global j-btn-small j-btn-callout">{i18nText('bookmarklet.sidebar.install')}</a>
+
+            {call .installBookmarkletModal}
+                {param communityName : $communityName /}
+            {/call}
+        </div>
+    </div>
+{/template}
+
+/**
+ * Instructions for installing the Bookmarklet.
+ *
+ * @param communityName the space name
+ */
+{template .installBookmarkletModal}
+    {call jive.shared.soy.resourceInlineJs}
+        {param code}
+        $j(document).ready(
+            function() {lb}
+                $j(".js-install-button").click(function() {lb}
+                    $j("#jive-favorite-add-site").lightbox_me();
+                    $j('html,body').animate({lb} scrollTop: 0 {rb}, 500);
+                    return false;
+                {rb});
+
+                if ($j.browser.safari) {lb}
+                  $j("#jive-bookmarklet-howto-safari-mac").show();
+                {rb} else if ($j.browser.mozilla && $j.browser.version.substr(0,3)=="1.9" && navigator.appVersion.indexOf("Mac")!=-1) {lb}
+                  $j("#jive-bookmarklet-howto-firefox-mac").show();
+                {rb} else if ($j.browser.msie) {lb}
+                   $j("#jive-bookmarklet-howto-ie7").show();
+                {rb} else {lb}
+                   $j("#jive-bookmarklet-howto-firefox-win").show();
+                {rb}
+            {rb});
+        {/param}
+    {/call}
+
+    <div class="jive-modal" id="jive-favorite-add-site">
+        <header>
+            <h2>{i18nText('favorites.site.add.modal.title', $communityName)}</h2>
+        </header>
+        <a href="#" class="j-modal-close-top close">{i18nText('global.close')}<span class="j-close-icon j-ui-elem" role="img"></span></a>
+
+        <div class="jive-modal-content">
+            <p>{i18nText('favorites.site.add.modal.summary', $communityName)}</p>
+
+            <div class="jive-instruction-container" id="jive-bookmarklet-howto-firefox-mac" style="display: none">
+                <div class="jive-favorite-add-site-step clearfix">
+                    <div class="jive-picture-box">
+                        <img src="{buildUrl('/images/bookmarklet/firefox_mac.png')}" alt=""/>
+                    </div>
+                    <div class="jive-description">
+                        <p>{i18nText('bookmarks.bookmarklet.instructions.toolbar', $communityName)}</p>
+                        <p>{i18nText('bookmarks.bookmarklet.instructions.tip.firefox')}</p>
+                    </div>
+                    <div class="jive-bookmarklet-container j-rc4 clearfix firefox-mac-button">
+                        <span class="bookmarklet-install-button">
+                            <a class="j-btn-global j-btn-callout" href="javascript:c=function(p){lb}try{lb}return((eval(p))?(b(eval(p+'()'))):t){rb}catch(ex){lb}return(a){rb}{rb};d=function(p){lb}z=c(p);if(z){lb}return(z){rb}else{lb}for(i=0;i<frames.length;i++){lb}z=c('frames['+i+'].'+p);if(z){lb}return(z){rb}{rb}{rb}return(a){rb};b=function(p){lb}return(encodeURIComponent(p)){rb};a='';f=window.open('{buildAbsoluteUrl('/create-favorite-bookmarklet!input.jspa')}?url='+b(location.href)+'&notes='+window.getSelection().toString()+'&subject='+b(document.title),'jive_sbs_favorite','height=630,width=615,scrollbars=yes,resizable');f.focus();"
+                               title="{i18nText('favorites.site.add.modal.title', $communityName)}">{i18nText('favorites.site.add.modal.title', $communityName)}</a>
+                        </span>
+                        <p>{i18nText('bookmarks.bookmarklet.drag.to.toolbar')}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="jive-instruction-container" id="jive-bookmarklet-howto-firefox-win" style="display: none">
+                <div class="jive-favorite-add-site-step clearfix">
+                    <div class="jive-picture-box">
+                        <img src="{buildUrl('/images/bookmarklet/firefox_win.png')}" alt=""/>
+                    </div>
+                    <div class="jive-description">
+                        <p>{i18nText('bookmarks.bookmarklet.instructions.toolbar', $communityName)}</p>
+                        <p>{i18nText('bookmarks.bookmarklet.instructions.tip.firefox')}</p>
+                    </div>
+                    <div class="jive-bookmarklet-container j-rc4 clearfix firefox-win-button">
+                        <span class="bookmarklet-install-button">
+                            <a class="j-btn-global j-btn-callout" href="javascript:c=function(p){lb}try{lb}return((eval(p))?(b(eval(p+'()'))):t){rb}catch(ex){lb}return(a){rb}{rb};d=function(p){lb}z=c(p);if(z){lb}return(z){rb}else{lb}for(i=0;i<frames.length;i++){lb}z=c('frames['+i+'].'+p);if(z){lb}return(z){rb}{rb}{rb}return(a){rb};b=function(p){lb}return(encodeURIComponent(p)){rb};a='';f=window.open('{buildAbsoluteUrl('/create-favorite-bookmarklet!input.jspa')}?url='+b(location.href)+'&notes='+window.getSelection().toString()+'&subject='+b(document.title),'jive_sbs_favorite','height=630,width=615,scrollbars=yes,resizable');f.focus();"
+                               title="{i18nText('favorites.site.add.modal.title', $communityName)}">{i18nText('favorites.site.add.modal.title', $communityName)}</a>
+                        </span>
+                        <p>{i18nText('bookmarks.bookmarklet.drag.to.toolbar')}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="jive-instruction-container" id="jive-bookmarklet-howto-safari-mac" style="display: none">
+                <div class="jive-favorite-add-site-step clearfix">
+                    <div class="jive-picture-box">
+                        <img src="{buildUrl('/images/bookmarklet/safari_mac.png')}" alt=""/>
+                    </div>
+                    <div class="jive-description">
+                        <p>{i18nText('bookmarks.bookmarklet.instructions.toolbar', $communityName)}</p>
+                        <p>{i18nText('bookmarks.bookmarklet.instructions.tip.safari')}</p>
+                    </div>
+                    <div class="jive-bookmarklet-container j-rc4 clearfix safari-mac-button">
+                        <span class="bookmarklet-install-button">
+                            <a class="j-btn-global j-btn-callout" href="javascript:c=function(p){lb}try{lb}return((eval(p))?(b(eval(p+'()'))):t){rb}catch(ex){lb}return(a){rb}{rb};d=function(p){lb}z=c(p);if(z){lb}return(z){rb}else{lb}for(i=0;i<frames.length;i++){lb}z=c('frames['+i+'].'+p);if(z){lb}return(z){rb}{rb}{rb}return(a){rb};b=function(p){lb}return(encodeURIComponent(p)){rb};a='';f=window.open('{buildAbsoluteUrl('/create-favorite-bookmarklet!input.jspa')}?url='+b(location.href)+'&notes='+window.getSelection().toString()+'&subject='+b(document.title),'jive_sbs_favorite','height=630,width=615,scrollbars=yes,resizable');f.focus();"
+                               title="{i18nText('favorites.site.add.modal.title', $communityName)}">{i18nText('favorites.site.add.modal.title', $communityName)}</a>
+                        </span>
+                        <p>{i18nText('bookmarks.bookmarklet.drag.to.toolbar')}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="jive-instruction-container" id="jive-bookmarklet-howto-ie7" style="display: none">
+                <div class="jive-bookmarklet-container j-rc4 clearfix ie-win-button">
+                    <span class="bookmarklet-install-button">
+                        <a class="j-btn-global j-btn-callout" href="javascript:b=function(p){lb}return(encodeURIComponent(p)){rb};f=window.open('{buildAbsoluteUrl('/create-favorite-bookmarklet!input.jspa')}?url='+b(location.href)+'&subject='+b(document.title),'jive_sbs_favorite','height=630,width=615,scrollbars=yes,resizable');f.focus();"
+                           title="{i18nText('favorites.site.add.modal.title', $communityName)}">{i18nText('favorites.site.add.modal.title', $communityName)}</a>
+                    </span>
+                    <p>{i18nText('bookmarks.bookmarklet.right.click.ie')}</p>
+                </div>
+                <div class="jive-favorite-add-site-step clearfix">
+                    <div class="jive-picture-box">
+                        <img src="{buildUrl('/images/bookmarklet/ie7-1.png')}" alt=""/>
+                    </div>
+                    <div class="jive-description">
+                        <p>{i18nText('bookmarks.bookmarklet.instructions.ie1', $communityName)}</p>
+                    </div>
+                </div>
+                <div class="jive-favorite-add-site-step clearfix">
+                    <div class="jive-picture-box">
+                        <img src="{buildUrl('/images/bookmarklet/ie7-step-2.png')}" alt=""/>
+                    </div>
+                    <div class="jive-description">
+                        <p>{i18nText('bookmarks.bookmarklet.instructions.ie2')}</p>
+                        <p>{i18nText('bookmarks.bookmarklet.instructions.ie2.tip')}</p>
+                    </div>
+                </div>
+                <div class="jive-favorite-add-site-step clearfix">
+                    <div class="jive-picture-box">
+                        <img src="{buildUrl('/images/bookmarklet/ie7-step-3.png')}" alt=""/>
+                    </div>
+                    <div class="jive-description">
+                        <p>{i18nText('bookmarks.bookmarklet.instructions.ie3')}</p>
+                        <p>{i18nText('bookmarks.bookmarklet.instructions.ie3.tip1')}</p>
+                        <p>{i18nText('bookmarks.bookmarklet.instructions.ie3.tip2')}</p>
+                        <p><img src="{buildUrl('/images/bookmarklet/ie7-tip.png')}" alt=""/></p>
+                    </div>
+                </div>
+            </div>
+
+            <p><a href="#" class="close">{i18nText('favorites.site.add.modal.close.window')}</a></p>
+
+        </div>
+    </div>
+{/template}
+

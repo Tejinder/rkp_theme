@@ -1,0 +1,80 @@
+
+
+
+#docs-brand-select-container{
+    margin:20px 20px 0 20px;
+    clear: both;
+    overflow: hidden;
+}
+#docs-brand-select-container label{
+    float: left;
+}
+#docs-brand-select-container select{
+    float: right;
+    font-size: 9px;
+	margin:0px;
+	width:116px;
+}
+#docs-country-select-container{
+    margin: 5px 20px 5px 20px;
+    clear: both;
+    overflow: hidden;
+}
+#docs-country-select-container label{
+    float: left;
+}
+#docs-country-select-container select{
+    float: right;
+    font-size: 9px;
+	width:116px;
+}
+@-moz-document url-prefix() { 
+  #docs-country-select-container select{
+		float: right;
+		font-size: 11px;
+		width:113px;
+	}
+}
+#docs-methodology-select-container{
+    clear: both;
+    margin:0 20px;
+}
+#docs-methodology-select-container .customselectwidth{
+    width:99%;
+    margin-top:3px;
+    font-size: 9px;
+}
+#docs-from-select-container, #docs-to-select-container{
+    clear: both;
+    margin:0 20px;
+}
+#docs-from-select-container span{
+    display: block;
+    padding:5px 0;
+    font-weight: bold;
+}
+#docs-to-select-container span{
+    display: block;
+    padding:5px 0;
+    font-weight: bold;
+}
+.docperiod-month, .docperiod-year{
+    width: 88px;
+    float: left;
+}
+.docperiod-year{
+    margin-left:6px;
+}
+.docperiod-month .customselect,
+.docperiod-year .customselect{
+    width:100%;
+    font-size:9px;
+}
+.save-button{
+    overflow: hidden;
+    clear:both;
+}
+.save-button input{
+    margin:7% 0 8% 33%;
+}
+

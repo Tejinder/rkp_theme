@@ -1,0 +1,44 @@
+.jMenu{
+    display:table;
+    margin:0;
+    padding:0;
+    list-style:none;
+}
+.jMenu li ul{
+    display:none;
+    position:relative;
+    z-index:9999;
+    padding:0;
+    margin:0;
+    list-style:none;
+    /*top:25px !important;*/
+    left:-28px !important;
+}
+.jMenu li ul li{
+    height: auto;
+    background: #1b93c0;
+    padding:0 4px;
+    list-style:none;
+    position:relative;
+    border: 1px solid #dcdcdc;
+    border-top:none;
+    border-bottom: none;
+    text-align: center;
+
+}
+.jMenu li ul li a{
+    width: 135px;
+    font-size:12px;
+    text-transform:none;
+    display:block;
+    padding:5px 7px;
+    border-right: none;
+    border-bottom:1px solid #76bed9;
+}
+
+.jMenu li ul li.last{
+    border-bottom: 1px solid #dcdcdc;
+}
+.jMenu li ul li.last a{
+    padding-right: 7px;
+}

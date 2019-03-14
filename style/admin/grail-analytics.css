@@ -1,0 +1,35 @@
+/* Grail Analytics */
+
+#user_report_query_block img.ui-datepicker-trigger{
+	position: relative;
+	top: 6px;
+	left:2px;
+}
+
+#user_report_wrapper{
+	margin-top:10px;
+}
+#user_report_wrapper table td{
+	padding:5px;	
+} 
+#user_report_query_block img.ui-datepicker-trigger{
+	margin-right:0px;
+}
+#main_user_report_form .query_block input{margin-left:5px;}
+#main_user_report_form .query_block label{padding-left:5px !important;}
+
+#main_doc_report_form .query_block input{margin-left:5px;}
+#main_doc_report_form .query_block label{padding-left:5px !important;}
+
+#document_report_wrapper table td{
+	padding:5px;	
+}
+#document_report_wrapper{
+	margin-top:10px;
+}
+
+#document_report_query_block img.ui-datepicker-trigger{
+	position: relative;
+	top: 6px;
+	left:2px;
+}

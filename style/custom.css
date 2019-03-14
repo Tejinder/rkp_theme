@@ -1,0 +1,101 @@
+@charset "utf-8";
+/* Common Css */
+html{height:100%;}
+body{min-height:100%;    position: relative;font-size:13px;font-family:Arial, Helvetica, sans-serif;color:#5d5d5d;    padding-bottom: 10px;}
+h1{font-size:22px;}
+a {color:#5d5d5d;text-decoration:underline;}
+input, a, i, img, button {
+    -webkit-transition: all 0.5s ease-in-out;
+    -moz-transition: all 0.5s ease-in-out;
+    -ms-transition: all 0.5s ease-in-out;
+    -o-transition: all 0.5s ease-in-out;
+}
+.content_container {
+    margin-bottom: 50px;
+}
+.btn-blue:hover {
+    background-color: transparent;
+    border: 1px solid;
+}
+label span {
+    font-weight: 100;
+}
+.btn{
+    padding: 7px 20px;
+    font-weight: 700;
+	font-size: 13px;
+}
+#jive-login-formblock #jive-login-username input ,
+.jive-login-short-width #jive-login-password input{
+    width:100% !important;
+}
+#jive-login-formblock div#jive-login-button .jive-form-button-submit{
+	background: #00adc3;
+    color: #fff;
+    border-radius: 0;
+	margin-left: 20px;
+margin-right:0;
+}
+.jive-login-short-width #jive-login-formblock {
+    padding: 10px 50px !important;
+}
+footer.container {
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+}
+footer a {
+    float: right;
+    margin-left: 20px;
+    text-decoration: none;
+}
+footer p {
+    float: left;
+}
+/* Common Css */
+
+
+/* header CSS */
+#j-header-wrap #j-header {
+    background: url('../images/top-bg.png');
+    padding: 7px 0;
+	text-align: center;    height: 85px;    min-width:inherit;    background-size: cover;
+}
+.top-icons img {    width: 60%;}
+.top-icons {vertical-align: middle;
+    display: inline-block;
+    background: #fff;
+    border-radius: 50%;
+    height: 70px;
+    width: 70px;
+    text-align: center;
+    padding-top: 14px;
+    margin-right: 35px;
+}
+/* end header CSS */
+
+/* login section */
+#jive-body-maincol .jive-login-reg-formblock{    width: 470px !important;    border-radius: 0;
+    background: #fbfbfb;}
+.top-icons:last-child{margin:0}
+.jive-login-short-width #jive-login-formblock{width:100% !important;}
+footer .footer_main{    background: #fff;}
+#jive-login-formblock div#jive-login-button .jive-form-button-submit{
+.jive-login-short-width #jive-login-username input,
+#jive-login-formblock #jive-login-password input {
+    width: 98% !important;
+}
+section.login {
+    width: 60%;
+    margin: 60px auto 0;
+    background-color: #f9f9f9;
+    padding: 30px 60px 20px;
+	border: 1px solid #c6c5c5;
+}
+.submit-btn{    text-align: right;}
+/* end login section */
+
+
+
+

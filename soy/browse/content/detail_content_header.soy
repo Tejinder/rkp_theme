@@ -1,0 +1,26 @@
+{namespace jive.browse.content autoescape="contextual"}
+
+/**
+* Renders the detail table header for content
+*
+* @param columns The columns shown in the details view.
+*/
+{template .detailContentHeader}
+    <thead>
+        <tr>
+            <th colspan="2"><strong class="font-color-meta-light">{i18nText('browse.heading.content')}</strong></th>
+            <th><strong class="font-color-meta-light">{i18nText('browse.heading.author')}</strong></th>
+            {if $columns and $columns.creationDate}<th><strong class="font-color-meta-light">{i18nText('browse.heading.creationdate')}</strong></th>
+            {else}<th><strong class="font-color-meta-light">{i18nText('browse.heading.latestactivity')}</strong></th>{/if}
+			 {if $columns and not $columns.ratedDocs}
+			 {else}
+			 <th class="center"><strong class="font-color-meta-light">{i18nText('browse.heading.rating')}</strong></th>
+			 {/if}
+            <th class="number"><strong class="font-color-meta-light">{i18nText('browse.heading.viewcount')}</strong></th>
+            <th class="number"><span role="img" title="{i18nText('browse.heading.likecount')}" class="jive-icon-glyph icon-thumbs-up font-color-meta-light"></span></th>
+            <th class="number"><span role="img" title="{i18nText('browse.heading.bookmarkcount')}" class="jive-icon-glyph icon-bookmark2 font-color-meta-light"></span></th>
+            <th class="number"><span role="img" title="{i18nText('browse.heading.replycount')}" class="jive-icon-glyph icon-reply font-color-meta-light"></span></th>
+            <th class="number"></th>
+        </tr>
+    </thead>
+{/template}

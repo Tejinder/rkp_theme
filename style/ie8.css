@@ -1,0 +1,51 @@
+.pib-select_div .form-select{
+	/*background: #f2f2f2;*/
+	padding-right: 1% !important;
+}
+.pib-select_div .form-select:hover{
+	/*background: #f2f2f2;*/
+	padding-right: 1% !important;
+}
+.project_details .form-select{
+	/*background: #f2f2f2;*/
+	padding-right: 1% !important;
+}
+.project_details .form-select:hover{
+	/*background: #f2f2f2;*/
+	padding-right: 1% !important;
+}
+.project_details select{
+	/*background: #f2f2f2;*/
+	padding-right: 1% !important;
+}
+.project_details select:hover{
+	/*background: #f2f2f2;*/
+	padding-right: 1% !important;
+}
+.pib_right select{
+	/*background: #f2f2f2;*/
+	padding-right: 1% !important;
+}
+.select_field{
+	/*background: #f2f2f2;*/
+	padding-right: 1% !important;
+}
+.select_field:hover{
+	/*background: #f2f2f2;*/
+	padding-right: 1% !important;
+}
+.project-data-extract select.form-select{
+	/*background: #f2f2f2;*/
+	padding-right: 1% !important;
+}
+.view_edit_pib .pib_band_view li select{
+	padding-right: 1% !important;
+}
+.project-data-extract .project_start_date select.form-select_year, 
+.project-data-extract .project_complete_date select.form-select_year{
+	/*background: #f2f2f2;*/
+	padding-right: 1% !important;
+}
+.form-select_div_main.pit-category select{
+	height: 60px;
+}

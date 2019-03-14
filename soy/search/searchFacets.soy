@@ -1,0 +1,639 @@
+{namespace jive.search.facets}
+
+/**
+* sidebar
+* 
+*/
+{template .main}
+<div class="j-column-wrap-s">
+    <div class="j-column-s">
+        <a href="#" id="mobile-sidenav-btn"></a>
+        <div class="j-column-content">
+        {call .communities data="all"/}
+
+        {call .searchFor data="all"/}
+
+        {call .timeRanges data="all"/}
+        {call .sortBy data="all"/}
+
+        {call .languagesFacet data="all"/}
+
+        {call .contentSearchOptions data="all"/}
+        {call .depthFacets data="all"/}
+
+        {call .peopleSearchOptions data="all"/}
+        {call .deactivated data="all"/}
+
+        {call .contentFacets data="all"/}
+        {call .placesFacets data="all"/}
+
+        {call .outcomes data="all"/}
+
+        {call .social data="all"/}
+        </div>
+    </div>
+</div>
+{/template}
+
+/**
+ * Communities Box
+ *
+ * @param showOpenSearch
+ * @param rootCommunityName
+ * @param searchEngines
+ * @param stats
+ */
+{template .communities}
+{if $showOpenSearch}
+    <div class="j-box j-communities">
+        <nav id="j-communities">
+            <dl>
+                <dt>{i18nText('search.thiscommunity.header')}</dt>
+                <dd data-id="" class="j-community j-active">
+                    <a href="#">
+                        <img src="{buildUrl('/favicon.png')}" width="16" height="16" alt=""/><span class="j-name">{$rootCommunityName}</span>
+                    </a>
+                </dd>
+                
+                {if $stats.enabledParseableEngines}
+                    <dt>{i18nText('search.othercommunities.header')}</dt>
+                    {foreach $engine in $searchEngines}
+                    {if $engine.enabled and $engine.queryResultParseable}
+                    <dd id="engine-{$engine.id}" data-id="{$engine.id}" data-url="{$engine.externalSearchURL}" data-name="{$engine.shortName}" class="j-community-bridged">
+                        <a href="#" title="{$engine.shortName}">
+                            {if $engine.iconURL}
+                                <img src="{$engine.iconURL}" width="16" height="16" alt=""/>
+                            {else}
+                                <span class="j-favicon-placeholder j-rc4"></span>
+                            {/if}
+                            <span class="j-name">{$engine.shortName}</span>
+                        </a>
+                    </dd>
+                    {/if}
+                    {/foreach}
+                {/if}
+                
+                {if $stats.enabledNonParseableEngines}
+                    <dt>{i18nText('search.results.os.loctns.label')}</dt>
+                    {foreach $engine in $searchEngines}
+                    {if $engine.enabled and not $engine.queryResultParseable}
+                    <dd id="engine-{$engine.id}" class="j-community-bridged">
+                        <a href="{$engine.externalSearchURL}" target="_new">
+                            {if $engine.iconURL}
+                                <img src="{$engine.iconURL}" width="16" height="16" alt=""/>
+                            {else}
+                                <span class="j-favicon-placeholder j-rc4"></span>
+                            {/if}
+                            <span class="j-name">{$engine.shortName}</span>
+                        </a>
+                    </dd>
+                    {/if}
+                    {/foreach}
+                {/if}
+            </dl>
+        </nav>
+    </div>
+{/if}
+{/template}
+
+/**
+ * Search for radio options
+ */
+{template .searchFor}
+<div class="j-box j-facets">
+    <h4 id="search_for-title-group-desc">
+        <label>{i18nText('search.search_for.title')}</label>
+    </h4>
+    <nav>
+        <ul data-param="facet" role="listbox" aria-labelledby="search_for-title-group-desc">
+            <li data-value="content" class="j-bucket" role="listitem" aria-labelledby="search_for-title-group-desc">
+                <a href="#" title="{i18nText('search.search_for.title')} {i18nText('search.search_for.content')}">
+                    <span class="j-status"></span>
+                    <span class="j-508-label">{i18nText('search.search_for.title')}</span>
+                    {i18nText('search.search_for.content')}
+                </a>
+            </li>
+            <li data-value="people" class="j-bucket" role="listitem" aria-labelledby="search_for-title-group-desc">
+                <a href="#" title="{i18nText('search.search_for.title')} {i18nText('search.search_for.people')}">
+                    <span class="j-status"></span>
+                    <span class="j-508-label">{i18nText('search.search_for.title')}</span>
+                    {i18nText('search.search_for.people')}
+                </a>
+            </li>
+            <li data-value="places" class="j-bucket" role="listitem" aria-labelledby="search_for-title-group-desc">
+                <a href="#" title="{i18nText('search.search_for.title')} {i18nText('search.search_for.places')}">
+                    <span class="j-status"></span>
+                    <span class="j-508-label">{i18nText('search.search_for.title')}</span>
+                    {i18nText('search.search_for.places')}
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+{/template}
+
+/**
+ * Places radio options
+ *
+ * @param placeFacets
+ * @param selectedPlaceFacet
+ * @depends i18nKeys = search.facets.show
+ *
+ * @allowDependsWildcard
+ *
+ * @depends i18nKeys = search.place.*
+ */
+{template .placesFacets}
+<div class="j-box j-sub-facets j-places">
+    <h4 id="search-faces-places-facets-desc">
+        <label>{i18nText('search.facets.show')}</label>
+    </h4>
+    <nav>
+        <ul data-facet="places" data-param="type" aria-labelledby="search-faces-places-facets-desc">
+            {foreach $placeFacet in $placeFacets}
+                {call .facet}
+                    {param type : $placeFacet /}
+                    {param active : $selectedPlaceFacet==$placeFacet /}
+                    {param searchType : 'search.place' /}
+                {/call}
+            {/foreach}
+        </ul>
+    </nav>
+</div>
+{/template}
+
+
+/**
+ * Content language option
+ *
+ * @param multipleLanguageSearchEnabled
+ * @param allowedLanguages
+ * @param defaultLanguage
+ * @depends i18nKeys = search.form.language.title
+ */
+{template .languagesFacet}
+{if $multipleLanguageSearchEnabled and length($allowedLanguages) > 1}
+<div class="j-box j-sub-facets j-content j-places">
+    <h4 id="search-content-language">
+        <label>{i18nText('search.form.language.title')}</label>
+    </h4>
+    <nav>
+        <ul data-facet="content places" data-param="language" role="listbox" aria-labelledby="search-content-language">
+            {call .languageFacet data="$defaultLanguage"/}
+            {foreach $language in $allowedLanguages}
+                {if not $language.defaultLanguage}
+                    {call .languageFacet data="$language"/}
+                {/if}
+            {/foreach}
+        </ul>
+    </nav>
+</div>
+{/if}
+{/template}
+
+/**
+ * Content language option
+ *
+ * @param languageCode
+ * @param defaultLanguage
+ * @param displayName
+ */
+{template .languageFacet}
+<li data-value="{if not $defaultLanguage}{$languageCode}{/if}" class="j-facet {if $defaultLanguage}j-active{/if}" role="listitem" aria-labelledby="search-facets-show-content-desc">
+    <a href="#" title="{i18nText('search.facets.show')} {$displayName}">
+        <span class="j-status"></span>
+        <span class="j-508-label">{i18nText('search.facets.show')}</span>
+        {$displayName}
+    </a>
+</li>
+{/template}
+
+/**
+ * Content radio options
+ *
+ * @param contentFacets
+ * @param selectedContentFacet
+ * @param? externalActivityFacets
+ * @depends i18nKeys = search.facets.show
+ *
+ * @allowDependsWildcard
+ *
+ * @depends i18nKeys = search.content.*
+ */
+{template .contentFacets}
+<div class="j-box j-sub-facets j-content">
+    <h4 id="search-facets-show-content-desc">
+        <label>{i18nText('search.facets.show')}</label>
+    </h4>
+    <nav>
+        <ul data-facet="content" data-param="type" role="listbox" aria-labelledby="search-facets-show-content-desc">
+            {foreach $contentFacet in $contentFacets}
+                {call .facet}
+                    {param type : $contentFacet /}
+                    {param active : $selectedContentFacet==$contentFacet /}
+                    {param searchType : 'search.content' /}
+                {/call}
+            {/foreach}
+        </ul>
+        {if $externalActivityFacets and length($externalActivityFacets) != 0 }
+            <ul data-facet='content' data-param='source' data-parent="extStreamActivity" role='listbox' aria-labelledby="search-facets-show-content-desc">
+                {foreach $externalActivityFacet in $externalActivityFacets}
+                    {call .externalFacet}
+                        {param name       : $externalActivityFacet.displayName /}
+                        {param type       : $externalActivityFacet.type /}
+                    {/call}
+                 {/foreach}
+            </ul>
+        {/if}
+        </ul>
+    </nav>
+</div>
+{/template}
+
+
+/**
+ * facet
+ *
+ * @param type the type of facet
+ * @param active
+ * @param searchType the search type this facet falls under
+ * @depends i18nKeys = search.facets.show
+ *
+ * @allowDependsWildcard
+ *
+ * @depends i18nKeys = search.content.*
+ */
+{template .facet}
+    <li data-value="{$type}" class="j-facet {if $active}j-active{/if}" role="listitem" aria-labelledby="search-facets-show-content-desc">
+        <a href="#" title="{i18nText('search.facets.show')} {i18nText($searchType+'.'+$type)}">
+            <span class="j-status"></span>
+            <span class="j-508-label">{i18nText('search.facets.show')}</span>
+            {i18nText($searchType+'.'+$type)}
+        </a>
+    </li>
+{/template}
+
+/**
+ * External Activity Facet. We get the type and name directly from data
+ *
+ * @param name The display name of the facet
+ * @param type The type of the external activity
+ * @depends i18nKeys = search.facets.show
+ */
+{template .externalFacet}
+    <li data-value="{$type}" class="j-facet j-external j-child" role="listitem" aria-labelledby="search-facets-show-content-desc">
+        <a href="#" title="{i18nText('search.facets.show')} {$name}">
+            <span class="j-status"></span>
+            <span class="j-508-label">{i18nText('search.facets.show')}</span>
+            {$name}
+        </a>
+    </li>
+{/template}
+
+
+/**
+ * People search options
+ */
+{template .peopleSearchOptions}
+<div class="j-box j-sub-facets j-people j-people-search-options">
+    <h4>
+        <label>Matching</label>
+    </h4>
+    <form class="j-form">
+        <div class="j-form-row">
+            <input type="checkbox" name="nameonly" value="true" id="nameonly" />
+            <label for="nameonly">{i18nText('search.people.match_names')}</label>
+        </div>
+    </form>
+</div>
+{/template}
+
+/**
+ * Author and place filters
+ *
+ * @depends i18nKeys = search.options.restrict
+ * @depends i18nKeys = search.options.restrict.people
+ * @depends i18nKeys = search.options.restrict.places
+ * @depends i18nKeys = search.content.author_placeholder
+ * @depends i18nKeys = search.content.place_placeholder
+ *
+ * @depends template=jive.search.facets.userAutocomplete
+ * @depends template=jive.search.facets.selectedUserAutocomplete
+ * @depends template=jive.search.facets.selectedPlaceAutocomplete
+ * @depends template=jive.search.facets.placeAutocomplete
+ */
+{template .contentSearchOptions}
+<div class="j-box j-sub-facets j-content j-content-search-options j-autocomplete-options" role="group" aria-label="search-options-restrict-desc">
+    <h4 id="search-options-restrict-desc">
+        <label>{i18nText('search.options.restrict')}</label>
+    </h4>
+    <form class="j-form">
+        <div class="j-form-row">
+            <label for="author" class="j-508-label">{i18nText('search.options.restrict.people')}</label>
+            <input type="text" name="author" value="" id="author" autocomplete="off" placeholder="{i18nText('search.people.author_placeholder')}"
+                role="combobox" />
+        </div>
+        <div class="j-form-row">
+            <label for="place" class="j-508-label">{i18nText('search.options.restrict.places')}</label>
+            <input type="text" name="place" value="" id="place" placeholder="{i18nText('search.people.place_placeholder')}"
+                role="combobox" />
+        </div>
+    </form>
+    <div class="jive-chooser-list j-result-list j-people-list clearfix">
+        
+    </div>
+    <ul id="autocomplete-results" class="jive-autocomplete j-icon-list" style="max-height:300px; overflow-y:auto; display:none"></ul>
+</div>
+{/template}
+
+/**
+ * render user list
+ * @param results the users list to display
+ */
+{template .userAutocomplete}
+
+{if length($results) > 0}
+    <div class="j-menu j-quick-menu">
+        <ul class="j-suggestions j-avatar-list j-autocomplete-results" role="listbox">
+            {foreach $user in $results}
+                <li class="user-autocomplete-item" role="option">
+                    <a href="#" id="user_{$user.id}"
+                    data-url="{$user.url}"
+                    data-email="{$user.email}"
+                    data-display-name="{$user.displayName}"
+                    data-username="{$user.jive.username}">
+                        {call jive.shared.displayutil.avatar data="$user.jive"}
+                            {param size: 24/}
+                            {param hideLink:true /}
+                        {/call}
+                        <span class="lnk">{$user.displayName}</span>
+                    </a>
+                </li>
+            {/foreach}
+        </ul>
+    </div>
+{/if}
+{/template}
+
+/**
+ * render user
+ * @param user the user to display
+ */
+{template .selectedUserAutocomplete}
+<ul class="jive-autocomplete-search-selected jive-chooser-list j-people-list j-result-list clearfix">
+    <li>
+        {if $user.avatarHtml}
+            {$user.avatarHtml|noAutoescape}
+        {else}
+        {call jive.shared.displayutil.avatar data="$user.jive"}
+            {param size: 22/}
+            {param hideLink:true/}
+        {/call}
+        {/if}
+        <span class="j-selected-list-text">{$user.displayName}</span>
+        <em><a class="remove" href="#" title="{i18nText('search.facets.remove')}"><span class="jive-icon-glyph icon-close2"></span></a></em>
+    </li>
+</ul>
+{/template}
+
+
+/**
+ * render place list
+ * @param results the users list to display
+ */
+{template .placeAutocomplete}
+
+{if length($results) > 0}
+    <div class="j-menu j-quick-menu">
+        <ul class="j-suggestions j-icon-list j-autocomplete-results" role="listbox">
+            {foreach $place in $results}
+                <li class="user-autocomplete-item" role="option">
+                    <a href="#"
+                    data-url="{$place.url}"
+                    data-name="{$place.name}"
+                    data-display-name="{$place.displayName}"
+                    data-type="{$place.type}">
+                        <span class="jive-icon-med jive-icon-{$place.type}"></span>
+                        <span class="lnk">{$place.name}</span>
+                    </a>
+                </li>
+            {/foreach}
+        </ul>
+    </div>
+{/if}
+{/template}
+
+
+/**
+ * render place
+ * @param place the place to display
+ */
+{template .selectedPlaceAutocomplete}
+<ul class="jive-autocomplete-search-selected jive-chooser-list j-people-list j-result-list clearfix">
+    <li>
+     <span class="jive-icon-med jive-icon-{$place.type}"></span>
+     <span class="j-selected-list-text">{$place.name}</span>
+     <em><a class="remove" href="#" class="{i18nText('search.facets.remove')}"><span class="jive-icon-glyph icon-close2"></span></a></em>
+    </li>
+</ul>
+{/template}
+
+
+/**
+ * Structured outcome search filter
+ *
+ * @param outcomeTypes
+ * @param selectedOutcomeType
+ */
+{template .outcomes}
+{if $outcomeTypes and length($outcomeTypes) > 0}
+    <div class="j-box j-sub-facets j-content">
+        <h4 id="search-facets-restrict-outcome">
+            <label>{i18nText('search.outcomes.show')}</label>
+        </h4>
+        <nav>
+            <ul data-facet="content" data-param="outcomeType" role="listbox" aria-labelledby="search-facets-restrict-outcome">
+                {foreach $outcomeType in $outcomeTypes}
+                    {call .facet}
+                        {param type : $outcomeType /}
+                        {param active : $selectedOutcomeType==$outcomeType /}
+                        {param searchType : 'outcomes.badge' /}
+                    {/call}
+                {/foreach}
+            </ul>
+        </nav>
+    </div>
+{/if}
+{/template}
+
+
+/**
+ * Time ranges options
+ *
+ * @param timeRanges
+ * @param selectedTimeRange
+ */
+{template .timeRanges}
+<div class="j-box j-time-ranges j-sub-facets j-content">
+    <h4 id="search-time_ranges-desc">
+        <label>{i18nText('search.time_ranges.title')}</label>
+    </h4>
+    <nav>
+        <ul data-facet="content" data-param="after" role="listbox" aria-labelledby="search-time_ranges-desc">
+            {foreach $timeRange in $timeRanges}
+                {call .timeRangeOption }
+                    {param timeRange : $timeRange /}
+                    {param active : $timeRange == $selectedTimeRange /}
+                {/call}
+            {/foreach}
+        </ul>
+    </nav>
+</div>
+{/template}
+
+/**
+ * time range option
+ *
+ * @param timeRange
+ * @param active
+ *
+ * @allowDependsWildcard
+ *
+ * @depends i18nKeys = search.time_ranges.*
+ */
+{template .timeRangeOption}
+    <li data-value="{$timeRange}" class="j-time-range {if $active}j-active{/if}" role="listitem" aria-labelledby="search-time_ranges-desc">
+        <a href="#" title="{i18nText('search.time_ranges.title')} {i18nText('search.time_ranges.'+$timeRange)}">
+            <span class="j-status"></span>
+            <span class="j-508-label">{i18nText('search.time_ranges.title')}</span>
+            {i18nText('search.time_ranges.'+$timeRange)}
+        </a>
+    </li>
+{/template}
+
+/**
+ * Recursive search options
+ *
+ * @param depthFacets
+ * @param selectedDepthFacet
+ *
+ * @depends i18nKeys = search.depth_facets.title
+ */
+{template .depthFacets}
+<div class="j-box j-depth-facets j-sub-facets j-content" id="search-depth-facets" style="display: none;">
+    <h4 id="search-depth_facets-desc"><label>{i18nText('search.depth_facets.title')}</label></h4>
+    <nav>
+        <ul data-facet="content" data-param="depth" role="listbox" aria-labelledby="search-depth_facets-desc">
+            {foreach $depthFacet in $depthFacets}
+                {call .depthFacetOption }
+                    {param depthFacet : $depthFacet /}
+                    {param active : $depthFacet == $selectedDepthFacet /}
+                {/call}
+            {/foreach}
+        </ul>
+    </nav>
+</div>
+{/template}
+
+/**
+ * Recursive search option
+ *
+ * @param depthFacet
+ * @param active
+ *
+ * @depends i18nKeys = search.depth_facets.title
+ * @depends i18nKeys = search.depth_facets.none
+ * @depends i18nKeys = search.depth_facets.children
+ * @depends i18nKeys = search.depth_facets.all
+ */
+{template .depthFacetOption}
+    <li data-value="{$depthFacet}" class="j-depth-facet js-depth-facet {if $active}j-active{/if}" role="listitem" aria-labelledby="search-depth_facets-desc">
+        <a href="#" title="{i18nText('search.depth_facets.title')} {i18nText('search.depth_facets.'+$depthFacet)}">
+            <span class="j-status"></span>
+            <span class="j-508-label">{i18nText('search.depth_facets.title')}</span>
+            {i18nText('search.depth_facets.'+$depthFacet)}
+        </a>
+    </li>
+{/template}
+
+/**
+ * Sort by box
+ *
+ * @param sortOptions
+ *
+ * @allowDependsWildcard
+ *
+ * @depends i18nKeys = search.sort.*
+ */
+{template .sortBy}
+<div data-facet="content" class="j-box j-sort-attr j-sub-facets j-content j-places">
+    <h4 id="search-sort-desc">
+        <label for="sort">{i18nText('search.sort.title')}</label>
+    </h4>
+
+    <nav>
+        <ul id="sort" data-param="sort" role="listbox" aria-labelledby="search-sort-desc">
+            {foreach $sortOption in $sortOptions}
+                <li data-value="{$sortOption}" class="j-bucket" role="listitem" aria-labelledby="search-sort-desc">
+                    <a href="#" title="{i18nText('search.sort.'+$sortOption+'.title')}">
+                        <span class="j-status"></span>
+                        <span class="j-508-label">{i18nText('search.sort.'+$sortOption)}</span>
+                        {i18nText('search.sort.'+$sortOption)}
+                    </a>
+                </li>
+            {/foreach}
+        </ul>
+    </nav>
+</div>
+{/template}
+
+/**
+ * Social search toggle
+ *
+ * @param socialSearch
+ */
+{template .social}
+{if $socialSearch}
+    <div data-facet="content places" class="j-box j-sub-facets j-content j-places j-socialsearch-toggle">
+        <h4 id="search-social-desc">
+            <label for="search-social">{i18nText('search.social.title')}</label>{sp}
+            <a class="j-search-social-questionmark tooltip" title="{i18nText('search.social.tooltip.description')}"><span class="jive-icon-glyph icon-info"></span></a>
+        </h4>
+
+        <div id="search-social" data-facet="content places" data-param="socialSearch">
+            <a href="#" data-value="1" title="{i18nText('search.social.toggle_on.title')}"
+               class="j-socialsearch-toggle-on j-active" aria-labelledby="search-sort-desc">
+                {i18nText('search.social.toggle_on.text')}
+            </a>
+            &nbsp;/&nbsp;
+            <a href="#" data-value="0" title="{i18nText('search.social.toggle_off.title')}"
+               class="j-socialsearch-toggle-off" aria-labelledby="search-sort-desc">
+                {i18nText('search.social.toggle_off.text')}
+            </a>
+        </div>
+    </div>
+{/if}
+{/template}
+
+/**
+ * Deactivated user toggle
+ */
+{template .deactivated}
+<div data-facet="content people" class="j-box j-sub-facets j-content j-people j-people-search-options j-deactivated-toggle">
+    <h4 id="search-deactivated-desc">
+        <label for="deactivated">{i18nText('search.deactivated.title')}</label>
+    </h4>
+
+    <div id="search-deactivated" data-facet="content people" data-param="deactivated">
+        <a href="#" data-value="true" title="{i18nText('search.deactivated.toggle_show.title')}"
+           class="j-deactivated-toggle-show" aria-labelledby="search-sort-desc">
+            {i18nText('search.deactivated.toggle_show.text')}
+        </a>
+        &nbsp;/&nbsp;
+        <a href="#" data-value="false" title="{i18nText('search.deactivated.toggle_hide.title')}"
+           class="j-deactivated-toggle-hide j-active" aria-labelledby="search-sort-desc">
+            {i18nText('search.deactivated.toggle_hide.text')}
+        </a>
+    </div>
+</div>
+{/template}

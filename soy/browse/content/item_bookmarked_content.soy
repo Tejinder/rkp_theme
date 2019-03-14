@@ -1,0 +1,311 @@
+{namespace jive.browse.bookmark autoescape="contextual"}
+
+/**
+* Renders the detail table header for content
+*
+*
+* @param yourBookmarks Whether or not the user is viewing their own bookmarks.
+*
+*/
+{template .detailBookmarksHeader}
+    <thead>
+        <tr>
+            <th colspan="2"><strong class="font-color-meta-light">{i18nText('browse.heading.content')}</strong></th>
+            <th><strong class="font-color-meta-light">{i18nText('browse.heading.author')}</strong></th>
+            {if $yourBookmarks}
+//                <th><strong class="font-color-meta-light">{i18nText('browse.heading.notes')}</strong></th>
+//                <th><strong class="font-color-meta-light">{i18nText('browse.heading.tags')}</strong></th>
+            {else}
+            {/if}  <th><strong class="font-color-meta-light">{i18nText('browse.heading.bookmarkedon')}</strong></th>
+              <th class="number"><strong class="font-color-meta-light">{i18nText('browse.heading.viewcount')}</strong></th>
+
+            <th class="number"><span role="img" title="{i18nText('browse.heading.likecount')}" class="jive-icon-glyph icon-thumbs-up font-color-meta-light"></span></th>
+            <th class="number"><span role="img" title="{i18nText('browse.heading.bookmarkcount')}" class="jive-icon-glyph icon-bookmark2 font-color-meta-light"></span></th>
+            <th class="number"><span role="img" title="{i18nText('browse.heading.replycount')}" class="jive-icon-glyph icon-reply font-color-meta-light"></span></th>
+            <th class="number"></th>
+        </tr>
+    </thead>
+{/template}
+
+/**
+* Renders a single bookmarked detail item from a {@link BrowseViewItemBean} instance.
+*
+* @param link A relative link to the item.
+* @param iconCss An icon representing the item.
+* @param subject The item subject.
+* @param markedObjectId The bookmarked object ID
+* @param markedObjectType The bookmarked object type
+* @param externalURL If the favorited object is an external URL, the URL.
+* @param prop Properties of the content object.
+* @depends template=jive.eae.acclaim.count
+*/
+{template .detailBookmarkedItem}
+    <tr data-object-id={$markedObjectId} data-object-type="{$markedObjectType}">
+        <td class="j-td-icon">
+            <img src="{resourceUrl('/images/transparent.png')}" alt="" class="{$iconCss} jive-icon-big" />
+        </td>
+        <td class="j-td-title">
+            <a href="{buildUrl($link)}">{$subject|noAutoescape}
+                {if $prop.privacyInfo and $prop.privacyInfo.private}
+                    <span src="{buildUrl('/images/transparent.png')}"
+                    class="jive-icon-sml jive-icon-content-private{if $prop.privacyInfo.shared}-shared{/if}"
+                    title="{if $prop.privacyInfo.shared}{i18nText('doc.visibility.restricted.tooltip')}{else}{i18nText('doc.visibility.private.tooltip')}{/if}"
+                    ></span>
+                {/if}
+            </a>
+            {if $prop.isVisibleToPartner}
+                <span class="font-color-meta-light j-browse-external-access"> - {i18nText('partner.browse.ext_access')}</span>
+            {/if}
+            <div>
+            {if $prop.place}<p class="j-browse-content-location font-color-meta-light">{i18nText('global.in')} <a href="{buildUrl($prop.place.link)}" class="font-color-meta-light jivecontainerTT-hover-container" data-objectId="{$prop.place.id}" data-objectType="{$prop.place.type}">{$prop.place.subject}</a></p>{/if}
+            {if $externalURL}
+                <p class="j-browse-content-location font-color-meta-light">
+                <a href="{$externalURL}" class="font-color-meta-light" title="{$externalURL}">{i18nText('bookmark.view.visit.site.label')}</a>
+                </p>
+            {/if}
+            </div>
+        </td>
+        <td class="j-td-author font-color-meta">{call jive.shared.displayutil.userDisplayNameLink data="$prop.author"}{/call}</td>
+        {if $prop.lastActivityDate}
+            // this is the date the item/site was last bookmarked, NOT activity like comments/edits/etc
+        	<td class="j-td-date font-color-meta">{formatDate($prop.lastActivityDate)}</td>
+       	{else}
+       		<td class="j-td-date font-color-meta">&nbsp;</td>
+       	{/if}
+        <td class="j-td-views center font-color-meta number">
+            <span title="{i18nText('browse.heading.viewcount')}">
+            {if $prop.viewCount > -1}{$prop.viewCount}
+            {else}
+                &nbsp;
+            {/if}
+            </span>
+        </td>
+        <td class="j-td-likes number font-color-meta">
+            <span title="{i18nText('browse.heading.likecount')}">
+                <span class="jive-icon-sml jive-icon-meta-like"></span>
+                {call jive.eae.acclaim.count}
+                    {param command:'showAcclaim' /}
+                    {param count}{$prop.activityInfo ? $prop.activityInfo.likeCount : 0}{/param}
+                    {param acclaimType : 'like' /}
+                    {param objectId:$markedObjectId /}
+                    {param objectType:$markedObjectType /}
+                    {param classes:'j-meta-number' /}
+                    {param accessibilityLinkLabel}
+                        {call jive.shared.soy.getCountTextByType}
+                            {param count}{$prop.activityInfo ? $prop.activityInfo.likeCount : 0}{/param}
+                            {param type:'showlikescount'/}
+                        {/call}
+                    {/param}
+                {/call}
+            </span>
+        </td>
+        <td class="j-td-bookmarks number font-color-meta">
+            <span title="{i18nText('browse.heading.bookmarkcount')}">
+                <span class="jive-icon-sml jive-icon-meta-bookmark"></span>
+                {call jive.eae.acclaim.count}
+                    {param command:'showBookmarks' /}
+                    {param count}{$prop.activityInfo ? $prop.activityInfo.bookmarkCount : 0}{/param}
+                    {param objectId:$markedObjectId /}
+                    {param objectType:$markedObjectType /}
+                    {param classes:'j-meta-number' /}
+                    {param accessibilityLinkLabel}
+                        {call jive.shared.soy.getCountTextByType}
+                            {param count}{$prop.activityInfo ? $prop.activityInfo.bookmarkCount : 0}{/param}
+                            {param type:'showbookmarkscount'/}
+                        {/call}
+                    {/param}
+                {/call}
+            </span>
+        </td>
+        <td class="j-td-replies center font-color-meta number">
+            <span title="{i18nText('browse.heading.replycount')}"><img src="{resourceUrl('/images/transparent.png')}" alt="" class="jive-icon-sml jive-glyph-comment"/>
+            {if $prop.activityInfo}{$prop.activityInfo.replyCount}{else}0{/if}</span>
+        </td>
+        <td class="j-td-actions">
+            {call jive.browse.content.detailActionPanel}
+               {param id   : $markedObjectId /}
+               {param type : $markedObjectType /}
+               {param prop : $prop /}
+            {/call}
+        </td>
+    </tr>
+{/template}
+
+
+/**
+* Renders a single bookmarked content thumbnail item from a {@link BrowseViewItemBean} instance.
+*
+* @param id The object ID
+* @param type The object type
+* @param markedObjectId The bookmarked object ID
+* @param markedObjectType The bookmarked object type
+* @param iconCss An icon representing the item.
+* @param link A relative link to the item.
+* @param subject The item subject.
+* @param creationTime A user-friendly time-since-created string.
+* @param yourBookmarks Whether or not the user is viewing their own bookmarks.
+* @param popularBookmarks Whether or not the user is viewing popular bookmarks
+* @param popularCount The number of bookmarks during the past x period
+* @param popularRangeKey The i18n key for x bookmarks in the past x
+* @param canEdit Whether or not the user can edit the bookmark.
+* @param prop Item properties.
+* @param externalURL If the favorited object is an external URL, the URL.
+*
+* @allowDependsWildcard
+*
+* @depends i18nKeys=global.access.content.type.*
+* @depends i18nKeys=browse.bookmarks.date_x_by_author
+*/
+{template .thumbnailBookmarkedItem}
+<div class="card j-small-card" role="article" aria-labelledby="bookmark-subject-{$id}" {if $prop.bodysnippet}aria-describedby="bookmark-notes-{$id}"{/if}>
+        <div class="j-content-thumb j-bookmarked-thumb {if $yourBookmarks}j-your-bookmark-thumb{/if} j-thumb js-browse-item face card-front {call jive.browse.content.flippable data="$prop"}{param body: 'flippable'/}{/call}" data-object-type="{$type}" data-object-id="{$id}">
+            <header class="js-thumb-header">
+                <h4>
+                    <a href="{buildUrl($link)}" title="{$subject|noAutoescape}">
+                        <span title="{i18nText(i18nKey('global.access.content.type.' + $markedObjectType, true))}" class="jive-icon-med {$iconCss}" role="img"></span>
+                        <span class="js-header-text j-header-text" id="bookmark-subject-{$id}">{$subject|noAutoescape}</span>
+                    </a>
+                </h4>
+            </header>
+            <section>
+
+                {if $externalURL}
+                    <p class="j-bookmarked-link">
+                        <span class="jive-icon-sml jive-icon-link2"></span>
+                        <a href="{$externalURL}" title="{$externalURL}">{i18nText('bookmark.view.visit.site.label')}</a>
+                    </p>
+                {/if}
+
+                {if $yourBookmarks}
+                <p id="bookmark-notes-{$id}">
+                    <span class="jive-icon-sml jive-glyph-notes" role="img" title="{i18nText('bookmarks.create.notes.label')}"></span>
+                    // notes for your bookmarks
+                    {if $prop.bodysnippet}
+                        {$prop.bodysnippet|noAutoescape}
+                    {else}
+                        <em class="font-color-meta-light">{i18nText('browse.bookmarks.nonotes')}</em>
+                    {/if}
+                </p>
+                {else}
+                <article id="bookmark-notes-{$id}">
+                    {if $prop.bodysnippet}
+                        {$prop.bodysnippet|noAutoescape}
+                    {/if}
+                </article>
+                {/if}
+
+                {if $prop.bookmarkTags and $prop.bookmarkTags.tags and length($prop.bookmarkTags.tags) > 0}
+                <p>
+                    <span class="jive-icon-sml jive-icon-tag"></span>
+                    {foreach $tagEntry in $prop.bookmarkTags.tags}
+                        <a href="{buildUrl('/tags#/?tags=' + $tagEntry.tag)}" title="{i18nText('tag.link.content.tagged.tooltip', $tagEntry.tag)}">
+                            {if $tagEntry.abbreviatedTag}{$tagEntry.abbreviatedTag}{else}{$tagEntry.tag}{/if}</a>{if not isLast($tagEntry)},{sp}{/if}
+                    {/foreach}
+                    {if $prop.bookmarkTags.tagsRemaining > 0}
+                         {if $yourBookmarks and $canEdit}
+                            {sp}(<a href="#" class="edit-bookmark" data-objecttype="{$markedObjectType}" data-objectid="{$markedObjectId}">{i18nText('browse.bookmarks.more.tags', $prop.bookmarkTags.tagsRemaining)}</a>)
+                         {/if}
+                    {/if}
+                </p>
+                {/if}
+
+                {if $yourBookmarks and $canEdit}
+                <p>
+                    <span class="jive-icon-sml jive-glyph-edit"></span>
+                    <a href="#" role="button" class="edit-bookmark" data-objecttype="{$markedObjectType}" data-objectid="{$markedObjectId}">{i18nText('browse.bookmarks.edit')}</a>
+                </p>
+                {/if}
+
+            </section>
+            <footer>
+                // case 1 : sorted by activity
+                {if not $popularBookmarks and not $yourBookmarks}
+                    <div class="j-sort-meta font-color-meta j-author-block" >
+                        <span class="j-avatar-container">
+                            {call jive.shared.displayutil.avatar data="$prop.author"}
+                                {param size: 24 /}
+                            {/call}
+                        </span>
+                        <div class="j-author-info font-color-meta">
+							{call jive.shared.soy.i18nHelper}
+								{param i18nKey}
+								    {i18nKey('browse.bookmarks.date_x_by_author')}
+								{/param}
+								{param arg0}
+								    {SanitizedHtml('<strong>' + $creationTime + '</strong>')}
+								{/param}
+								{param arg1}
+									<span class="j-line2">
+									{call jive.shared.displayutil.userDisplayNameLink data="$prop.author"/}
+									</span>
+								{/param}
+								{param noAutoEscape}true{/param}
+							{/call}
+                        </div>
+                    </div>
+
+                {/if}
+
+                // case 2 : sorted by popularity
+                {if $popularBookmarks}
+
+                    {call .popularBookmarkText}
+                        {param popularRangeKey: $popularRangeKey /}
+                        {param popularCount: $popularCount /}
+                    {/call}
+
+                {/if}
+
+
+
+                // case 3: your bookmarks
+                {if $yourBookmarks}
+
+                {/if}
+
+                <div class="j-thumb-footer" data-object-id="{$markedObjectId}" data-object-type="{$markedObjectType}">
+                    {call jive.browse.content.activityInfoBlock data="$prop"}
+                        {param objectId:$markedObjectId /}
+                        {param objectType:$markedObjectType /}
+                        {param displaySharedContentCue:$prop.isVisibleToPartner /}
+                    {/call}
+                    <span class="j-thumb-title-meta">
+                        {if $prop.privacyInfo and $prop.privacyInfo.private}
+                            <span src="{buildUrl('/images/transparent.png')}"
+                                class="jive-icon-sml jive-icon-content-private{if $prop.privacyInfo.shared}-shared{/if}"
+                                title="{if $prop.privacyInfo.shared}{i18nText('doc.visibility.restricted.tooltip')}{else}{i18nText('doc.visibility.private.tooltip')}{/if}"
+                                ></span>
+                        {/if}
+                        {if $prop.attachmentInfo and $prop.attachmentInfo.hasAttachments}
+                            <span class="jive-icon-sml jive-icon-content-attachment"></span>
+                        {/if}
+                    </span>
+                </div>
+            </footer>
+            {call jive.browse.content.flipperControl data="$prop"/}
+        </div>
+        <div class="j-thumb-back face card-back j-thumb-back-small" aria-hidden="true">
+            <header>
+            <h6 class="font-color-white"><span class="jive-icon-med {$iconCss}"></span>{$subject|noAutoescape}</h6>
+            </header>
+
+             {call jive.browse.content.thumbnailActionPanel}
+                {param id   : $markedObjectId /}
+                {param type : $markedObjectType /}
+                {param prop : $prop /}
+             {/call}
+            <a href="#" class="j-back-btn j-ui-elem"><span class="j-ui-elem">{i18nText('global.back.button')}</span></a>
+        </div>
+    </div>
+{/template}
+
+/**
+ * @param popularRangeKey
+ * @param popularCount
+ */
+{template .popularBookmarkText}
+    <div class="j-sort-meta font-color-meta js-bookmark-popular-text">
+        // x bookmarks in the past y
+        {i18nText(i18nKey($popularRangeKey, true), $popularCount)}
+    </div>
+{/template}

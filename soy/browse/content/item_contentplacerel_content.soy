@@ -1,0 +1,418 @@
+{namespace jive.browse.contentplacerel autoescape="contextual"}
+
+/**
+* Renders a single content place relationship detail item from a {@link BrowseViewItemBean} instance.
+*
+* @param id The object ID
+* @param type The object type
+* @param columns The columns shown in the details view.
+* @param prop Properties of the content object.
+* @depends template=jive.eae.acclaim.count
+*
+* @allowDependsWildcard
+* @depends i18nKeys=global.access.content.type.*
+* @depends i18nKeys=share.place.author.byline.no.place
+* @depends i18nKeys=share.place.original.place.from
+* @depends i18nKeys=browse.heading.lastmodifiedby
+* @depends i18nKeys=global.by_author
+*/
+{template .detailContentItem}
+    {if $prop.contentPlaceRelationship.referencedObject}
+        <tr class="js-browse-item" data-object-id={$id} data-object-type="{$type}">
+            <td class="j-td-icon">
+                <img src="{resourceUrl('/images/transparent.png')}" alt="{i18nText(i18nKey('global.access.content.type.' + $prop.contentPlaceRelationship.referencedObject.type, true))}" class="{$prop.contentPlaceRelationship.referencedObject.iconCss} jive-icon-big" />
+            </td>
+            <td class="j-td-title">
+                <div>
+                    <a href="{buildUrl($prop.contentPlaceRelationship.referencedObject.link)}">
+                        {if $prop.contentPlaceRelationship.referencedObject.hasUnreadReplies}<strong>{/if}{$prop.contentPlaceRelationship.referencedObject.subject |noAutoescape}{if $prop.contentPlaceRelationship.referencedObject.hasUnreadReplies}</strong>{/if}
+                        {if $prop.contentPlaceRelationship.referencedObject.privacyInfo and $prop.contentPlaceRelationship.referencedObject.privacyInfo.private}
+                            <span src="{buildUrl('/images/transparent.png')}"
+                            class="jive-icon-sml jive-icon-content-private{if $prop.contentPlaceRelationship.referencedObject.privacyInfo.shared}-shared{/if}"
+                            title="{if $prop.contentPlaceRelationship.referencedObject.privacyInfo.shared}{i18nText('doc.visibility.restricted.tooltip')}{else}{i18nText('doc.visibility.private.tooltip')}{/if}"
+                            ></span>
+                        {/if}
+                    </a>
+                    {if $prop.isVisibleToPartner}
+                        <span class="font-color-meta-light j-browse-external-access"> - <em>{i18nText('partner.browse.ext_access')}</em></span>
+                    {/if}
+
+                    <p class="j-browse-content-location font-color-meta-light">
+                        {call jive.shared.soy.i18nHelper}
+                            {param i18nKey}
+                                {i18nKey('share.place.author.byline.no.place')}
+                            {/param}
+                            {param arg0}
+                                {call jive.shared.displayutil.userDisplayNameLink data="$prop.author"}{/call}
+                            {/param}
+                            {param noAutoEscape:true/}
+                        {/call}
+                    </p>
+
+                    <p class="j-browse-content-location font-color-meta-light">
+                        {if $prop.contentPlaceRelationship.referencedObject.prop.place}
+                            {if not ($prop.contentPlaceRelationship.referencedObject.prop.place.type == 2020 or $prop.contentPlaceRelationship.referencedObject.prop.place.type == 37 and $prop.contentPlaceRelationship.referencedObject.prop.author)}
+                                {call jive.shared.soy.i18nHelper}
+                                    {param i18nKey}
+                                        {i18nKey('share.place.original.place.from')}
+                                    {/param}
+                                    {param arg0}
+                                        <a href="{buildUrl($prop.contentPlaceRelationship.referencedObject.prop.place.link)}" class="font-color-meta-light jivecontainerTT-hover-container"
+                                           data-objectId="{$prop.contentPlaceRelationship.referencedObject.prop.place.id}"
+                                           data-objectType="{$prop.contentPlaceRelationship.referencedObject.prop.place.type}">
+                                           {$prop.contentPlaceRelationship.referencedObject.prop.place.subject}
+                                        </a>
+                                    {/param}
+                                    {param noAutoEscape:true/}
+                                {/call}
+                            {elseif $prop.contentPlaceRelationship.referencedObject.prop.place.type == 2020 and not($prop.contentPlaceRelationship.canViewReferencedObject)}
+                                {i18nText('share.place.original.place.no_access')}
+                            {/if}
+                    {else}
+                        {i18nText('share.place.original.place.no_access')}
+                    {/if}
+                    </p>
+                </div>
+            </td>
+            <td class="j-td-author">
+				{if $prop.contentPlaceRelationship.referencedObject.prop.author}
+					{if not $prop.contentPlaceRelationship.referencedObject.prop.isOriginalAuthor}
+						{call jive.shared.soy.i18nHelper}
+							{param i18nKey}
+							    {i18nKey('browse.heading.lastmodifiedby')}
+							{/param}
+							{param arg0}{call jive.shared.displayutil.userDisplayNameLink data="$prop.contentPlaceRelationship.referencedObject.prop.author"}{/call}{/param}
+							{param noAutoEscape}true{/param}
+						{/call}					
+					{else}
+						{call jive.shared.displayutil.userDisplayNameLink data="$prop.contentPlaceRelationship.referencedObject.prop.author"}{/call}
+					{/if}
+				{/if}
+			</td>
+
+            {if $columns and $columns.creationDate}
+                <td class="j-td-date font-color-meta">{formatDate($prop.contentPlaceRelationship.referencedObject.creationDate)}</td>
+            {elseif $prop.lastActivityDate}
+                <td class="j-td-date font-color-meta">{formatDate($prop.contentPlaceRelationship.referencedObject.prop.lastActivityDate)}{sp}
+                    {if $prop.contentPlaceRelationship.referencedObject.prop.author}
+						<span class="font-color-meta-light" style="display: none">
+							{call jive.shared.soy.i18nHelper}
+								{param i18nKey}
+								    {i18nKey('global.by_author')}
+								{/param}
+								{param arg0}{call jive.shared.displayutil.userDisplayNameLink data="$prop.contentPlaceRelationship.referencedObject.prop.author"} {/call}{/param}
+								{param noAutoEscape}true{/param}
+							{/call}
+						</span>
+                    {/if}
+                </td>
+            {else}
+                <td></td>
+            {/if}
+            <td class="j-td-views number font-color-meta">
+                <span title="{i18nText('browse.heading.viewcount')}">
+                {if $prop.contentPlaceRelationship.referencedObject.prop.viewCount and $prop.contentPlaceRelationship.referencedObject.prop.viewCount > -1}{$prop.contentPlaceRelationship.referencedObject.prop.viewCount}
+                {else}
+                    &nbsp;
+                {/if}
+                </span>
+            </td>
+            <td class="j-td-likes number font-color-meta">
+                <span title="{i18nText('browse.heading.likecount')}">
+                    <span class="jive-icon-sml jive-icon-meta-like"></span>
+                    {if not($prop.contentPlaceRelationship.referencedObject.prop.activityInfo.canView)}
+                        {$prop.contentPlaceRelationship.referencedObject.prop.activityInfo.likeCount}
+                    {else}
+                        {call jive.eae.acclaim.count}
+                            {param command:'showAcclaim' /}
+                            {param acclaimType : 'like' /}
+                            {param count}{$prop.contentPlaceRelationship.referencedObject.prop.activityInfo ? $prop.contentPlaceRelationship.referencedObject.prop.activityInfo.likeCount : 0}{/param}
+                            {param objectId:$prop.contentPlaceRelationship.referencedObject.id /}
+                            {param objectType:$prop.contentPlaceRelationship.referencedObject.type /}
+                            {param classes:'j-meta-number' /}
+                            {param accessibilityLinkLabel}
+                                {call jive.shared.soy.getCountTextByType}
+                                    {param count}{$prop.contentPlaceRelationship.referencedObject.prop.activityInfo ? $prop.contentPlaceRelationship.referencedObject.prop.activityInfo.likeCount : 0}{/param}
+                                    {param type:'showlikescount'/}
+                                {/call}
+                            {/param}
+                        {/call}
+                    {/if}
+                </span>
+            </td>
+            <td class="j-td-bookmarks number font-color-meta">
+                <span title="{i18nText('browse.heading.bookmarkcount')}">
+                    <span class="jive-icon-sml jive-icon-meta-bookmark"></span>
+                        {if not($prop.contentPlaceRelationship.referencedObject.prop.activityInfo.canView)}
+                            {$prop.contentPlaceRelationship.referencedObject.prop.activityInfo.bookmarkCount}
+                        {else}
+                            {call jive.eae.acclaim.count}
+                                {param command:'showBookmarks' /}
+                                {param count}
+                                    {$prop.contentPlaceRelationship.referencedObject.prop.activityInfo ? $prop.contentPlaceRelationship.referencedObject.prop.activityInfo.bookmarkCount : 0}
+                                {/param}
+                                {param objectId:$prop.contentPlaceRelationship.referencedObject.id /}
+                                {param objectType:$prop.contentPlaceRelationship.referencedObject.type /}
+                                {param classes:'j-meta-number' /}
+                                {param accessibilityLinkLabel}
+                                    {call jive.shared.soy.getCountTextByType}
+                                        {param count}
+                                            {$prop.contentPlaceRelationship.referencedObject.prop.activityInfo ? $prop.contentPlaceRelationship.referencedObject.prop.activityInfo.bookmarkCount : 0}
+                                        {/param}
+                                        {param type:'showbookmarkscount'/}
+                                    {/call}
+                                {/param}
+                            {/call}
+                        {/if}
+
+                </span>
+            </td>
+            <td class="j-td-replies number font-color-meta">
+                {let $accessibilityLinkLabel}
+                    {call jive.shared.soy.getCountTextByType}
+                        {param count}{$prop.contentPlaceRelationship.referencedObject.prop.activityInfo ? $prop.contentPlaceRelationship.referencedObject.prop.activityInfo.replyCount : 0}{/param}
+                        {param type:'reply'/}
+                    {/call}
+                {/let}
+                {if $accessibilityLinkLabel}
+                    <label class="j-508-label" id="replies-{$prop.contentPlaceRelationship.referencedObject.id}-{$prop.contentPlaceRelationship.referencedObject.type}-count-label">
+                        {$accessibilityLinkLabel}
+                    </label>
+                {/if}
+                <span title="{i18nText('browse.heading.replycount')}">
+                    <img src="{resourceUrl('/images/transparent.png')}" alt="" class="jive-icon-sml jive-icon-meta-comment"/>
+                    <a href="{buildUrl($prop.activityInfo.objectUrl + '#comments')}"
+                        {if $accessibilityLinkLabel}
+                            aria-labelledby="replies-{$prop.contentPlaceRelationship.referencedObject.id}-{$prop.contentPlaceRelationship.referencedObject.type}-count-label"
+                            title="{$accessibilityLinkLabel}"
+                        {/if}
+                    >
+                        {if $prop.contentPlaceRelationship.referencedObject.prop.activityInfo}{$prop.contentPlaceRelationship.referencedObject.prop.activityInfo.replyCount}{else}0{/if}
+                    </a>
+                </span>
+            </td>
+            <td class="j-td-actions">
+                {if $prop.contentPlaceRelationship.canViewReferencedObject}
+                    {call jive.browse.content.flippable data="$prop"}
+                        {param body}
+                            {call jive.browse.content.detailActionPanel data="$prop.contentPlaceRelationship.referencedObject"}
+                                {param contentPlaceRelInfo : $prop.contentPlaceRelationship /}
+                            {/call}
+                        {/param}
+                    {/call}
+                {/if}
+            </td>
+        </tr>
+    {/if}
+{/template}
+
+
+/**
+* Renders a single content place relationship thumbnail item from a {@link BrowseViewItemBean} instance.
+*
+* @depends path=/resources/scripts/apps/browse/content/view/binary_preview.js
+*
+* @param id The object ID
+* @param type The object type
+* @param prop Item properties.
+*
+* @allowDependsWildcard
+* @depends i18nKeys=global.access.content.type.*
+* @depends i18nKeys=share.place.author.byline.original.place
+* @depends i18nKeys=share.place.author.byline.no.place
+*/
+{template .thumbnailContentItem}
+<div class="card">
+    <div class="j-content-thumb j-doc-thumb j-thumb js-browse-item face card-front {call jive.browse.content.flippable data="$prop.contentPlaceRelationship.referencedObject.prop"}{param body: 'flippable'/}{/call}" data-object-type="{$type}" data-object-id="{$id}">
+        <header class="js-thumb-header">
+            <h4>
+                <p class="j-508-label" aria-hidden="true" id="label-{$type}-{$id}">{i18nText(i18nKey('global.access.content.type.' + $prop.contentPlaceRelationship.referencedObject.type, true))} {$prop.contentPlaceRelationship.referencedObject.subject}</p>
+                <a href="{buildUrl($prop.contentPlaceRelationship.referencedObject.link)}" aria-labelledby="label-{$type}-{$id}" title="{i18nText(i18nKey('global.access.content.type.' + $prop.contentPlaceRelationship.referencedObject.type, true))} {$prop.contentPlaceRelationship.referencedObject.subject}">
+                    <span class="jive-icon-med {$prop.contentPlaceRelationship.referencedObject.iconCss}" role="img"></span>
+                    <span class="js-header-text j-header-text" role="header">{$prop.contentPlaceRelationship.referencedObject.subject|noAutoescape}</span>
+                </a>
+            </h4>
+        </header>
+        <section>
+            <article>
+                {if $prop.contentPlaceRelationship.canViewReferencedObject}
+                    {if $prop.contentPlaceRelationship.referencedObject.prop.binaryPreview}
+                        {if $prop.contentPlaceRelationship.referencedObject.prop.binaryPreview.showViewer}
+                            <a href="{buildUrl($prop.contentPlaceRelationship.referencedObject.link)}" data-preview-url="{buildUrl($prop.contentPlaceRelationship.referencedObject.prop.binaryPreview.previewUrl)}">
+                                <img src="{buildUrl($prop.contentPlaceRelationship.referencedObject.prop.binaryPreview.thumbnailUrl)}" class="binary-preview"
+                                    alt="{$prop.contentPlaceRelationship.referencedObject.prop.bodysnippet|noAutoescape}" title="{$prop.contentPlaceRelationship.referencedObject.prop.bodysnippet|noAutoescape}"/>
+                            </a>
+                        {else}
+                            <a href="{buildUrl($prop.contentPlaceRelationship.referencedObject.prop.binaryPreview.previewUrl)}">
+                                                        <img src="{buildUrl($prop.contentPlaceRelationship.referencedObject.prop.binaryPreview.thumbnailUrl)}" class="binary-preview"
+                                                            alt="{$prop.contentPlaceRelationship.referencedObject.prop.bodysnippet|noAutoescape}" title="{$prop.contentPlaceRelationship.referencedObject.prop.bodysnippet|noAutoescape}"/>
+                                                    </a>
+                        {/if}
+                    {elseif $prop.contentPlaceRelationship.referencedObject.prop.bodysnippet}
+                        {$prop.contentPlaceRelationship.referencedObject.prop.bodysnippet|noAutoescape}
+                        // <a href="{buildUrl($link)}" class="j-more">{i18nText('browse.action.viewmore')}</a>
+                    {/if}
+                {elseif not($prop.contentPlaceRelationship.referencedObject.prop.place) or ($prop.contentPlaceRelationship.referencedObject.prop.place.type == 2020 and not($prop.contentPlaceRelationship.canViewReferencedObject))}
+                    // display no-access message if the user wasn't entitled to see the place or the place is a user container and the current user isn't entitled to see the content
+                    {i18nText('share.place.original.place.no_access')}
+                {/if}
+            </article>
+
+            {if ($prop.author)}
+            <div class="j-author-block">
+                <span class="j-avatar-container">
+                    {call jive.shared.displayutil.avatar data="$prop.author"}
+                        {param size: 24 /}
+                    {/call}
+                </span>
+                <div class="j-author-info font-color-meta">
+                {call jive.browse.content.thumbnailDateBlock data="all"/}
+                </div>
+            </div>
+            {/if}
+        </section>
+        <footer>
+            <div class="j-thumb-footer">
+                {call .activityInfoBlock data="$prop.contentPlaceRelationship.referencedObject.prop"}
+                    {param objectId:$prop.contentPlaceRelationship.referencedObject.id /}
+                    {param objectType:$prop.contentPlaceRelationship.referencedObject.type /}
+                {/call}
+                 <span class="j-thumb-title-meta">
+                    {if $prop.contentPlaceRelationship.referencedObject.prop.privacyInfo and $prop.contentPlaceRelationship.referencedObject.prop.privacyInfo.private}
+                        <span src="{buildUrl('/images/transparent.png')}"
+                            class="jive-icon-sml jive-icon-content-private{if $prop.contentPlaceRelationship.referencedObject.prop.privacyInfo.shared}-shared{/if}"
+                            title="{if $prop.contentPlaceRelationship.referencedObject.prop.privacyInfo.shared}{i18nText('doc.visibility.restricted.tooltip')}{else}{i18nText('doc.visibility.private.tooltip')}{/if}"
+                            ></span>
+                    {/if}
+                    {if $prop.contentPlaceRelationship.referencedObject.prop.attachmentInfo and $prop.contentPlaceRelationship.referencedObject.prop.attachmentInfo.hasAttachments}
+                        <span class="jive-icon-sml jive-icon-content-attachment"></span>
+                    {/if}
+                    {if $prop.contentPlaceRelationship.referencedObject.prop.isVisibleToPartner}
+                        <span class="jive-icon-med jive-icon-partner" title="{i18nText('partner.browse.ext_access')}"></span>
+                    {/if}
+                </span>
+            </div>
+        </footer>
+        {call jive.browse.content.flipperControl data="$prop"/}
+    </div>
+    <div class="j-thumb-back face card-back j-thumb-back-small" aria-hidden="true">
+        <header>
+        <h6 class="font-color-white"><span class="jive-icon-med {$prop.contentPlaceRelationship.referencedObject.iconCss}"></span>{$prop.contentPlaceRelationship.referencedObject.subject|noAutoescape}</h6>
+
+        <p class="j-browse-content-location font-color-meta-light">
+            {if $prop.contentPlaceRelationship.referencedObject.prop.place and (not ($prop.contentPlaceRelationship.referencedObject.prop.place.type == 2020 or $prop.contentPlaceRelationship.referencedObject.prop.place.type == 37 and $prop.contentPlaceRelationship.referencedObject.prop.author))}
+                {call jive.shared.soy.i18nHelper}
+                    {param i18nKey}
+                        {i18nKey('share.place.author.byline.original.place')}
+                    {/param}
+                    {param arg0}
+                        {call jive.shared.displayutil.userDisplayNameLink data="$prop.author"}
+                            {param extraCss : 'font-color-meta-light'/}
+                        {/call}
+                    {/param}
+                    {param arg1}
+                        <a href="{buildUrl($prop.contentPlaceRelationship.referencedObject.prop.place.link)}" class="font-color-meta-light jivecontainerTT-hover-container"
+                            data-objectId="{$prop.contentPlaceRelationship.referencedObject.prop.place.id}"
+                            data-objectType="{$prop.contentPlaceRelationship.referencedObject.prop.place.type}">
+                            {$prop.contentPlaceRelationship.referencedObject.prop.place.subject}
+                        </a>
+                    {/param}
+                    {param noAutoEscape:true/}
+                {/call}
+            {else}
+                {call jive.shared.soy.i18nHelper}
+                    {param i18nKey}
+                        {i18nKey('share.place.author.byline.no.place')}
+                    {/param}
+                    {param arg0}
+                        {call jive.shared.displayutil.userDisplayNameLink data="$prop.author"}
+                            {param extraCss : 'font-color-meta-light'/}
+                        {/call}
+                    {/param}
+                    {param noAutoEscape:true/}
+                {/call}
+            {/if}
+            {if $prop.contentPlaceRelationship.removable}
+                {sp}{sp}
+                {call jive.soy.share.removeContentPlaceLinkControl}
+                    {param contentPlaceRelationship : $prop.contentPlaceRelationship /}
+                {/call}
+            {/if}
+        </p>
+
+        </header>
+        {if $prop.contentPlaceRelationship.canViewReferencedObject}
+            {call jive.browse.content.thumbnailActionPanel data="$prop.contentPlaceRelationship.referencedObject"/}
+        {/if}
+        <a href="#" class="j-back-btn"><span class="jive-icon-glyph icon-angle-left"></span> {i18nText('global.back.button')}</a>
+    </div>
+</div>
+{/template}
+
+
+/**
+* Render the activityInfoFooter for content shares.
+*
+* @param  objectId
+* @param  objectType
+* @param? activityInfo An {@link com.jivesoftware.community.browse.rest.impl.ItemActivityBean} instance.
+*/
+{template .activityInfoBlock private="true"}
+    <ul class="j-stats">
+        <li><span class="jive-icon-sml jive-icon-meta-like"></span>
+        {if $activityInfo and $activityInfo.canView}
+            {call jive.eae.acclaim.count}
+                {param command:'showLikes' /}
+                {param count}{if $activityInfo}{$activityInfo.likeCount}{else}0{/if}{/param}
+                {param objectId:$objectId /}
+                {param objectType:$objectType /}
+                {param classes:'j-meta-number' /}
+                {param accessibilityLinkLabel}
+                    {call jive.shared.soy.getCountTextByType}
+                        {param count}{if $activityInfo}{$activityInfo.likeCount}{else}0{/if}{/param}
+                        {param type:'showlikescount'/}
+                    {/call}
+                {/param}
+            {/call}
+        {else}
+            {if $activityInfo}{$activityInfo.likeCount}{else}0{/if}
+        {/if}
+        </li>
+        <li><span class="jive-icon-sml jive-icon-meta-bookmark"></span>
+        {if $activityInfo and $activityInfo.canView}
+            {call jive.eae.acclaim.count}
+                {param command:'showBookmarks' /}
+                {param count}{if $activityInfo}{$activityInfo.bookmarkCount}{else}0{/if}{/param}
+                {param objectId:$objectId /}
+                {param objectType:$objectType /}
+                {param classes:'j-meta-number' /}
+                {param accessibilityLinkLabel}
+                    {call jive.shared.soy.getCountTextByType}
+                        {param count}{if $activityInfo}{$activityInfo.bookmarkCount}{else}0{/if}{/param}
+                        {param type:'showbookmarkscount'/}
+                    {/call}
+                {/param}
+            {/call}
+        {else}
+            {if $activityInfo}{$activityInfo.bookmarkCount}{else}0{/if}
+        {/if}
+        </li>
+        <li>
+            {let $accessibilityLinkLabel}
+                {call jive.shared.soy.getCountTextByType}
+                    {param count}{$activityInfo ? $activityInfo.replyCount : 0}{/param}
+                    {param type:'reply'/}
+                {/call}
+            {/let}
+            {if $accessibilityLinkLabel}
+                <label class="j-508-label" id="replies-{$objectId}-{$objectType}-count-label">
+                    {$accessibilityLinkLabel}
+                </label>
+            {/if}
+            <span class="jive-icon-sml jive-icon-meta-comment"></span>
+            <a href="{buildUrl($activityInfo.objectUrl + '#comment')}"
+                {if $accessibilityLinkLabel}aria-labelledby="replies-{$objectId}-{$objectType}-count-label" title="{$accessibilityLinkLabel}"{/if}>
+            {if $activityInfo}{$activityInfo.replyCount}{else}0{/if}</a>
+        </li>
+    </ul>
+{/template}

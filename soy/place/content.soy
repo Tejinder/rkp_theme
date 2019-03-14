@@ -1,0 +1,191 @@
+{namespace jive.place autoescape="contextual"}
+
+
+/**
+ * Renders the content section for a "place".
+ *
+ * @param place the {@link Place} that we are displaying.
+ * @param browseViewID A unique name for this browse view.
+ * @param archetypeID The ID of the archetype associated with this browse view.
+ * @param itemsView A collection of {@link ContentObjectViewBean}s.
+ * @param filterGroup A {@link FilterGroupBean} object with nested filters.
+ * @param guest Whether or not the current user is the guest user
+ * @param targetUserID The userID of the items being displayed.
+ * @param? layoutClass An optional class passed to the layout div element
+ * @param urlParams map of query parameters for the last request
+ * @param urlPath path for the last request
+ * @param feedUrl The url of the resource that provides a feed representation of this view
+ * @param feedsEnabled
+ * @param canonicalUrl
+ * @param? nextUrl the next paginated url for this page
+ * @param? previousUrl the previous paginated url of this page
+ * @param templateView The model to render the page template.
+ *
+ * @depends path=/resources/scripts/apps/browse/user/model/user_source.js
+ * @depends path=/resources/scripts/apps/browse/content/model/content_source.js
+ * @depends path=/resources/scripts/apps/filters/main.js
+ * @depends path=/resources/scripts/apps/browse/activity/info/main.js
+ * @depends path=/resources/scripts/apps/bookmark_app/main.js
+ * @depends template=jive.place.noContent
+ *
+ * @allowDependsWildcard
+ *
+ * @depends template=jive.browse.content.*
+ * @depends template=jive.browse.contentplacerel.*
+ */
+{template .content}
+     {call jive.skin.template.main data="$templateView"}
+            {param title}
+                {$place.placeTypeName|noAutoescape}: {$place.name|noAutoescape}
+            {/param}
+            {param canonicalUrl: $canonicalUrl/}
+            {param nextUrl : $nextUrl/}
+            {param previousUrl : $previousUrl/}
+            {param metaDescription: $place.description/}
+            {param selectedLinkID: 'jive-nav-link-place'/}
+            {param headContent}
+
+                {call .head data="all" /}
+                 <link class="js-content-feed-link" href="{$feedUrl}" rel="alternate" type="application/atom+xml"  />
+				<link rel="stylesheet" href="/themes/rkp_theme/style/rkp.css" type="text/css" media="all" />
+                {call jive.shared.soy.resourceInlineJs}
+                {param code}
+                $j(document).ready(
+                    function() {lb}
+                        var contentSource = new jive.Browse.Content.ItemSource();
+                        var filterApp = new jive.Filters.Main({lb}
+                            itemSource: contentSource,
+                            userPrefSource: new jive.Browse.User.ItemSource(),
+                            extraParams: {lb}containerType: {$place.objectType}, containerID: {$place.id}{rb},
+                            guest: {$guest},
+                            targetUserID: '{$targetUserID}',
+                            browseViewID: '{$browseViewID |escapeJs}',
+                            archetypeID: '{$archetypeID |escapeJs}',
+                            filterGroup: {buildJson($filterGroup) |noAutoescape},
+                            itemViewID: '{$itemsView.itemViewID |escapeJs}',
+                            pageSize: {$itemsView.pageSize |escapeJs},
+                            token: '{$itemsView.token}',
+                            noResultTemplateConfig: {lb}
+                              templateName: 'jive.place.noContent',
+                              data: {lb}i18nKeyPrefix: '{$place.placeI18nKeyPrefix |escapeJs}'{rb}
+                            {rb}
+                        {rb});
+                        var jiveFollow = new jive.FollowApp.Main({lb}
+                            i18n:null
+                        {rb});
+                        var bookmarkApp = new jive.BookmarkApp.Main({lb}createModalAction: '{buildUrl('create-favorite-popup!input.jspa')}'{rb});
+                    {rb});
+                {/param}
+            {/call}
+			
+        {/param}
+		{param showNav: 'true'/}
+        {param bodyClass: 'j-body-place'/}
+        {param bodyContent}
+            {call .header data="all" /}
+
+            <!-- BEGIN layout -->
+            <div class="j-layout j-layout-sl {if $layoutClass}{$layoutClass}{/if} j-rc4 clearfix">
+
+                <!-- BEGIN large column -->
+                <div class="j-column-wrap-l">
+                    <div class="j-column j-column-l j-rc5">
+
+                        <!-- BEGIN browse & filter block -->
+
+                        {call jive.browse.filter.filters data="$filterGroup"}
+                            {param itemsView: $itemsView /}
+                            {param urlParams: $urlParams /}
+                            {param urlPath: $urlPath /}
+                        {/call}
+
+                    <div id="j-browse-item-grid" class="j-box-body" role="main" aria-label="{i18nText('browse.filter.grid')}">
+                            {call jive.browse.grid.itemGrid data="$itemsView"}
+                                {param browseViewID: $browseViewID/}
+                                {param archetypeID: $archetypeID/}
+                                {param noResultTemplateConfig: ['templateName': 'jive.place.noContent', 'data': ['i18nKeyPrefix': $place.placeI18nKeyPrefix, 'unfiltered': true ]]/}
+                            {/call}
+                        </div>
+
+                        {call jive.browse.grid.moreSearchResultsAvailableHolder data="$itemsView"/}
+
+                        <div class="j-browse-filter-row j-bottom-row j-rc4">
+                            {call jive.shared.soy.paginationLinks}
+                                {param current: $itemsView.pageNumber /}
+                                {param max: $itemsView.pageNumber + ($itemsView.hasNext ? 1 : 0) /}
+                                {param pageSize: $itemsView.pageSize /}
+                                {param urlParams: $urlParams /}
+                                {param urlPath: $urlPath /}
+                            {/call}
+                        </div>
+
+                        <!-- END browse & filter block -->
+
+                        <!-- BEGIN RSS Feed Link -->
+                        {if $feedsEnabled}
+                            <div id="j-friend-feed-link" class="j-friend-feed-link">
+                                <a class="js-content-feed-link" href="{$feedUrl}" data-base-url="{buildUrl('view-browse-feed.jspa','browseSite', 'place-content', 'browseViewID', $browseViewID)}"><span class="jive-icon-glyph icon-feed"></span>{i18nText('browse.rss.feed')}</a>
+                            </div>
+                        {/if}
+                        <!-- END RSS Feed Link -->
+                    </div>
+                </div>
+                <!-- END large column -->
+
+                <!-- BEGIN small column -->
+                <div class="j-column-wrap-s j-sidebar-left">
+                    <div class="j-column j-column-s j-column-s-nav">
+
+                        {if ($filterGroup.filters)}
+                            {foreach $filter in $filterGroup.filters}
+                                {if ($filter.parentOfNested)}
+                                  <nav class="j-second-nav j-second-nav-categories">
+                                    <header>
+                                        <h4>{i18nText('global.categories')}
+                                            {call .clearCategoriesLink data="$filter"}
+                                                {param appliedFilterIDs: $filterGroup.appliedFilterIDs /}
+                                                {param urlParams: $urlParams /}
+                                                {param urlPath: $urlPath /}
+                                            {/call}
+                                        </h4>
+                                    </header>
+                                    <ul>
+                                    {foreach $categoryFilter in $filter.children}
+                                        {if $categoryFilter.nested}
+                                            {call jive.browse.filter.filterGroupItem data="$categoryFilter"}
+                                                {param descriptionIsKey: false/}
+                                                {param iconClass: 'jive-icon-med jive-icon-folder'/}
+                                                {param selected: indexOf($filterGroup.appliedFilterIDs, $categoryFilter.id) > -1 /}
+                                                {param urlPath: $urlPath /}
+                                            {/call}
+                                        {/if}
+                                    {/foreach}
+                                    </ul>
+                                  </nav>
+                                {/if}
+                            {/foreach}
+                        {/if}
+
+                        {call jive.browse.actionlink.actionLinkGroup data="all" /}
+
+                        <!-- BEGIN blog link (if there is a blog in this place) -->
+                        {if $place.blogName and $place.blogUrl}
+                            <div class="j-box j-box-placeblog">
+                                <header><h4>{i18nText('place.viewblog.link')}</h4></header>
+                                <div class="j-box-body">
+                                    <p><a href="{buildUrl($place.blogUrl)}">{$place.blogName}</a></p>
+                                </div>
+                            </div>
+                        {/if}
+                        <!-- END blog link -->
+
+                    </div>
+                </div>
+                <!-- END small column -->
+
+            </div>
+            <!-- END layout -->
+
+        {/param}
+     {/call}
+{/template}
